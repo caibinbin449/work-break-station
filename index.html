@@ -30,7 +30,7 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 .page{display:none}
 .page.active{display:block}
 .page-header{text-align:center;padding:40px 20px 24px;border-bottom:1px solid #e0d5c8;margin-bottom:30px}
-.page-header .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
+.page-header .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;cursor:pointer;transition:opacity .2s}.page-header .brand:hover{opacity:.75}
 .page-header .brand .mini-fish{width:40px;height:40px;border-radius:50%;overflow:hidden}
 .page-header .brand .mini-fish img{width:100%;height:100%;object-fit:cover}
 .page-header .brand h1{font-size:24px;font-weight:700;color:#8b4513;letter-spacing:3px}
@@ -277,7 +277,7 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
     <div id="loginBtnArea"><button class="login-btn" onclick="showLogin()">💚 账号登录</button></div>
   </div>
   <div class="page-header">
-    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼</h1></div>
+    <div class="brand" onclick="goBackToLanding()" title="回到封面"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼</h1></div>
     <div class="date">📅 <span id="todayDate"></span></div>
   </div>
   <div class="page-content">
