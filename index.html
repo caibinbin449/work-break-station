@@ -344,6 +344,8 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 
 /* 新闻：紧凑标题列表 */
 .dash-news .dash-news-cat{font-size:12px;font-weight:700;color:#8b4513;margin:0 0 4px;padding-left:8px;border-left:3px solid #e67e22}
+.dash-cat-more{font-size:11px;color:#999;cursor:pointer;text-decoration:none;padding:2px 0 6px;display:inline-block;transition:color .2s}
+.dash-cat-more:hover{color:#e67e22}
 .dash-news .dash-news-list{display:flex;flex-direction:column;margin-bottom:8px}
 .dash-news .dash-news-list:last-child{margin-bottom:0}
 .dash-news .dash-news-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;cursor:pointer;transition:all .12s;border-bottom:1px solid #f0ebe0}
@@ -1463,8 +1465,11 @@ function renderDashboard(){
   ];
   sections.forEach(function(s){
     h += '<div class="dash-news-cat">'+s.title+'</div><div class="dash-news-list">';
-    s.ids.forEach(function(id){
+    var maxShow = 5;
+    var showIds = s.ids.slice(0, maxShow);
+    showIds.forEach(function(id){
       var n = newsData[id];
+      if (!n) return;
       var brief = n.body.replace(/<[^>]*>/g,'').substring(0,45)+'...';
       h += '<div class="dash-news-row" onclick="event.stopPropagation();history.pushState({view:\'detail\',id:'+id+'},\'\',\'#detail-'+id+'\');navigateTo(\'detail\','+id+')">';
       h += '<span class="ncr-tag '+n.tagClass+'">'+n.tag+'</span>';
@@ -1472,6 +1477,9 @@ function renderDashboard(){
       h += '<span class="ncr-brief">'+brief+'</span>';
       h += '</div>';
     });
+    if (s.ids.length > maxShow) {
+      h += '<a class="dash-cat-more" href="javascript:void(0)" onclick="event.stopPropagation();navigateTo(\'news\');history.pushState({view:\'news\'},\'\',\'#news\')">更多 '+s.title+' ></a>';
+    }
     h += '</div>';
   });
   h += '</div></div>';
@@ -1523,19 +1531,29 @@ function renderDashShare(){
   var h = '';
   if (dashShareTab === 'articles') {
     h += '<div class="dash-article-list">';
-    authorArticles.forEach(function(a){
+    var maxShow = 5;
+    var showArticles = authorArticles.slice(0, maxShow);
+    showArticles.forEach(function(a){
       h += '<div class="dash-article-card" onclick="openArticle(\''+a.id+'\')">';
       h += '<span class="ac-tag '+a.tagClass+'">'+a.tag+'</span>';
       h += '<span class="ac-title">'+a.title+'</span>';
       h += '<span class="ac-date">'+a.date+'</span>';
       h += '</div>';
     });
+    if (authorArticles.length > maxShow) {
+      h += '<a class="dash-cat-more" href="javascript:void(0)" onclick="navigateTo(\'share\');history.pushState({view:\'share\'},\'\',\'#share\')">更多作者分享 ></a>';
+    }
     h += '</div>';
   } else {
     h += '<div class="dash-dl-list">';
-    lawDocuments.forEach(function(d){
+    var maxShow = 5;
+    var showDocs = lawDocuments.slice(0, maxShow);
+    showDocs.forEach(function(d){
       h += '<div class="dash-dl-item"><span class="dl-icon">'+d.icon+'</span><span class="dl-title">'+d.title+'</span><span class="dl-tag">'+d.tag+'</span><span class="dl-size">'+d.size+'</span><div class="dl-actions"><button class="dl-btn read" onclick="event.stopPropagation();viewLawDocument(\''+d.id+'\')">📖 阅读</button><button class="dl-btn share" onclick="event.stopPropagation();shareLawDocument(\''+d.id+'\')">📤 分享</button></div></div>';
     });
+    if (lawDocuments.length > maxShow) {
+      h += '<a class="dash-cat-more" href="javascript:void(0)" onclick="switchDashShareTab(\'downloads\');navigateTo(\'share\');history.pushState({view:\'share\'},\'\',\'#share\')">更多资料下载 ></a>';
+    }
     h += '</div>';
   }
   c.innerHTML = h;
