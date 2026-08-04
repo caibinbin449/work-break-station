@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>茶山烤鱼 - 每日新鲜</title>
-<script src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/3.16.0/cloudbase.full.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;background:#f5f0eb;color:#333;min-height:100vh;overflow-x:hidden}
@@ -547,33 +547,77 @@ function switchLoginTab(tab){
   document.querySelector('.login-header h2').textContent = titles[tab] || '登录';
 }
 
-// ============ 手机短信登录（CloudBase 原生 API） ============
+// ============ 手机短信登录 ============
 var smsTimer = null, smsSeconds = 0;
-var smsVerifyOtp = null;
+var smsVerifyFn = null; // 保存 verifyOtp 回调，可能是函数也可能是包含 data 的对象
 
 function resetSmsCountdown(){
   if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
   smsSeconds = 0;
-  smsVerifyOtp = null;
+  smsVerifyFn = null;
   var b = document.getElementById('sendSmsBtn');
   b.disabled = false; b.classList.remove('counting'); b.textContent = '获取验证码';
 }
 
+// 发送短信验证码：尝试多种 CloudBase API
 async function sendSmsCode(){
-  var phone = document.getElementById('phoneNum').value.trim();
-  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('提示','请输入正确的11位手机号'); return; }
+  var phoneRaw = document.getElementById('phoneNum').value.trim();
+  if (!/^1[3-9]\d{9}$/.test(phoneRaw)) { toast('提示','请输入正确的11位手机号'); return; }
   var btn = document.getElementById('sendSmsBtn');
   btn.disabled = true; btn.textContent = '发送中...';
-  try {
-    // CloudBase Supabase-like SDK: signInWithOtp 发送验证码
-    var r = await auth.signInWithOtp({ phone: '+86' + phone });
-    if (r.error) { toast('发送失败', r.error.message || '验证码发送失败'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
-    // r.data 包含 verifyOtp 回调函数
-    if (!r.data || !r.data.verifyOtp) { toast('发送失败','接口返回异常，请重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
-    smsVerifyOtp = r.data.verifyOtp;
-    toast('已发送','验证码已发送到 ' + phone);
-    startSmsCountdown();
-  } catch(e) { toast('发送失败', (e && e.message) || '请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; }
+
+  var phoneFull = '+86' + phoneRaw;
+  var errMsg = '';
+
+  // 方法1: auth.getVerification — CloudBase 默认短信通道推荐 API
+  if (typeof auth.getVerification === 'function') {
+    try {
+      var r1 = await auth.getVerification({ phone_number: phoneFull });
+      var e1 = r1 && r1.error;
+      if (!e1) {
+        // Supabase 风格: { data, error } 或直接返回 verificationInfo
+        var vInfo = (r1.data && r1.data.verificationInfo) || r1.data || r1.verificationInfo || r1;
+        if (vInfo && typeof vInfo === 'object') {
+          smsVerifyFn = { method: 'getVerification', vInfo: vInfo };
+          toast('已发送','验证码已发送到 ' + phoneRaw);
+          startSmsCountdown(); return;
+        }
+      }
+      errMsg = (e1 && e1.message) || 'getVerification 返回异常';
+    } catch(e1) { errMsg = 'getVerification: ' + (e1.message || 'error'); }
+  }
+
+  // 方法2: auth.signUp({ phone }) — Supabase 风格，自动注册 + 发码
+  if (typeof auth.signUp === 'function') {
+    try {
+      var r2 = await auth.signUp({ phone: phoneFull, nickname: '用户' + phoneRaw.slice(-4) });
+      var e2 = r2 && r2.error;
+      if (!e2 && r2.data && typeof r2.data.verifyOtp === 'function') {
+        smsVerifyFn = { method: 'signUp', fn: r2.data.verifyOtp };
+        toast('已发送','验证码已发送到 ' + phoneRaw);
+        startSmsCountdown(); return;
+      }
+      if (e2 && e2.message) errMsg += (errMsg ? ' | ' : '') + 'signUp: ' + e2.message;
+    } catch(e2) { errMsg += (errMsg ? ' | ' : '') + 'signUp: ' + (e2.message || 'error'); }
+  }
+
+  // 方法3: auth.signInWithOtp({ phone }) — Supabase 风格，已有用户登录发码
+  if (typeof auth.signInWithOtp === 'function') {
+    try {
+      var r3 = await auth.signInWithOtp({ phone: phoneFull });
+      var e3 = r3 && r3.error;
+      if (!e3 && r3.data && typeof r3.data.verifyOtp === 'function') {
+        smsVerifyFn = { method: 'signInWithOtp', fn: r3.data.verifyOtp };
+        toast('已发送','验证码已发送到 ' + phoneRaw);
+        startSmsCountdown(); return;
+      }
+      if (e3 && e3.message) errMsg += (errMsg ? ' | ' : '') + 'signInWithOtp: ' + e3.message;
+    } catch(e3) { errMsg += (errMsg ? ' | ' : '') + 'signInWithOtp: ' + (e3.message || 'error'); }
+  }
+
+  // 全部失败
+  toast('发送失败', errMsg || '短信通道暂不可用，请使用账号密码登录，或联系管理员');
+  btn.disabled = false; btn.textContent = '获取验证码';
 }
 
 function startSmsCountdown(){
@@ -590,19 +634,33 @@ function startSmsCountdown(){
 }
 
 async function doPhoneLogin(){
-  var phone = document.getElementById('phoneNum').value.trim();
+  var phoneRaw = document.getElementById('phoneNum').value.trim();
   var code = document.getElementById('smsCode').value.trim();
-  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('提示','请输入正确的手机号'); return; }
+  if (!/^1[3-9]\d{9}$/.test(phoneRaw)) { toast('提示','请输入正确的手机号'); return; }
   if (!/^\d{6}$/.test(code)) { toast('提示','请输入6位验证码'); return; }
   var btn = document.getElementById('phoneLoginBtn');
   btn.disabled = true; btn.textContent = '验证中...';
   try {
-    if (!smsVerifyOtp) { toast('提示','请先获取验证码'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
-    // CloudBase Supabase-like SDK: verifyOtp 验证短信验证码
-    var lr = await smsVerifyOtp({ token: code });
-    if (lr.error) { toast('验证失败', lr.error.message || '验证码错误或已过期'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
-    // 成功 - lr.data 包含 user 和 session
-    smsVerifyOtp = null;
+    if (!smsVerifyFn) { toast('提示','请先获取验证码'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
+
+    var lr;
+    if (smsVerifyFn.method === 'getVerification') {
+      // getVerification 路径: 用 signInWithSms 验证
+      lr = await auth.signInWithSms({
+        verificationInfo: smsVerifyFn.vInfo,
+        verificationCode: code,
+        phoneNum: '+86' + phoneRaw
+      });
+    } else {
+      // signUp / signInWithOtp 路径: 用 verifyOtp 回调验证
+      lr = await smsVerifyFn.fn({ token: code });
+    }
+
+    var e = lr && lr.error;
+    if (e) { toast('验证失败', e.message || '验证码错误或已过期'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
+
+    // 登录成功
+    smsVerifyFn = null;
     document.getElementById('phoneNum').value = '';
     document.getElementById('smsCode').value = '';
     resetSmsCountdown();
