@@ -19,102 +19,54 @@
 
   /* ========== 烤鱼封面 ========== */
   .landing {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    z-index: 10;
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+    z-index: 10; transition: all 0.8s cubic-bezier(0.4,0,0.2,1); cursor: pointer;
   }
-  .landing.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(1.1);
-  }
+  .landing.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
   .landing .fish-container {
-    position: relative;
-    width: 280px; height: 280px;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 0 60px rgba(255, 107, 53, 0.4), 0 0 120px rgba(255, 107, 53, 0.2);
-    animation: pulse 3s ease-in-out infinite;
-    margin-bottom: 40px;
+    position: relative; width: 280px; height: 280px; border-radius: 50%;
+    overflow: hidden; box-shadow: 0 0 60px rgba(255,107,53,0.4), 0 0 120px rgba(255,107,53,0.2);
+    animation: pulse 3s ease-in-out infinite; margin-bottom: 40px;
   }
-  .landing .fish-container img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
+  .landing .fish-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .landing .fish-container::after {
     content: ''; position: absolute; inset: 0; border-radius: 50%;
     border: 3px solid rgba(255,255,255,0.3); pointer-events: none;
   }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
   .landing .title {
-    font-size: 36px; font-weight: 700; color: #fff;
-    letter-spacing: 6px;
-    text-shadow: 0 2px 20px rgba(255,107,53,0.6);
-    margin-bottom: 16px;
+    font-size: 36px; font-weight: 700; color: #fff; letter-spacing: 6px;
+    text-shadow: 0 2px 20px rgba(255,107,53,0.6); margin-bottom: 16px;
   }
-  .landing .subtitle {
-    font-size: 15px; color: rgba(255,255,255,0.6); letter-spacing: 3px;
-  }
-  .landing .hint {
-    margin-top: 40px; font-size: 14px; color: rgba(255,255,255,0.4);
-    animation: blink 2s ease-in-out infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; }
-  }
-
-  /* ========== 每日话语 ========== */
+  .landing .subtitle { font-size: 15px; color: rgba(255,255,255,0.6); letter-spacing: 3px; }
+  .landing .hint { margin-top: 40px; font-size: 14px; color: rgba(255,255,255,0.4); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:.3} 50%{opacity:.8} }
   .landing .daily-quote {
-    margin-top: 28px; padding: 18px 28px;
-    background: rgba(255,255,255,0.05); border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.08);
-    max-width: 460px; text-align: center;
+    margin-top: 28px; padding: 18px 28px; background: rgba(255,255,255,0.05);
+    border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); max-width: 460px; text-align: center;
   }
-  .landing .daily-quote .quote-label {
-    font-size: 11px; color: rgba(255,255,255,0.3);
-    letter-spacing: 3px; margin-bottom: 10px;
-  }
-  .landing .daily-quote .quote-text {
-    font-size: 15px; color: rgba(255,255,255,0.8);
-    line-height: 1.9; letter-spacing: 1px; min-height: 28px;
-  }
-  .landing .daily-quote .quote-date {
-    font-size: 11px; color: rgba(255,255,255,0.25);
-    margin-top: 10px; letter-spacing: 1px;
-  }
+  .landing .daily-quote .quote-label { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 3px; margin-bottom: 10px; }
+  .landing .daily-quote .quote-text { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.9; letter-spacing: 1px; min-height: 28px; }
+  .landing .daily-quote .quote-date { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 10px; letter-spacing: 1px; }
 
   /* ========== 通用页面容器 ========== */
   .page { display: none; }
   .page.active { display: block; }
   .page-header {
-    text-align: center; padding: 40px 20px 24px;
-    border-bottom: 1px solid #e0d5c8; margin-bottom: 30px;
+    text-align: center; padding: 40px 20px 24px; border-bottom: 1px solid #e0d5c8; margin-bottom: 30px;
   }
-  .page-header .brand {
-    display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;
-  }
-  .page-header .brand .mini-fish {
-    width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
-  }
-  .page-header .brand .mini-fish img {
-    width: 100%; height: 100%; object-fit: cover;
-  }
+  .page-header .brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+  .page-header .brand .mini-fish { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
+  .page-header .brand .mini-fish img { width: 100%; height: 100%; object-fit: cover; }
   .page-header .brand h1 { font-size: 24px; font-weight: 700; color: #8b4513; letter-spacing: 3px; }
   .page-header .date { font-size: 14px; color: #999; margin-top: 8px; }
   .page-header .date span { color: #e67e22; font-weight: 600; }
   .page-back {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 10px 0; font-size: 15px; color: #8b4513; cursor: pointer;
-    margin: 20px 0 0 20px; font-weight: 500; transition: color 0.2s;
+    display: inline-flex; align-items: center; gap: 6px; padding: 10px 0;
+    font-size: 15px; color: #8b4513; cursor: pointer; margin: 20px 0 0 20px;
+    font-weight: 500; transition: color 0.2s;
   }
   .page-back:hover { color: #e67e22; }
   .page-content { max-width: 800px; margin: 0 auto; padding: 0 20px 60px; }
@@ -123,79 +75,143 @@
     border-top: 1px solid #e0d5c8; margin-top: 20px;
   }
   .footer .back-btn {
-    display: inline-block; margin-top: 16px; padding: 8px 24px;
-    background: #8b4513; color: #fff; border-radius: 20px; font-size: 13px;
-    cursor: pointer; transition: background 0.2s;
+    display: inline-block; margin-top: 16px; padding: 8px 24px; background: #8b4513;
+    color: #fff; border-radius: 20px; font-size: 13px; cursor: pointer; transition: background 0.2s;
   }
   .footer .back-btn:hover { background: #a0522d; }
 
+  /* ========== 用户状态栏 ========== */
+  .user-bar {
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    padding: 12px 20px; max-width: 800px; margin: 0 auto;
+  }
+  .user-bar .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #e67e22;
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .user-bar .user-name { font-size: 14px; color: #666; }
+  .user-bar .login-btn {
+    padding: 6px 18px; background: #07c160; color: #fff; border: none;
+    border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;
+    display: flex; align-items: center; gap: 4px; transition: background 0.2s;
+  }
+  .user-bar .login-btn:hover { background: #06ad56; }
+  .user-bar .logout-btn {
+    padding: 4px 12px; background: none; color: #999; border: 1px solid #ddd;
+    border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .user-bar .logout-btn:hover { color: #e74c3c; border-color: #e74c3c; }
+  .user-bar .admin-link {
+    padding: 4px 12px; background: none; color: #8e44ad; border: 1px solid #8e44ad;
+    border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .user-bar .admin-link:hover { background: #8e44ad; color: #fff; }
+
+  /* ========== 登录弹窗 ========== */
+  .login-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .login-overlay.hidden { display: none; }
+  .login-card {
+    background: #fff; border-radius: 18px; width: 420px; max-width: 92vw;
+    overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-card .login-header {
+    background: linear-gradient(135deg, #07c160, #06ad56); padding: 28px 24px;
+    text-align: center; color: #fff; position: relative;
+  }
+  .login-card .login-header .close-btn {
+    position: absolute; top: 12px; right: 16px; width: 32px; height: 32px;
+    border-radius: 50%; background: rgba(255,255,255,0.2); border: none;
+    color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .login-card .login-header .close-btn:hover { background: rgba(255,255,255,0.4); }
+  .login-card .login-header .wx-icon { font-size: 36px; margin-bottom: 8px; }
+  .login-card .login-header h2 { font-size: 20px; font-weight: 600; letter-spacing: 2px; }
+  .login-card .login-header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  .login-card .login-body { padding: 24px; }
+  .login-card .login-tabs {
+    display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px;
+  }
+  .login-card .login-tab {
+    flex: 1; text-align: center; padding: 10px 0; cursor: pointer;
+    font-size: 14px; color: #999; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .login-card .login-tab.active { color: #07c160; border-bottom-color: #07c160; font-weight: 600; }
+  .login-card .login-tab:hover { color: #07c160; }
+  .login-card .login-panel { display: none; }
+  .login-card .login-panel.active { display: block; }
+  .login-card .qr-section { text-align: center; padding: 10px 0; }
+  .login-card .qr-box {
+    width: 180px; height: 180px; margin: 0 auto 16px; background: #f5f5f5;
+    border-radius: 12px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; position: relative; overflow: hidden;
+  }
+  .login-card .qr-box .qr-icon { font-size: 80px; opacity: 0.3; }
+  .login-card .qr-box .qr-text { font-size: 13px; color: #999; margin-top: 8px; }
+  .login-card .qr-tip { font-size: 13px; color: #999; line-height: 1.8; }
+  .login-card .qr-tip a { color: #07c160; cursor: pointer; text-decoration: underline; }
+  .login-card .form-group { margin-bottom: 14px; }
+  .login-card .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+  .login-card .form-group input {
+    width: 100%; padding: 12px 14px; border: 1px solid #e0d5c8; border-radius: 10px;
+    font-size: 14px; outline: none; transition: border-color 0.2s; background: #fafaf7;
+  }
+  .login-card .form-group input:focus { border-color: #07c160; }
+  .login-card .submit-btn {
+    width: 100%; padding: 12px; background: #07c160; color: #fff;
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
+    cursor: pointer; letter-spacing: 2px; transition: background 0.2s; margin-top: 6px;
+  }
+  .login-card .submit-btn:hover { background: #06ad56; }
+  .login-card .register-switch { text-align: center; margin-top: 12px; font-size: 13px; color: #999; }
+  .login-card .register-switch a { color: #07c160; cursor: pointer; }
+
   /* ========== 板块导航 Hub ========== */
   .hub-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 680px;
-    margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 680px; margin: 0 auto;
   }
   .hub-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 36px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    position: relative;
-    overflow: hidden;
+    background: #fff; border-radius: 16px; padding: 36px 24px; text-align: center;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden;
   }
   .hub-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    transition: height 0.3s;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; transition: height 0.3s;
   }
-  .hub-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-  }
+  .hub-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
   .hub-card:hover::before { height: 6px; }
-  .hub-card.news::before { background: linear-gradient(90deg, #e67e22, #f39c12); }
-  .hub-card.share::before { background: linear-gradient(90deg, #2980b9, #3498db); }
-  .hub-card.message::before { background: linear-gradient(90deg, #27ae60, #2ecc71); }
-  .hub-card.legal::before { background: linear-gradient(90deg, #8e44ad, #9b59b6); }
-  .hub-card .hub-icon {
-    font-size: 48px; margin-bottom: 16px; display: block;
-  }
-  .hub-card h2 {
-    font-size: 20px; font-weight: 700; color: #333; margin-bottom: 10px;
-    letter-spacing: 2px;
-  }
-  .hub-card p {
-    font-size: 13px; color: #999; line-height: 1.6;
-  }
+  .hub-card.news::before { background: linear-gradient(90deg,#e67e22,#f39c12); }
+  .hub-card.share::before { background: linear-gradient(90deg,#2980b9,#3498db); }
+  .hub-card.message::before { background: linear-gradient(90deg,#27ae60,#2ecc71); }
+  .hub-card.legal::before { background: linear-gradient(90deg,#8e44ad,#9b59b6); }
+  .hub-card .hub-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+  .hub-card h2 { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 10px; letter-spacing: 2px; }
+  .hub-card p { font-size: 13px; color: #999; line-height: 1.6; }
   .hub-card.news:hover h2 { color: #e67e22; }
   .hub-card.share:hover h2 { color: #2980b9; }
   .hub-card.message:hover h2 { color: #27ae60; }
   .hub-card.legal:hover h2 { color: #8e44ad; }
+  .hub-card .lock-icon { font-size: 13px; color: #ccc; margin-top: 6px; display: none; }
+  .hub-card.login-required .lock-icon { display: block; }
 
   /* ========== 新闻列表 ========== */
   .news-section { margin-bottom: 32px; }
   .news-section .section-title {
-    font-size: 18px; font-weight: 700; color: #8b4513;
-    padding-left: 14px; border-left: 4px solid #e67e22; margin-bottom: 16px; line-height: 1.4;
+    font-size: 18px; font-weight: 700; color: #8b4513; padding-left: 14px;
+    border-left: 4px solid #e67e22; margin-bottom: 16px; line-height: 1.4;
   }
   .news-section .card {
     background: #fff; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer; border-left: 3px solid transparent;
   }
-  .news-section .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    border-left-color: #e67e22;
-  }
+  .news-section .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-left-color: #e67e22; }
   .news-section .card .card-tag {
     display: inline-block; font-size: 11px; font-weight: 600; color: #fff;
     background: #e67e22; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; letter-spacing: 1px;
@@ -204,170 +220,177 @@
   .news-section .card .card-tag.economy { background: #2980b9; }
   .news-section .card .card-tag.tech { background: #8e44ad; }
   .news-section .card .card-tag.world { background: #16a085; }
-  .news-section .card h3 {
-    font-size: 16px; font-weight: 600; color: #222; margin-bottom: 6px; line-height: 1.6;
-  }
-  .news-section .card p {
-    font-size: 14px; color: #666; line-height: 1.8;
-  }
-  .news-section .card .card-more {
-    font-size: 13px; color: #e67e22; margin-top: 8px; font-weight: 500;
-  }
+  .news-section .card h3 { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 6px; line-height: 1.6; }
+  .news-section .card p { font-size: 14px; color: #666; line-height: 1.8; }
+  .news-section .card .card-more { font-size: 13px; color: #e67e22; margin-top: 8px; font-weight: 500; }
 
-  /* ========== 新闻详情页 ========== */
+  /* ========== 新闻详情 ========== */
   .detail-content {
     background: #fff; border-radius: 12px; padding: 30px 30px 40px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-top: 10px;
   }
   .detail-content .detail-tag {
     display: inline-block; font-size: 12px; font-weight: 600; color: #fff;
     background: #e67e22; padding: 3px 12px; border-radius: 4px; margin-bottom: 16px; letter-spacing: 1px;
   }
-  .detail-content .detail-tag.politics { background: #c0392b; }
-  .detail-content .detail-tag.economy { background: #2980b9; }
-  .detail-content .detail-tag.tech { background: #8e44ad; }
-  .detail-content .detail-tag.world { background: #16a085; }
-  .detail-content h1 {
-    font-size: 24px; font-weight: 700; color: #222; line-height: 1.5; margin-bottom: 16px;
-  }
+  .detail-content .detail-tag.politics{background:#c0392b} .detail-content .detail-tag.economy{background:#2980b9}
+  .detail-content .detail-tag.tech{background:#8e44ad} .detail-content .detail-tag.world{background:#16a085}
+  .detail-content h1 { font-size: 24px; font-weight: 700; color: #222; line-height: 1.5; margin-bottom: 16px; }
   .detail-content .detail-meta {
     display: flex; gap: 16px; font-size: 13px; color: #999;
     padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid #eee;
   }
-  .detail-content .detail-body {
-    font-size: 16px; color: #333; line-height: 2; letter-spacing: 0.5px;
-  }
+  .detail-content .detail-body { font-size: 16px; color: #333; line-height: 2; letter-spacing: 0.5px; }
   .detail-content .detail-body p { margin-bottom: 16px; }
-  .detail-content .detail-source {
-    margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee;
-    font-size: 13px; color: #999;
-  }
+  .detail-content .detail-source { margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; font-size: 13px; color: #999; }
 
   /* ========== 资料分享 ========== */
   .resource-list { display: flex; flex-direction: column; gap: 14px; }
   .resource-item {
     background: #fff; border-radius: 12px; padding: 20px 24px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    display: flex; align-items: center; gap: 16px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 4px solid transparent;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); display: flex; align-items: center;
+    gap: 16px; transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid transparent;
   }
-  .resource-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    border-left-color: #2980b9;
-  }
-  .resource-item .res-icon {
-    font-size: 36px; flex-shrink: 0; width: 56px; height: 56px;
-    display: flex; align-items: center; justify-content: center;
-    background: #eef6fd; border-radius: 12px;
-  }
+  .resource-item:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-left-color: #2980b9; }
+  .resource-item .res-icon { font-size: 36px; flex-shrink: 0; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: #eef6fd; border-radius: 12px; }
   .resource-item .res-info { flex: 1; }
-  .resource-item .res-info h3 {
-    font-size: 15px; font-weight: 600; color: #222; margin-bottom: 4px;
-  }
-  .resource-item .res-info p {
-    font-size: 13px; color: #999; line-height: 1.5;
-  }
-  .resource-item .res-tag {
-    font-size: 11px; padding: 3px 10px; border-radius: 12px;
-    background: #eef6fd; color: #2980b9; font-weight: 500; flex-shrink: 0;
-  }
+  .resource-item .res-info h3 { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 4px; }
+  .resource-item .res-info p { font-size: 13px; color: #999; line-height: 1.5; }
+  .resource-item .res-tag { font-size: 11px; padding: 3px 10px; border-radius: 12px; background: #eef6fd; color: #2980b9; font-weight: 500; flex-shrink: 0; }
 
   /* ========== 留言互动 ========== */
   .message-form {
-    background: #fff; border-radius: 12px; padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 24px;
+    background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 24px;
   }
-  .message-form .form-row {
-    display: flex; gap: 12px; margin-bottom: 12px;
+  .message-form .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .message-form textarea {
+    width: 100%; padding: 12px 16px; border: 1px solid #e0d5c8; border-radius: 10px;
+    font-size: 14px; font-family: inherit; outline: none; min-height: 80px; resize: vertical;
+    background: #fafaf7; transition: border-color 0.2s;
   }
-  .message-form input, .message-form textarea {
-    flex: 1; padding: 12px 16px; border: 1px solid #e0d5c8; border-radius: 10px;
-    font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;
-    background: #fafaf7;
-  }
-  .message-form input:focus, .message-form textarea:focus { border-color: #27ae60; }
-  .message-form textarea { width: 100%; min-height: 80px; resize: vertical; }
+  .message-form textarea:focus { border-color: #27ae60; }
+  .message-form .submit-row { display: flex; justify-content: space-between; align-items: center; }
   .message-form button {
     padding: 10px 32px; background: #27ae60; color: #fff; border: none;
     border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600;
-    transition: background 0.2s; letter-spacing: 1px;
+    letter-spacing: 1px; transition: background 0.2s;
   }
   .message-form button:hover { background: #219a52; }
+  .message-form .review-hint {
+    font-size: 12px; color: #e67e22; display: flex; align-items: center; gap: 4px;
+  }
+  .login-gate {
+    text-align: center; padding: 60px 20px; background: #fff; border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .login-gate .gate-icon { font-size: 56px; margin-bottom: 16px; }
+  .login-gate h3 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  .login-gate p { font-size: 14px; color: #999; margin-bottom: 20px; }
+  .login-gate .gate-btn {
+    padding: 10px 32px; background: #07c160; color: #fff; border: none;
+    border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;
+  }
+  .login-gate .gate-btn:hover { background: #06ad56; }
   .message-list { display: flex; flex-direction: column; gap: 12px; }
   .message-item {
     background: #fff; border-radius: 12px; padding: 18px 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    border-left: 3px solid #27ae60;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); border-left: 3px solid #27ae60;
   }
-  .message-item .msg-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+  .message-item .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .message-item .msg-name { font-size: 15px; font-weight: 600; color: #27ae60; }
+  .message-item .msg-time { font-size: 12px; color: #bbb; }
+  .message-item .msg-body { font-size: 14px; color: #555; line-height: 1.8; }
+  .message-item .msg-pending {
+    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px;
+    background: #fef3e2; color: #e67e22; margin-left: 8px;
   }
-  .message-item .msg-name {
-    font-size: 15px; font-weight: 600; color: #27ae60;
-  }
-  .message-item .msg-time {
-    font-size: 12px; color: #bbb;
-  }
-  .message-item .msg-body {
-    font-size: 14px; color: #555; line-height: 1.8;
-  }
-  .msg-empty {
-    text-align: center; padding: 50px 20px; color: #bbb;
-  }
+  .msg-empty { text-align: center; padding: 50px 20px; color: #bbb; }
   .msg-empty .empty-icon { font-size: 56px; margin-bottom: 14px; }
 
   /* ========== 法律咨询 ========== */
   .legal-topics { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
   .legal-topic {
     background: #fff; border-radius: 12px; padding: 20px 24px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 4px solid transparent;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid transparent;
   }
-  .legal-topic:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    border-left-color: #8e44ad;
-  }
-  .legal-topic h3 {
-    font-size: 16px; font-weight: 600; color: #222; margin-bottom: 6px;
-  }
-  .legal-topic p {
-    font-size: 13px; color: #999; line-height: 1.6;
-  }
-  .legal-topic .topic-arrow {
-    color: #8e44ad; font-weight: 700; margin-top: 6px; font-size: 13px;
-  }
+  .legal-topic:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-left-color: #8e44ad; }
+  .legal-topic h3 { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 6px; }
+  .legal-topic p { font-size: 13px; color: #999; line-height: 1.6; }
+  .legal-topic .topic-arrow { color: #8e44ad; font-weight: 700; margin-top: 6px; font-size: 13px; }
   .legal-form {
-    background: #fff; border-radius: 12px; padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
-  .legal-form h3 {
-    font-size: 18px; font-weight: 700; color: #8b4513; margin-bottom: 6px;
-  }
-  .legal-form .form-hint {
-    font-size: 13px; color: #999; margin-bottom: 18px;
-  }
-  .legal-form input, .legal-form textarea, .legal-form select {
+  .legal-form h3 { font-size: 18px; font-weight: 700; color: #8b4513; margin-bottom: 6px; }
+  .legal-form .form-hint { font-size: 13px; color: #999; margin-bottom: 18px; }
+  .legal-form select, .legal-form textarea {
     width: 100%; padding: 12px 16px; border: 1px solid #e0d5c8; border-radius: 10px;
     font-size: 14px; font-family: inherit; outline: none; margin-bottom: 12px;
-    transition: border-color 0.2s; background: #fafaf7;
+    background: #fafaf7; transition: border-color 0.2s;
   }
-  .legal-form input:focus, .legal-form textarea:focus, .legal-form select:focus { border-color: #8e44ad; }
+  .legal-form select:focus, .legal-form textarea:focus { border-color: #8e44ad; }
   .legal-form textarea { min-height: 100px; resize: vertical; }
+  .legal-form .submit-row { display: flex; justify-content: space-between; align-items: center; }
   .legal-form button {
     padding: 10px 32px; background: #8e44ad; color: #fff; border: none;
     border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600;
-    transition: background 0.2s; letter-spacing: 1px;
+    letter-spacing: 1px; transition: background 0.2s;
   }
   .legal-form button:hover { background: #7d3c98; }
   .section-label {
     display: inline-block; font-size: 18px; font-weight: 700; color: #8b4513;
     padding-left: 14px; border-left: 4px solid #8e44ad; margin-bottom: 16px;
   }
+
+  /* ========== 管理后台 ========== */
+  .admin-panel { max-width: 800px; margin: 0 auto; padding: 0 20px 60px; }
+  .admin-panel .admin-header {
+    background: linear-gradient(135deg, #2c3e50, #34495e); color: #fff;
+    border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;
+  }
+  .admin-panel .admin-header h2 { font-size: 20px; letter-spacing: 2px; }
+  .admin-panel .admin-tabs { display: flex; gap: 0; margin-bottom: 20px; }
+  .admin-panel .admin-tab {
+    flex: 1; text-align: center; padding: 12px 0; background: #f0f0f0;
+    cursor: pointer; font-size: 14px; font-weight: 500; color: #666;
+    transition: all 0.2s;
+  }
+  .admin-panel .admin-tab:first-child { border-radius: 8px 0 0 8px; }
+  .admin-panel .admin-tab:last-child { border-radius: 0 8px 8px 0; }
+  .admin-panel .admin-tab.active { background: #8e44ad; color: #fff; }
+  .admin-panel .admin-tab .badge {
+    display: inline-block; background: #e74c3c; color: #fff; font-size: 11px;
+    padding: 1px 7px; border-radius: 10px; margin-left: 6px; min-width: 20px;
+  }
+  .admin-item {
+    background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); border-left: 4px solid #e67e22;
+  }
+  .admin-item .admin-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .admin-item .admin-item-user { font-size: 14px; font-weight: 600; color: #333; }
+  .admin-item .admin-item-time { font-size: 12px; color: #bbb; }
+  .admin-item .admin-item-body { font-size: 14px; color: #555; line-height: 1.8; margin-bottom: 14px; }
+  .admin-item .admin-item-category { font-size: 12px; color: #8e44ad; margin-bottom: 8px; }
+  .admin-item .admin-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .admin-item .btn-approve {
+    padding: 6px 16px; background: #27ae60; color: #fff; border: none;
+    border-radius: 6px; font-size: 13px; cursor: pointer; transition: background 0.2s;
+  }
+  .admin-item .btn-approve:hover { background: #219a52; }
+  .admin-item .btn-reject {
+    padding: 6px 16px; background: #e74c3c; color: #fff; border: none;
+    border-radius: 6px; font-size: 13px; cursor: pointer; transition: background 0.2s;
+  }
+  .admin-item .btn-reject:hover { background: #c0392b; }
+  .admin-item.approved { border-left-color: #27ae60; }
+  .admin-status {
+    display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 10px;
+  }
+  .admin-status.pending { background: #fef3e2; color: #e67e22; }
+  .admin-status.approved { background: #e8f8ef; color: #27ae60; }
+  .admin-status.rejected { background: #fde8e8; color: #e74c3c; }
+  .admin-empty { text-align: center; padding: 50px 20px; color: #bbb; }
 
   @media (max-width: 600px) {
     .landing .fish-container { width: 220px; height: 220px; }
@@ -380,12 +403,53 @@
     .detail-content { padding: 20px 18px 30px; }
     .detail-content h1 { font-size: 20px; }
     .detail-content .detail-body { font-size: 15px; }
-    .message-form .form-row { flex-direction: column; }
+    .message-form .submit-row { flex-direction: column; gap: 12px; align-items: flex-start; }
     .resource-item { flex-direction: column; text-align: center; }
+    .login-card { width: 95vw; }
   }
 </style>
 </head>
 <body>
+
+<!-- ========== 登录弹窗 ========== -->
+<div class="login-overlay hidden" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-header">
+      <button class="close-btn" onclick="closeLogin()">✕</button>
+      <div class="wx-icon">💚</div>
+      <h2>微信扫码登录</h2>
+      <p>登录后可留言互动和法律咨询</p>
+    </div>
+    <div class="login-body">
+      <div class="login-tabs">
+        <div class="login-tab active" data-tab="qr" onclick="switchLoginTab('qr')">扫码登录</div>
+        <div class="login-tab" data-tab="form" onclick="switchLoginTab('form')">快速注册</div>
+      </div>
+      <div class="login-panel active" id="panel-qr">
+        <div class="qr-section">
+          <div class="qr-box">
+            <div class="qr-icon">📱</div>
+            <div class="qr-text">微信扫码</div>
+          </div>
+          <div class="qr-tip">
+            请使用微信扫描二维码<br>
+            或 <a onclick="switchLoginTab('form')">点击此处快速注册</a>
+          </div>
+        </div>
+      </div>
+      <div class="login-panel" id="panel-form">
+        <div class="form-group">
+          <label>微信昵称</label>
+          <input type="text" id="regName" placeholder="请输入您的昵称" maxlength="20">
+        </div>
+        <button class="submit-btn" onclick="doRegister()">💚 一键注册登录</button>
+        <div class="register-switch">
+          已有账号？<a onclick="switchLoginTab('qr')">返回扫码登录</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ========== 烤鱼封面 ========== -->
 <div class="landing" id="landing">
@@ -404,6 +468,17 @@
 
 <!-- ========== 板块导航 Hub ========== -->
 <div class="page" id="hubPage">
+  <div class="user-bar">
+    <div id="userInfo" style="display:none;display:flex;align-items:center;gap:10px;">
+      <div class="user-avatar" id="userAvatar"></div>
+      <span class="user-name" id="userNameDisplay"></span>
+      <button class="admin-link" id="adminBtn" style="display:none;" onclick="goToAdmin()">⚙ 管理后台</button>
+      <button class="logout-btn" onclick="doLogout()">退出</button>
+    </div>
+    <div id="loginBtnArea">
+      <button class="login-btn" onclick="showLogin()">💚 微信登录</button>
+    </div>
+  </div>
   <div class="page-header">
     <div class="brand">
       <div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div>
@@ -423,20 +498,46 @@
         <h2>资料分享</h2>
         <p>实用资料 · 模板工具 · 学习资源</p>
       </div>
-      <div class="hub-card message" onclick="goToMessage()">
+      <div class="hub-card message login-required" onclick="goToMessage()">
         <span class="hub-icon">💬</span>
         <h2>留言互动</h2>
         <p>交流讨论 · 心得分享 · 问题反馈</p>
+        <span class="lock-icon">🔒 需登录</span>
       </div>
-      <div class="hub-card legal" onclick="goToLegal()">
+      <div class="hub-card legal login-required" onclick="goToLegal()">
         <span class="hub-icon">⚖️</span>
         <h2>法律咨询</h2>
         <p>法律知识 · 案例解析 · 合规指南</p>
+        <span class="lock-icon">🔒 需登录</span>
       </div>
     </div>
     <div class="footer" style="margin-top:40px;">
       <p>茶山烤鱼 · 每日新鲜 | 2026年8月4日</p>
       <div class="back-btn" onclick="goBackToLanding()">🐟 返回烤鱼</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 管理后台页 ========== -->
+<div class="page" id="adminPage">
+  <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
+  <div class="admin-panel">
+    <div class="admin-header">
+      <h2>🛡 管理后台</h2>
+      <p style="margin-top:6px;font-size:13px;opacity:0.8;">审核留言和法律咨询</p>
+    </div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="switchAdminTab('messages')">
+        留言审核 <span class="badge" id="msgPendingCount">0</span>
+      </div>
+      <div class="admin-tab" onclick="switchAdminTab('legal')">
+        法律咨询 <span class="badge" id="legalPendingCount">0</span>
+      </div>
+    </div>
+    <div id="adminMessagesList"></div>
+    <div id="adminLegalList" style="display:none;"></div>
+    <div class="footer">
+      <p>管理后台 · 所有操作仅在本地生效</p>
     </div>
   </div>
 </div>
@@ -452,110 +553,32 @@
     <div class="date">📅 <span>2026年8月4日</span> 星期二 · 每日新闻速览</div>
   </div>
   <div class="page-content">
-    <!-- 国内要闻 -->
     <div class="news-section">
       <div class="section-title">🔥 国内要闻</div>
-      <div class="card" data-id="1">
-        <span class="card-tag">政策</span>
-        <h3>新型电力系统建设"十五五"规划发布</h3>
-        <p>国家发改委、国家能源局印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="2">
-        <span class="card-tag economy">经济</span>
-        <h3>上半年海洋生产总值5.5万亿元，同比增长5.1%</h3>
-        <p>我国海洋经济稳步增长，太平岭核电2号机组正式投产。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="3">
-        <span class="card-tag">法规</span>
-        <h3>《集成电路布图设计保护条例》20多年来首次修订</h3>
-        <p>国务院公布修订后的条例，自2026年10月15日起施行。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="4">
-        <span class="card-tag">治理</span>
-        <h3>中央网信办处置违规网络团播账号1840余个</h3>
-        <p>深入推进"清朗·网络娱乐团播乱象整治"专项行动。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="5">
-        <span class="card-tag tech">科技</span>
-        <h3>我国牵头的区块链国际标准在ISO立项</h3>
-        <p>我国首次开展碳效领跑者企业遴选，三部门联合推进重点行业能效提升。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
+      <div class="card" data-id="1"><span class="card-tag">政策</span><h3>新型电力系统建设"十五五"规划发布</h3><p>国家发改委、国家能源局印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="2"><span class="card-tag economy">经济</span><h3>上半年海洋生产总值5.5万亿元，同比增长5.1%</h3><p>我国海洋经济稳步增长，太平岭核电2号机组正式投产。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="3"><span class="card-tag">法规</span><h3>《集成电路布图设计保护条例》20多年来首次修订</h3><p>国务院公布修订后的条例，自2026年10月15日起施行。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="4"><span class="card-tag">治理</span><h3>中央网信办处置违规网络团播账号1840余个</h3><p>深入推进"清朗·网络娱乐团播乱象整治"专项行动。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="5"><span class="card-tag tech">科技</span><h3>我国牵头的区块链国际标准在ISO立项</h3><p>我国首次开展碳效领跑者企业遴选，三部门联合推进重点行业能效提升。</p><div class="card-more">📖 点击阅读详情 →</div></div>
     </div>
-
-    <!-- 财经速递 -->
     <div class="news-section">
       <div class="section-title">💰 财经速递</div>
-      <div class="card" data-id="6">
-        <span class="card-tag economy">金融</span>
-        <h3>人民币国债期货在港交所挂牌上市</h3>
-        <p>证监会主席吴清出席上市仪式，这是内地与香港深化资本市场合作的重要里程碑。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="7">
-        <span class="card-tag economy">数据</span>
-        <h3>保险行业上半年接报案53.3万件，已赔付55.3亿元</h3>
-        <p>20个省份暴雨洪涝、台风、地震等自然灾害，保险业累计估损110.5亿元。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="8">
-        <span class="card-tag">民生</span>
-        <h3>上海集中处罚12家网约车平台，总额超2500万元</h3>
-        <p>上海市交通管理部门约谈全市网约车平台，同步下达首批集中行政处罚决定书。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
+      <div class="card" data-id="6"><span class="card-tag economy">金融</span><h3>人民币国债期货在港交所挂牌上市</h3><p>证监会主席吴清出席上市仪式，内地与香港资本市场合作里程碑。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="7"><span class="card-tag economy">数据</span><h3>保险行业上半年接报案53.3万件，已赔付55.3亿元</h3><p>20个省份暴雨洪涝、台风、地震等自然灾害，保险业累计估损110.5亿元。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="8"><span class="card-tag">民生</span><h3>上海集中处罚12家网约车平台，总额超2500万元</h3><p>上海市交通管理部门约谈全市网约车平台，下达首批集中行政处罚决定书。</p><div class="card-more">📖 点击阅读详情 →</div></div>
     </div>
-
-    <!-- 国际观察 -->
     <div class="news-section">
       <div class="section-title">🌍 国际观察</div>
-      <div class="card" data-id="9">
-        <span class="card-tag world">中东</span>
-        <h3>美伊谈判动态：特朗普称谈判已重启，伊朗否认</h3>
-        <p>美伊双方各执一词，霍尔木兹海峡船舶通行量持续下降至单日9艘。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="10">
-        <span class="card-tag world">贸易</span>
-        <h3>美国25州联合起诉特朗普政府301关税政策</h3>
-        <p>大规模诉讼挑战特朗普关税政策合法性。七国宣布继续增产石油。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="11">
-        <span class="card-tag world">国际</span>
-        <h3>俄乌冲突：俄击落1158架无人机创单日新高</h3>
-        <p>乌克兰对俄境内多处目标实施远程打击，加沙地带以军袭击造成18人死亡。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
+      <div class="card" data-id="9"><span class="card-tag world">中东</span><h3>美伊谈判动态：特朗普称谈判已重启，伊朗否认</h3><p>美伊双方各执一词，霍尔木兹海峡船舶通行量持续下降至单日9艘。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="10"><span class="card-tag world">贸易</span><h3>美国25州联合起诉特朗普政府301关税政策</h3><p>大规模诉讼挑战特朗普关税政策合法性。七国宣布继续增产石油。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="11"><span class="card-tag world">国际</span><h3>俄乌冲突：俄击落1158架无人机创单日新高</h3><p>乌克兰对俄境内多处目标实施远程打击，加沙地带以军袭击造成18人死亡。</p><div class="card-more">📖 点击阅读详情 →</div></div>
     </div>
-
-    <!-- 社会民生 -->
     <div class="news-section">
       <div class="section-title">📋 社会民生</div>
-      <div class="card" data-id="12">
-        <span class="card-tag">天气</span>
-        <h3>台风"白海豚"周四起影响我国，18条河流维持超警</h3>
-        <p>第13号台风"白海豚"预计8月6-7日穿过琉球群岛移入东海。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="13">
-        <span class="card-tag">娱乐</span>
-        <h3>暑期档电影总票房突破75亿元</h3>
-        <p>中国烹饪协会等发布公告，全面清理撤销此前颁发的各类称号。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
-      <div class="card" data-id="14">
-        <span class="card-tag">正能量</span>
-        <h3>00后军人顶着巨浪三次入海救起三人</h3>
-        <p>海南陵水一名军人奋不顾身救援落水群众，赛里木湖景区自驾费调整为按"车"收费。</p>
-        <div class="card-more">📖 点击阅读详情 →</div>
-      </div>
+      <div class="card" data-id="12"><span class="card-tag">天气</span><h3>台风"白海豚"周四起影响我国，18条河流维持超警</h3><p>第13号台风"白海豚"预计8月6-7日穿过琉球群岛移入东海。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="13"><span class="card-tag">娱乐</span><h3>暑期档电影总票房突破75亿元</h3><p>中国烹饪协会等发布公告，全面清理撤销此前颁发的各类称号。</p><div class="card-more">📖 点击阅读详情 →</div></div>
+      <div class="card" data-id="14"><span class="card-tag">正能量</span><h3>00后军人顶着巨浪三次入海救起三人</h3><p>海南陵水一名军人奋不顾身救援落水群众。</p><div class="card-more">📖 点击阅读详情 →</div></div>
     </div>
-
     <div class="footer">
       <p>茶山烤鱼 · 每日新鲜资讯 | 2026年8月4日</p>
       <p style="margin-top:4px;font-size:12px">新闻来源：新华社、央视新闻、国务院、证监会、中央气象台 等</p>
@@ -583,58 +606,14 @@
   </div>
   <div class="page-content">
     <div class="resource-list">
-      <div class="resource-item">
-        <div class="res-icon">📋</div>
-        <div class="res-info">
-          <h3>常用合同模板合集</h3>
-          <p>劳动合同、租赁合同、合作协议等实用模板</p>
-        </div>
-        <span class="res-tag">法律文书</span>
-      </div>
-      <div class="resource-item">
-        <div class="res-icon">📊</div>
-        <div class="res-info">
-          <h3>2026年度个税计算器</h3>
-          <p>最新个税政策下的薪资计算与筹划工具</p>
-        </div>
-        <span class="res-tag">财务工具</span>
-      </div>
-      <div class="resource-item">
-        <div class="res-icon">📖</div>
-        <div class="res-info">
-          <h3>劳动法实务手册</h3>
-          <p>劳动合同签订、解除、加班费计算等常见问题解答</p>
-        </div>
-        <span class="res-tag">实用指南</span>
-      </div>
-      <div class="resource-item">
-        <div class="res-icon">🏢</div>
-        <div class="res-info">
-          <h3>公司注册流程指引</h3>
-          <p>有限责任公司注册全流程，含材料清单与注意事项</p>
-        </div>
-        <span class="res-tag">创业指南</span>
-      </div>
-      <div class="resource-item">
-        <div class="res-icon">🛡️</div>
-        <div class="res-info">
-          <h3>知识产权保护指南</h3>
-          <p>商标注册、专利申请、著作权保护实用手册</p>
-        </div>
-        <span class="res-tag">法律文书</span>
-      </div>
-      <div class="resource-item">
-        <div class="res-icon">💼</div>
-        <div class="res-info">
-          <h3>社保公积金政策汇编</h3>
-          <p>2026年最新五险一金缴纳比例、基数及政策解读</p>
-        </div>
-        <span class="res-tag">政策法规</span>
-      </div>
+      <div class="resource-item"><div class="res-icon">📋</div><div class="res-info"><h3>常用合同模板合集</h3><p>劳动合同、租赁合同、合作协议等实用模板</p></div><span class="res-tag">法律文书</span></div>
+      <div class="resource-item"><div class="res-icon">📊</div><div class="res-info"><h3>2026年度个税计算器</h3><p>最新个税政策下的薪资计算与筹划工具</p></div><span class="res-tag">财务工具</span></div>
+      <div class="resource-item"><div class="res-icon">📖</div><div class="res-info"><h3>劳动法实务手册</h3><p>劳动合同签订、解除、加班费计算等常见问题解答</p></div><span class="res-tag">实用指南</span></div>
+      <div class="resource-item"><div class="res-icon">🏢</div><div class="res-info"><h3>公司注册流程指引</h3><p>有限责任公司注册全流程，含材料清单与注意事项</p></div><span class="res-tag">创业指南</span></div>
+      <div class="resource-item"><div class="res-icon">🛡️</div><div class="res-info"><h3>知识产权保护指南</h3><p>商标注册、专利申请、著作权保护实用手册</p></div><span class="res-tag">法律文书</span></div>
+      <div class="resource-item"><div class="res-icon">💼</div><div class="res-info"><h3>社保公积金政策汇编</h3><p>2026年最新五险一金缴纳比例、基数及政策解读</p></div><span class="res-tag">政策法规</span></div>
     </div>
-    <div class="footer">
-      <p>更多资料持续更新中，敬请关注</p>
-    </div>
+    <div class="footer"><p>更多资料持续更新中，敬请关注</p></div>
   </div>
 </div>
 
@@ -648,18 +627,7 @@
     </div>
     <div class="date">💬 交流讨论 · 心得分享 · 问题反馈</div>
   </div>
-  <div class="page-content">
-    <div class="message-form" id="messageForm">
-      <div class="form-row">
-        <input type="text" id="msgName" placeholder="你的昵称" maxlength="20">
-      </div>
-      <textarea id="msgContent" placeholder="说点什么吧..." maxlength="500"></textarea>
-      <div style="text-align:right;margin-top:10px;">
-        <button onclick="submitMessage()">💬 发布留言</button>
-      </div>
-    </div>
-    <div class="message-list" id="messageList"></div>
-  </div>
+  <div class="page-content" id="messagePageContent"></div>
 </div>
 
 <!-- ========== 法律咨询页 ========== -->
@@ -672,61 +640,11 @@
     </div>
     <div class="date">⚖️ 法律知识 · 案例解析 · 合规指南</div>
   </div>
-  <div class="page-content">
-    <div class="section-label">📌 热门法律话题</div>
-    <div class="legal-topics">
-      <div class="legal-topic">
-        <h3>🔹 劳动合同纠纷常见问题</h3>
-        <p>未签劳动合同如何维权？被违法辞退能拿多少赔偿？加班费怎么算？</p>
-        <div class="topic-arrow">查看详情 →</div>
-      </div>
-      <div class="legal-topic">
-        <h3>🔹 民间借贷法律风险防范</h3>
-        <p>借条怎么写才有效？利率超过多少不受法律保护？没有借条如何举证？</p>
-        <div class="topic-arrow">查看详情 →</div>
-      </div>
-      <div class="legal-topic">
-        <h3>🔹 婚姻家庭财产分割指南</h3>
-        <p>婚前财产如何界定？离婚时房产怎么分？子女抚养权归谁？</p>
-        <div class="topic-arrow">查看详情 →</div>
-      </div>
-      <div class="legal-topic">
-        <h3>🔹 消费者权益保护法解读</h3>
-        <p>买到假货如何索赔？网购七天无理由退货怎么用？商家欺诈怎么办？</p>
-        <div class="topic-arrow">查看详情 →</div>
-      </div>
-    </div>
-
-    <div class="section-label" style="margin-top:32px;">✉️ 在线咨询</div>
-    <div class="legal-form" id="legalForm">
-      <h3>提交法律咨询</h3>
-      <p class="form-hint">请描述您遇到的法律问题，我们将尽快回复</p>
-      <input type="text" id="legalName" placeholder="您的称呼" maxlength="20">
-      <select id="legalCategory">
-        <option value="">请选择咨询类型</option>
-        <option value="劳动纠纷">劳动纠纷</option>
-        <option value="合同纠纷">合同纠纷</option>
-        <option value="婚姻家庭">婚姻家庭</option>
-        <option value="民间借贷">民间借贷</option>
-        <option value="消费维权">消费维权</option>
-        <option value="房产纠纷">房产纠纷</option>
-        <option value="公司法律">公司法律</option>
-        <option value="其他">其他</option>
-      </select>
-      <textarea id="legalContent" placeholder="请详细描述您的问题..." maxlength="2000"></textarea>
-      <div style="text-align:right;">
-        <button onclick="submitLegal()">📨 提交咨询</button>
-      </div>
-    </div>
-
-    <div class="footer">
-      <p>免责声明：本栏目提供法律知识参考，不构成正式法律意见。涉及重大权益，请咨询专业律师。</p>
-    </div>
-  </div>
+  <div class="page-content" id="legalPageContent"></div>
 </div>
 
 <script>
-// ========== 每日话语 ==========
+// ==================== 每日话语 ====================
 const autoQuotes = [
   '每一天都是崭新的开始，用热爱奔赴山海，用坚持书写答案。',
   '你只管努力，剩下的交给时间。星光不负赶路人。',
@@ -760,70 +678,147 @@ const autoQuotes = [
   '看似不起眼的日复一日，会在将来的某一天，突然让你看到坚持的意义。',
   '勇敢的人，不是不落泪的人，而是愿意含着泪继续奔跑的人。'
 ];
-
 function getToday() {
   const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
-
 function getAutoQuoteForToday() {
   const d = new Date();
-  const start = new Date(d.getFullYear(), 0, 0);
+  const start = new Date(d.getFullYear(),0,0);
   const diff = d - start;
-  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const dayOfYear = Math.floor(diff/(1000*60*60*24));
   return autoQuotes[dayOfYear % autoQuotes.length];
 }
-
 function renderQuoteView() {
   const today = getToday();
-  const saved = JSON.parse(localStorage.getItem('dq') || '{}');
+  const saved = JSON.parse(localStorage.getItem('dq')||'{}');
   const text = saved[today] || getAutoQuoteForToday();
-  document.getElementById('dailyQuote').innerHTML = `
-    <div class="quote-label">✦ 今日话语 ✦</div>
-    <div class="quote-text">${escapeHtml(text)}</div>
-    <div class="quote-date">${today}</div>
-  `;
+  document.getElementById('dailyQuote').innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+escapeHtml(text)+'</div><div class="quote-date">'+today+'</div>';
 }
-
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
-
-// 预设今日话语
 (function() {
   const today = getToday();
   if (today === '2026-08-04') {
-    const saved = JSON.parse(localStorage.getItem('dq') || '{}');
-    if (!saved[today]) {
-      saved[today] = '欢迎周五茶山吃烤鱼';
-      localStorage.setItem('dq', JSON.stringify(saved));
-    }
+    const saved = JSON.parse(localStorage.getItem('dq')||'{}');
+    if (!saved[today]) { saved[today] = '欢迎周五茶山吃烤鱼'; localStorage.setItem('dq', JSON.stringify(saved)); }
   }
 })();
 renderQuoteView();
-document.getElementById('dailyQuote').addEventListener('click', function(e) { e.stopPropagation(); });
+document.getElementById('dailyQuote').addEventListener('click', function(e){e.stopPropagation();});
 
-// ========== 新闻详细数据 ==========
+// ==================== 用户认证系统 ====================
+const ADMIN_PASSWORD = 'chashan888';
+
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('currentUser')||'null');
+}
+function setCurrentUser(user) {
+  localStorage.setItem('currentUser', JSON.stringify(user));
+}
+function isLoggedIn() {
+  return getCurrentUser() !== null;
+}
+function isAdmin() {
+  const u = getCurrentUser();
+  return u && u.role === 'admin';
+}
+
+function updateUserUI() {
+  const user = getCurrentUser();
+  const userInfo = document.getElementById('userInfo');
+  const loginBtnArea = document.getElementById('loginBtnArea');
+  const adminBtn = document.getElementById('adminBtn');
+  if (user) {
+    userInfo.style.display = 'flex';
+    loginBtnArea.style.display = 'none';
+    document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('userNameDisplay').textContent = user.name;
+    adminBtn.style.display = (user.role === 'admin') ? 'inline-block' : 'none';
+  } else {
+    userInfo.style.display = 'none';
+    loginBtnArea.style.display = 'block';
+    adminBtn.style.display = 'none';
+  }
+}
+
+function showLogin() {
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  switchLoginTab('qr');
+}
+function closeLogin() {
+  document.getElementById('loginOverlay').classList.add('hidden');
+}
+function switchLoginTab(tab) {
+  document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.login-tab[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  if (!name || name.length < 2) { alert('请输入至少2个字符的昵称'); return; }
+  const user = { name: name, role: 'user', regTime: new Date().toISOString() };
+  setCurrentUser(user);
+  closeLogin();
+  updateUserUI();
+  showToast('登录成功', '欢迎你，'+name+'！');
+}
+
+function doLogout() {
+  localStorage.removeItem('currentUser');
+  updateUserUI();
+  // 如果在需要登录的页面，返回 hub
+  if (['message','legal','admin'].includes(currentView)) {
+    navigateTo('hub');
+    history.replaceState({view:'hub'},'','#hub');
+  }
+  showToast('已退出', '你已退出登录');
+}
+
+function requireLogin(callback) {
+  if (isLoggedIn()) { callback(); return; }
+  showLogin();
+  // 登录成功后自动执行回调
+  const checkInterval = setInterval(function() {
+    if (isLoggedIn()) { clearInterval(checkInterval); callback(); }
+  }, 300);
+  // 最多等30秒
+  setTimeout(function(){ clearInterval(checkInterval); }, 30000);
+}
+
+// Toast 提示
+function showToast(title, msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:14px 24px;border-radius:10px;z-index:200;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:toastIn 0.3s ease;';
+  t.innerHTML = '<strong>'+title+'</strong><br><span style="opacity:0.8;font-size:12px;">'+msg+'</span>';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0';t.style.transition='opacity 0.4s';setTimeout(function(){t.remove();},400); }, 2500);
+}
+
+// ==================== 新闻数据 ====================
 const newsData = {
-  1: { tag: '政策', tagClass: '', title: '新型电力系统建设"十五五"规划发布', date: '2026年8月4日', source: '国家能源局', body: '<p>国家发改委、国家能源局联合印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。这是我国能源领域的一项重大战略部署。</p><p>规划提出六大重点任务：</p><p><strong>一、加快新能源大规模开发。</strong>到2030年风电、太阳能发电总装机容量达到18亿千瓦以上，加快西南水电基地建设，安全有序发展核电。</p><p><strong>二、推动电网全面升级。</strong>建设适应高比例新能源接入的智慧电网，推进跨省跨区输电通道建设，提升电网柔性调节能力。</p><p><strong>三、新能源汽车充电全面升级。</strong>未来五年，全国充电基础设施将实现"县县全覆盖、乡乡有覆盖"，高速公路服务区充电站覆盖率提升至95%以上。</p><p><strong>四、储能规模化发展。</strong>新型储能装机规模达到6000万千瓦以上，推动抽水蓄能电站加快建设。</p><p><strong>五、电力市场化改革深化。</strong>完善电力现货市场，推动新能源全面参与市场交易。</p><p><strong>六、数字化智能化转型。</strong>建设数字电网，推动"云大物移智"技术在电力系统深度应用。</p><p>规划强调，新型电力系统建设将带动超过10万亿元的投资，成为拉动经济增长的重要引擎，同时将有力支撑我国碳达峰碳中和目标的实现。</p>' },
-  2: { tag: '经济', tagClass: 'economy', title: '上半年海洋生产总值5.5万亿元，同比增长5.1%', date: '2026年8月4日', source: '新华社', body: '<p>自然资源部最新数据显示，2026年上半年我国海洋生产总值达到5.5万亿元，同比增长5.1%，海洋经济保持稳步增长态势，发展势头良好。</p><p>多个重大工程取得突破性进展：</p><p><strong>太平岭核电2号机组正式投产。</strong>这是粤港澳大湾区首个"华龙一号"核电一期工程全面建成的标志，两台机组年发电量约200亿千瓦时，可满足粤港澳大湾区约1500万人口的年度用电需求。</p><p><strong>海上风电装机突破5000万千瓦。</strong>我国海上风电累计装机容量已位居全球第一，上半年新增装机超过600万千瓦。</p><p><strong>海洋油气产量再创新高。</strong>上半年海洋原油产量同比增长4.2%，天然气产量同比增长6.8%，深海一号二期工程加快推进。</p><p>此外，海洋旅游业持续复苏，上半年沿海城市接待游客同比增长12%，海洋交通运输业保持平稳增长，港口货物吞吐量同比增长3.8%。</p>' },
-  3: { tag: '法规', tagClass: '', title: '《集成电路布图设计保护条例》20多年来首次修订', date: '2026年8月4日', source: '国务院', body: '<p>国务院总理李强签署国务院令，公布修订后的《集成电路布图设计保护条例》，这是该条例自2001年施行以来的首次全面修订，将于2026年10月15日起施行。</p><p>此次修订的主要亮点包括：</p><p><strong>一、大幅扩展保护范围。</strong>将保护对象从传统集成电路扩展至三维集成、先进封装等新型布图设计，适应芯片技术快速迭代的需求。</p><p><strong>二、完善申请登记程序。</strong>简化申请材料，缩短审查周期，建立快速审查通道，对涉及国家重大战略需求的布图设计实行优先审查。</p><p><strong>三、加大侵权赔偿力度。</strong>引入惩罚性赔偿制度，对故意侵权的可处以实际损失1至5倍的赔偿金；将法定赔偿上限从100万元提高至500万元。</p><p><strong>四、加强行政保护。</strong>赋予知识产权管理部门更强的执法权限，可对侵权产品进行查封扣押。</p><p>工业和信息化部相关负责人表示，此次修订将为我国集成电路产业创新发展提供更强法律保障，有助于激发企业创新积极性，推动芯片产业自主可控。</p>' },
-  4: { tag: '治理', tagClass: '', title: '中央网信办处置违规网络团播账号1840余个', date: '2026年8月4日', source: '中央网信办', body: '<p>中央网信办深入推进"清朗·网络娱乐团播乱象整治"专项行动，近期集中处置了一批违规网络团播账号。</p><p>专项行动重点针对以下突出问题：</p><p><strong>违规PK刺激打赏。</strong>部分直播间设置高额打赏PK环节，诱导观众非理性消费，单个直播间单场打赏金额高达数十万元。</p><p><strong>低俗内容泛滥。</strong>一些主播以低俗表演、色情擦边内容吸引流量，严重污染网络环境。</p><p><strong>侵害未成年人权益。</strong>部分直播间未设置未成年人保护措施，允许未成年人进行大额打赏。</p><p>治理成果：本次专项行动共处置违规账号1840余个，关闭问题直播间320余间，约谈相关平台负责人60余人次。同时，已建立网络团播长效监管机制，要求平台落实主体责任。</p><p>中央网信办表示，将持续高压整治网络直播乱象，为广大网民营造清朗网络空间。</p>' },
-  5: { tag: '科技', tagClass: 'tech', title: '我国牵头的区块链国际标准在ISO立项', date: '2026年8月4日', source: '工信部 / 证监会', body: '<p>近期多项科技和产业政策密集出台：</p><p><strong>区块链国际标准取得重大突破。</strong>由我国牵头的"区块链和分布式记账技术 参考架构"国际标准在ISO正式立项，标志着我国在区块链领域的标准话语权进一步提升。该标准将对区块链系统的架构模型、功能组件、跨链交互等核心内容进行规范。</p><p><strong>碳效领跑者企业首次遴选。</strong>工信部等三部门联合启动碳效领跑者企业遴选工作，在钢铁、水泥、电解铝等重点行业评选碳效领跑者，引导全行业对标提升能效水平。入选企业将在用能权交易、绿色金融等方面享受政策支持。</p><p><strong>内地与香港资本市场合作再深化。</strong>证监会同日推出10项举措，包括扩大沪深港通标的范围、优化基金互认安排、支持香港推出国债期货等金融产品、推动跨境理财通业务升级等，进一步巩固香港国际金融中心地位。</p>' },
-  6: { tag: '金融', tagClass: 'economy', title: '人民币国债期货在港交所挂牌上市', date: '2026年8月4日', source: '中国证监会 / 中国银行业协会', body: '<p>人民币国债期货于8月4日在香港交易所正式挂牌交易，这是内地与香港深化资本市场合作的又一重要里程碑。中国证监会主席吴清出席上市仪式并致辞。</p><p><strong>产品概况：</strong>首批上市合约包括2年期、5年期和10年期三个品种，以境内银行间市场国债为标的，采用人民币计价和现金交割。首个交易日成交活跃，三个品种合计成交超过8000手。</p><p><strong>战略意义：</strong>人民币国债期货的推出，为境外投资者提供了有效的人民币利率风险管理工具，有助于提升人民币债券市场的深度和广度，推动人民币国际化进程。</p><p><strong>金融租赁行业数据：</strong>中国银行业协会同日发布报告，截至2025年末，金融租赁行业总资产达5.23万亿元，同比增长6.3%；不良贷款率降至0.91%，较上年末下降0.12个百分点，整体资产质量持续向好。</p><p>报告显示，金融租赁在支持实体经济方面发挥了重要作用，特别是在航空、船舶、高端装备制造等领域，已成为企业设备更新和技术改造的重要融资渠道。</p>' },
-  7: { tag: '数据', tagClass: 'economy', title: '保险行业上半年接报案53.3万件，已赔付55.3亿元', date: '2026年8月4日', source: '中国保险行业协会 / 财政部', body: '<p>中国保险行业协会发布2026年上半年自然灾害理赔数据，数据显示保险行业积极应对各类自然灾害，保障社会民生。</p><p><strong>理赔数据：</strong>2026年上半年，保险行业针对20个省份的暴雨洪涝、台风、地震等自然灾害，累计接报案53.3万件，已赔付55.3亿元，累计估损金额达110.5亿元。其中，暴雨洪涝灾害赔付占比最高，约为60%。</p><p><strong>重点灾害：</strong>——南方多省暴雨洪涝：6月中下旬，长江中下游地区遭遇持续强降雨，湖南、江西、安徽等省份受灾严重，保险业累计接报案超20万件，赔付金额超30亿元。——台风"格美"：7月下旬登陆福建，造成沿海多地严重损失，保险理赔正在加速推进中。</p><p><strong>财政支持：</strong>财政部同期下达农业防灾减灾和水利救灾资金21.54亿元，支持受灾地区开展农业救灾和水利设施修复，确保粮食安全和群众饮水安全。</p>' },
-  8: { tag: '民生', tagClass: '', title: '上海集中处罚12家网约车平台，总额超2500万元', date: '2026年8月4日', source: '上海市交通委', body: '<p>上海市交通管理部门近日集中约谈全市网约车平台，同日下达首批集中行政处罚决定书，对12家平台共计处罚超2500万元。这是上海近年来对网约车行业力度最大的一次集中整治。</p><p><strong>主要违法行为：</strong>——向无资质车辆和驾驶员派单，这是本次处罚的主要原因，涉及平台未严格审核司机和车辆资质。——未按规定上传运营数据，部分平台数据上传不及时、不完整，逃避监管。——违规调整计价规则，未向主管部门报备即自行调整运价。——对乘客投诉处理不及时，服务质量问题突出。</p><p><strong>配套新闻：</strong>多地近期对牛蛙产品抗生素超标问题开展全面核查抽检。市场监管总局要求各地严查养殖环节违规用药行为，确保水产品质量安全，保障消费者"舌尖上的安全"。</p>' },
-  9: { tag: '中东', tagClass: 'world', title: '美伊谈判动态：特朗普称谈判已重启，伊朗否认', date: '2026年8月4日', source: 'Reuters / 伊朗外交部', body: '<p>美伊关系持续紧张，关于谈判进展双方各执一词。美国总统特朗普于8月3日声称与伊朗的谈判已重新启动，但伊朗方面立即予以否认。</p><p><strong>美方表态：</strong>特朗普在社交媒体上表示，"与伊朗的谈判已于8月3日正式重启，我们希望达成一项公平合理的协议"，但未透露更多谈判细节或参与方。</p><p><strong>伊朗回应：</strong>伊朗外交部发言人发表声明称，"伊朗目前未与美国进行任何形式的谈判"，但同时确认正就霍尔木兹海峡安全问题与阿曼进行磋商，并欢迎一切有助于缓和地区紧张局势的外交努力。</p><p><strong>霍尔木兹海峡局势：</strong>受地缘政治紧张影响，霍尔木兹海峡船舶通行量持续下降，已降至单日仅9艘。作为全球约20%石油运输量的必经通道，海峡通行受阻已对国际油价产生显著影响。</p><p>国际社会普遍呼吁各方保持克制，通过对话解决分歧。中国外交部表示，反对任何可能导致地区局势升级的行为，呼吁有关各方相向而行。</p>' },
-  10: { tag: '贸易', tagClass: 'world', title: '美国25州联合起诉特朗普政府301关税政策', date: '2026年8月4日', source: 'CNN / 新华社', body: '<p>美国25个州的总检察长联合向联邦法院提起诉讼，挑战特朗普政府依据《1974年贸易法》301条款对中国商品加征关税的合法性，这是迄今为止对特朗普关税政策最大规模的法律挑战。</p><p><strong>诉讼理由：</strong>原告方认为，加征关税的决定权属于国会而非总统，特朗普政府滥用《贸易法》301条款授权，超出法定权限范围。诉讼还指出，关税已对美国消费者和企业造成实质性损害。</p><p><strong>经济影响：</strong>据美国有关机构估算，301关税已导致美国家庭年均支出增加约1300美元，美国企业增加的进口成本累计超过1500亿美元。</p><p><strong>石油市场动态：</strong>七国集团成员宣布将继续执行增产计划，沙特、俄罗斯等主要产油国也表达增产意愿。分析师认为，全球原油供应格局正面临新一轮调整，若增产计划全面落实，国际油价可能面临下行压力，布伦特原油价格或在70-75美元/桶区间运行。</p>' },
-  11: { tag: '国际', tagClass: 'world', title: '俄乌冲突：俄击落1158架无人机创单日新高', date: '2026年8月4日', source: '俄罗斯国防部 / 半岛电视台', body: '<p>俄罗斯国防部8月3日通报称，在过去的24小时内，俄防空部队击落了1158架乌克兰无人机，创下冲突以来单日拦截无人机数量最高纪录。</p><p><strong>战场态势：</strong>乌克兰于近期加大了对俄境内目标的远程打击力度，动用大规模无人机群对俄边境地区多个军事设施和能源基础设施发动攻击。分析认为，这是乌方在冲突新阶段采取的"消耗战"策略。</p><p><strong>加沙局势：</strong>同日，加沙地带多地遭遇以军袭击，造成至少18名巴勒斯坦人死亡。埃及、卡塔尔、土耳其三国外交部发表联合声明，强烈谴责以色列持续侵犯加沙地带的巴勒斯坦平民，呼吁立即实现全面停火。</p><p><strong>国际社会反应：</strong>联合国秘书长对加沙平民伤亡表示严重关切，强调保护平民是冲突各方的国际法义务。中国常驻联合国代表呼吁立即停止一切针对平民的暴力行为，推动政治解决进程。</p>' },
-  12: { tag: '天气', tagClass: '', title: '台风"白海豚"周四起影响我国，18条河流维持超警', date: '2026年8月4日', source: '中央气象台 / 应急管理部', body: '<p>中央气象台8月4日继续发布台风蓝色预警：今年第13号台风"白海豚"已于今日凌晨减弱为强台风级，预计将于8月6日至7日穿过琉球群岛移入东海，届时可能对我国东部沿海造成风雨影响。</p><p><strong>台风动态：</strong>"白海豚"中心附近最大风力14级（42米/秒），将以每小时15-20公里的速度向西北方向移动。受其影响，8月5日起东海大部海域将出现8-10级大风，阵风可达11-12级。</p><p><strong>暴雨洪涝持续：</strong>陕西中南部暴雨洪涝灾害仍在持续，多条中小河流出现超警洪水。全国共有18条河流维持超警戒水位，其中汉江上游部分河段超保证水位。</p><p><strong>救援进展：</strong>应急管理部紧急调拨6.5万件（套）救灾物资支援陕西灾区，包括帐篷、折叠床、棉被等生活必需品。国家防总维持防汛四级应急响应，已派出工作组赴灾区指导抢险救援工作。</p><p>气象部门提醒：台风路径仍有不确定性，请沿海地区居民密切关注最新预报预警，做好防风防雨准备。</p>' },
-  13: { tag: '娱乐', tagClass: '', title: '暑期档电影总票房突破75亿元', date: '2026年8月4日', source: '央视新闻', body: '<p>据灯塔专业版数据显示，截至8月3日，2026年暑期档电影总票房（含预售）突破75亿元，观影人次超过1.8亿，多项指标创历史同期新高。</p><p><strong>票房亮点：</strong>国产影片继续保持绝对优势，票房占比超过85%。多部国产动画、科幻、喜剧电影表现亮眼，其中3部影片票房超过10亿元。</p><p><strong>行业整顿：</strong>中国烹饪协会、中国茶叶流通协会近期相继发布公告，宣布全面清理并撤销此前颁发的"烹饪大师""名师""美食地标城市""制茶大师"等各类称号。公告指出，此类称号评选标准和程序不够规范，存在商业化运作倾向，不利于行业健康发展。</p><p>两协会表示，将建立更加科学、规范、透明的行业评价体系，推动烹饪和茶文化产业高质量发展。</p>' },
-  14: { tag: '正能量', tagClass: '', title: '00后军人顶着巨浪三次入海救起三人', date: '2026年8月4日', source: '新华社', body: '<p>近日，海南陵水发生一起感人救援事件。一名00后海军战士在休假期间，发现三名游客被巨浪卷入深海，他毫不犹豫地三次冲入汹涌的海浪中，成功将三人全部救回岸边。</p><p><strong>救援经过：</strong>事发当日下午，风浪较大，三名游客在陵水某海滩游玩时不慎被离岸流卷入深水区。正在附近散步的该名战士听到呼救声后，立即冲入海中。他先后三次往返，每次都将一名落水者拖带回岸边。在救援第三名游客时，他已明显体力不支，但仍然坚持将人安全救回。</p><p><strong>事后回应：</strong>救援结束后，该战士因体力透支和轻微擦伤被送往医院治疗，目前身体状况良好。他表示："作为一名军人，保护人民群众生命安全是我的本能反应，换了谁都会这么做。"</p><p><strong>旅游资讯：</strong>新疆赛里木湖景区近日宣布，自8月20日起，景区自驾游览收费方式将由按"人"收费调整为按"车"收费，7座以下车辆每车次200元。新标准更加合理，将有效降低家庭出游成本。</p>' }
+  1:{tag:'政策',tagClass:'',title:'新型电力系统建设"十五五"规划发布',date:'2026年8月4日',source:'国家能源局',body:'<p>国家发改委、国家能源局联合印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。</p><p>规划提出六大重点任务：加快新能源大规模开发、推动电网全面升级、新能源汽车充电全面升级、储能规模化发展、电力市场化改革深化、数字化智能化转型。规划强调将带动超过10万亿元投资，成为拉动经济增长的重要引擎，有力支撑碳达峰碳中和目标实现。</p>'},
+  2:{tag:'经济',tagClass:'economy',title:'上半年海洋生产总值5.5万亿元，同比增长5.1%',date:'2026年8月4日',source:'新华社',body:'<p>自然资源部数据显示，2026年上半年我国海洋生产总值达到5.5万亿元，同比增长5.1%。太平岭核电2号机组正式投产，海上风电装机突破5000万千瓦，海洋油气产量再创新高。海洋旅游业持续复苏，港口货物吞吐量同比增长3.8%。</p>'},
+  3:{tag:'法规',tagClass:'',title:'《集成电路布图设计保护条例》20多年来首次修订',date:'2026年8月4日',source:'国务院',body:'<p>国务院公布修订后的条例，自2026年10月15日起施行。修订亮点：扩展保护范围至三维集成等新型设计，简化申请程序，引入惩罚性赔偿（最高5倍），法定赔偿上限从100万提高至500万元。</p>'},
+  4:{tag:'治理',tagClass:'',title:'中央网信办处置违规网络团播账号1840余个',date:'2026年8月4日',source:'中央网信办',body:'<p>中央网信办深入推进"清朗·网络娱乐团播乱象整治"专项行动，共处置违规账号1840余个，关闭问题直播间320余间，约谈平台负责人60余人次。已建立长效监管机制。</p>'},
+  5:{tag:'科技',tagClass:'tech',title:'我国牵头的区块链国际标准在ISO立项',date:'2026年8月4日',source:'工信部',body:'<p>由我国牵头的"区块链和分布式记账技术 参考架构"国际标准在ISO正式立项。工信部等三部门联合启动碳效领跑者企业遴选。证监会推出10项举措深化内地与香港资本市场合作。</p>'},
+  6:{tag:'金融',tagClass:'economy',title:'人民币国债期货在港交所挂牌上市',date:'2026年8月4日',source:'中国证监会',body:'<p>人民币国债期货于8月4日在港交所正式挂牌交易，首批合约包括2年、5年和10年期三个品种。金融租赁行业总资产达5.23万亿元，不良贷款率降至0.91%。</p>'},
+  7:{tag:'数据',tagClass:'economy',title:'保险行业上半年接报案53.3万件，已赔付55.3亿元',date:'2026年8月4日',source:'中国保险行业协会',body:'<p>2026年上半年保险行业针对暴雨洪涝、台风、地震等自然灾害累计接报案53.3万件，已赔付55.3亿元，估损110.5亿元。财政部下达农业防灾救灾资金21.54亿元。</p>'},
+  8:{tag:'民生',tagClass:'',title:'上海集中处罚12家网约车平台，总额超2500万元',date:'2026年8月4日',source:'上海市交通委',body:'<p>上海市交通管理部门集中约谈全市网约车平台，对12家平台处罚超2500万元。主要问题：向无资质车辆派单、未上传运营数据、违规调价、投诉处理不及时。</p>'},
+  9:{tag:'中东',tagClass:'world',title:'美伊谈判动态：特朗普称谈判已重启，伊朗否认',date:'2026年8月4日',source:'Reuters',body:'<p>特朗普声称与伊朗谈判已重启，伊朗外交部立即否认。霍尔木兹海峡船舶通行量降至单日仅9艘。国际社会呼吁各方保持克制。</p>'},
+  10:{tag:'贸易',tagClass:'world',title:'美国25州联合起诉特朗普政府301关税政策',date:'2026年8月4日',source:'CNN',body:'<p>美国25州总检察长联合起诉特朗普关税政策，认为关税决定权属国会。据估算301关税已致美国家庭年支出增1300美元。七国宣布继续增产石油。</p>'},
+  11:{tag:'国际',tagClass:'world',title:'俄乌冲突：俄击落1158架无人机创单日新高',date:'2026年8月4日',source:'俄罗斯国防部',body:'<p>俄防空部队单日击落1158架乌无人机创纪录。加沙地带以军袭击致18人死亡，埃及、卡塔尔、土耳其联合谴责。</p>'},
+  12:{tag:'天气',tagClass:'',title:'台风"白海豚"周四起影响我国，18条河流维持超警',date:'2026年8月4日',source:'中央气象台',body:'<p>第13号台风"白海豚"预计8月6-7日移入东海，中心风力14级。全国18条河流超警，应急管理部调拨6.5万件物资支援陕西灾区。</p>'},
+  13:{tag:'娱乐',tagClass:'',title:'暑期档电影总票房突破75亿元',date:'2026年8月4日',source:'央视新闻',body:'<p>2026年暑期档票房突破75亿元，观影1.8亿人次。国产影片占比超85%。中国烹饪协会等宣布清理撤销各类不规范称号。</p>'},
+  14:{tag:'正能量',tagClass:'',title:'00后军人顶着巨浪三次入海救起三人',date:'2026年8月4日',source:'新华社',body:'<p>海南陵水一名00后海军战士休假期间三次冲入巨浪救起三名落水游客，目前身体已恢复。赛里木湖景区自驾费调整为按车收费。</p>'}
 };
 
-// ========== 页面导航系统 ==========
+// ==================== 页面导航 ====================
 const landing = document.getElementById('landing');
 const hubPage = document.getElementById('hubPage');
 const newsPage = document.getElementById('newsPage');
@@ -831,239 +826,366 @@ const detailPage = document.getElementById('detailPage');
 const sharePage = document.getElementById('sharePage');
 const messagePage = document.getElementById('messagePage');
 const legalPage = document.getElementById('legalPage');
+const adminPage = document.getElementById('adminPage');
 const detailContent = document.getElementById('detailContent');
-
-let currentView = 'landing'; // landing | hub | news | detail | share | message | legal
+let currentView = 'landing';
 
 function hideAll() {
-  landing.style.display = 'none';
-  landing.classList.add('hidden');
-  [hubPage, newsPage, detailPage, sharePage, messagePage, legalPage].forEach(p => p.style.display = 'none');
+  landing.style.display = 'none'; landing.classList.add('hidden');
+  [hubPage,newsPage,detailPage,sharePage,messagePage,legalPage,adminPage].forEach(function(p){p.style.display='none';});
 }
-
 function navigateTo(view, data) {
   hideAll();
   currentView = view;
-  switch (view) {
-    case 'landing':
-      landing.style.display = 'flex';
-      landing.classList.remove('hidden');
-      break;
-    case 'hub':
-      hubPage.style.display = 'block';
-      break;
-    case 'news':
-      newsPage.style.display = 'block';
-      break;
+  switch(view) {
+    case 'landing': landing.style.display='flex'; landing.classList.remove('hidden'); break;
+    case 'hub': hubPage.style.display='block'; updateUserUI(); break;
+    case 'news': newsPage.style.display='block'; break;
     case 'detail':
-      const news = newsData[data];
-      if (!news) return;
-      detailContent.innerHTML = `
-        <span class="detail-tag ${news.tagClass}">${news.tag}</span>
-        <h1>${news.title}</h1>
-        <div class="detail-meta">
-          <span>📅 ${news.date}</span>
-          <span>📰 ${news.source}</span>
-        </div>
-        <div class="detail-body">${news.body}</div>
-        <div class="detail-source">来源：${news.source}</div>
-      `;
-      detailPage.style.display = 'block';
-      break;
-    case 'share':
-      sharePage.style.display = 'block';
-      break;
-    case 'message':
-      messagePage.style.display = 'block';
-      renderMessages();
-      break;
-    case 'legal':
-      legalPage.style.display = 'block';
-      break;
+      var n = newsData[data]; if(!n) return;
+      detailContent.innerHTML = '<span class="detail-tag '+n.tagClass+'">'+n.tag+'</span><h1>'+n.title+'</h1><div class="detail-meta"><span>📅 '+n.date+'</span><span>📰 '+n.source+'</span></div><div class="detail-body">'+n.body+'</div><div class="detail-source">来源：'+n.source+'</div>';
+      detailPage.style.display='block'; break;
+    case 'share': sharePage.style.display='block'; break;
+    case 'message': messagePage.style.display='block'; renderMessagePage(); break;
+    case 'legal': legalPage.style.display='block'; renderLegalPage(); break;
+    case 'admin': adminPage.style.display='block'; renderAdminPanel(); break;
   }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // 封面 → Hub
-landing.addEventListener('click', function() {
-  history.pushState({ view: 'hub' }, '', '#hub');
+landing.addEventListener('click', function(){
+  history.pushState({view:'hub'},'','#hub');
   landing.classList.add('hidden');
-  setTimeout(() => navigateTo('hub'), 600);
+  setTimeout(function(){navigateTo('hub');},600);
 });
 
-// Hub → 新闻
-function goToNews() {
-  history.pushState({ view: 'news' }, '', '#news');
-  navigateTo('news');
+function goToNews(){ history.pushState({view:'news'},'','#news'); navigateTo('news'); }
+function goToShare(){ history.pushState({view:'share'},'','#share'); navigateTo('share'); }
+function goToMessage(){
+  requireLogin(function(){
+    history.pushState({view:'message'},'','#message');
+    navigateTo('message');
+  });
 }
+function goToLegal(){
+  requireLogin(function(){
+    history.pushState({view:'legal'},'','#legal');
+    navigateTo('legal');
+  });
+}
+function goToAdmin(){
+  if(!isAdmin()){ alert('仅管理员可访问后台'); return; }
+  history.pushState({view:'admin'},'','#admin');
+  navigateTo('admin');
+}
+function backToNews(){ history.pushState({view:'news'},'','#news'); navigateTo('news'); }
+function goBackToHub(){ history.pushState({view:'hub'},'','#hub'); navigateTo('hub'); }
+function goBackToLanding(){ history.pushState({view:'landing'},'',window.location.pathname); navigateTo('landing'); }
 
-// 新闻列表 → 新闻详情
-document.querySelectorAll('.card[data-id]').forEach(card => {
-  card.addEventListener('click', function() {
-    const id = this.getAttribute('data-id');
-    history.pushState({ view: 'detail', id: id }, '', '#detail-' + id);
-    navigateTo('detail', id);
+document.querySelectorAll('.card[data-id]').forEach(function(card){
+  card.addEventListener('click', function(){
+    var id = this.getAttribute('data-id');
+    history.pushState({view:'detail',id:id},'','#detail-'+id);
+    navigateTo('detail',id);
   });
 });
 
-// 新闻详情 → 返回新闻列表
-function backToNews() {
-  history.pushState({ view: 'news' }, '', '#news');
-  navigateTo('news');
-}
-
-// Hub → 资料分享
-function goToShare() {
-  history.pushState({ view: 'share' }, '', '#share');
-  navigateTo('share');
-}
-
-// Hub → 留言互动
-function goToMessage() {
-  history.pushState({ view: 'message' }, '', '#message');
-  navigateTo('message');
-}
-
-// Hub → 法律咨询
-function goToLegal() {
-  history.pushState({ view: 'legal' }, '', '#legal');
-  navigateTo('legal');
-}
-
-// 各板块 → 返回 Hub
-function goBackToHub() {
-  history.pushState({ view: 'hub' }, '', '#hub');
-  navigateTo('hub');
-}
-
-// 返回封面
-function goBackToLanding() {
-  history.pushState({ view: 'landing' }, '', window.location.pathname);
-  navigateTo('landing');
-}
-
-// 监听浏览器前进/后退
-window.addEventListener('popstate', function(event) {
+window.addEventListener('popstate', function(event){
   if (event.state) {
-    switch (event.state.view) {
+    switch(event.state.view) {
       case 'landing': navigateTo('landing'); break;
       case 'hub': navigateTo('hub'); break;
       case 'news': navigateTo('news'); break;
-      case 'detail': navigateTo('detail', event.state.id); break;
+      case 'detail': navigateTo('detail',event.state.id); break;
       case 'share': navigateTo('share'); break;
       case 'message': navigateTo('message'); break;
       case 'legal': navigateTo('legal'); break;
+      case 'admin': navigateTo('admin'); break;
     }
-  } else {
-    navigateTo('landing');
-  }
+  } else { navigateTo('landing'); }
 });
 
-// 初始加载：根据 URL hash 显示对应页面
-(function() {
-  const hash = window.location.hash;
-  if (hash === '#hub') {
-    history.replaceState({ view: 'hub' }, '', '#hub');
-    landing.style.display = 'none';
-    navigateTo('hub');
-  } else if (hash === '#news') {
-    history.replaceState({ view: 'news' }, '', '#news');
-    landing.style.display = 'none';
-    navigateTo('news');
-  } else if (hash.startsWith('#detail-')) {
-    const id = hash.replace('#detail-', '');
-    history.replaceState({ view: 'detail', id: id }, '', hash);
-    landing.style.display = 'none';
-    navigateTo('detail', id);
-  } else if (hash === '#share') {
-    history.replaceState({ view: 'share' }, '', '#share');
-    landing.style.display = 'none';
-    navigateTo('share');
-  } else if (hash === '#message') {
-    history.replaceState({ view: 'message' }, '', '#message');
-    landing.style.display = 'none';
-    navigateTo('message');
-  } else if (hash === '#legal') {
-    history.replaceState({ view: 'legal' }, '', '#legal');
-    landing.style.display = 'none';
-    navigateTo('legal');
-  } else {
-    history.replaceState({ view: 'landing' }, '', window.location.pathname);
+(function(){
+  var hash = window.location.hash;
+  var views = {hub:'hub',news:'news',share:'share',message:'message',legal:'legal',admin:'admin'};
+  var matched = false;
+  for (var k in views) {
+    if (hash === '#'+k) {
+      history.replaceState({view:views[k]},'','#'+k);
+      landing.style.display='none';
+      navigateTo(views[k]);
+      matched = true; break;
+    }
   }
+  if (!matched && hash.startsWith('#detail-')) {
+    var id = hash.replace('#detail-','');
+    history.replaceState({view:'detail',id:id},'',hash);
+    landing.style.display='none';
+    navigateTo('detail',id);
+    matched = true;
+  }
+  if (!matched) { history.replaceState({view:'landing'},'',window.location.pathname); }
+  updateUserUI();
 })();
 
-// ========== 留言板功能 ==========
+// ==================== 留言系统（含审查） ====================
 function getMessages() {
-  return JSON.parse(localStorage.getItem('messages') || '[]');
+  return JSON.parse(localStorage.getItem('messages_review')||'[]');
 }
-
 function saveMessages(msgs) {
-  localStorage.setItem('messages', JSON.stringify(msgs));
+  localStorage.setItem('messages_review', JSON.stringify(msgs));
 }
 
 function submitMessage() {
-  const name = document.getElementById('msgName').value.trim();
-  const content = document.getElementById('msgContent').value.trim();
-  if (!name) { alert('请输入昵称'); return; }
+  var content = document.getElementById('msgContent').value.trim();
   if (!content) { alert('请输入留言内容'); return; }
-
-  const msgs = getMessages();
+  var user = getCurrentUser();
+  var msgs = getMessages();
   msgs.unshift({
-    name: name,
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2,5),
+    userId: user.name,
+    userName: user.name,
     content: content,
+    status: 'pending',
     time: new Date().toLocaleString('zh-CN')
   });
-  // 最多保留50条
-  if (msgs.length > 50) msgs.length = 50;
   saveMessages(msgs);
-
-  document.getElementById('msgName').value = '';
   document.getElementById('msgContent').value = '';
-  renderMessages();
+  renderMessagePage();
+  showToast('留言已提交', '等待管理员审核后公开显示');
 }
 
-function renderMessages() {
-  const msgs = getMessages();
-  const list = document.getElementById('messageList');
-  if (msgs.length === 0) {
-    list.innerHTML = '<div class="msg-empty"><div class="empty-icon">💬</div><p>还没有留言，来抢沙发吧！</p></div>';
+function getApprovedMessages() {
+  return getMessages().filter(function(m){return m.status==='approved';});
+}
+
+function getUserPendingMessages() {
+  var user = getCurrentUser();
+  if (!user) return [];
+  return getMessages().filter(function(m){return m.userId===user.name&&m.status==='pending';});
+}
+
+function renderMessagePage() {
+  var container = document.getElementById('messagePageContent');
+  if (!isLoggedIn()) {
+    container.innerHTML = '<div class="login-gate"><div class="gate-icon">🔒</div><h3>请先登录</h3><p>登录后即可留言互动</p><button class="gate-btn" onclick="showLogin()">💚 微信登录</button></div>';
+    return;
+  }
+  var user = getCurrentUser();
+  var pendingMsgs = getMessages().filter(function(m){return m.userId===user.name&&m.status==='pending';});
+  var approvedMsgs = getApprovedMessages();
+
+  var html = '<div class="message-form"><div class="form-row"><textarea id="msgContent" placeholder="说点什么吧..." maxlength="500"></textarea></div><div class="submit-row"><span class="review-hint">📝 留言需经管理员审核后公开显示</span><button onclick="submitMessage()">💬 发布留言</button></div></div>';
+
+  // 显示用户自己的待审留言
+  if (pendingMsgs.length > 0) {
+    html += '<div style="margin-bottom:20px;"><div style="font-size:14px;color:#e67e22;margin-bottom:10px;">⏳ 你提交的待审留言（'+pendingMsgs.length+'条）</div>';
+    pendingMsgs.forEach(function(m){
+      html += '<div class="message-item" style="border-left-color:#e67e22;"><div class="msg-header"><span class="msg-name">'+escapeHtml(m.userName)+'<span class="msg-pending">审核中</span></span><span class="msg-time">'+m.time+'</span></div><div class="msg-body">'+escapeHtml(m.content)+'</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // 公开留言
+  html += '<div class="message-list" id="publicMessageList">';
+  if (approvedMsgs.length === 0) {
+    html += '<div class="msg-empty"><div class="empty-icon">💬</div><p>还没有留言，来抢沙发吧！</p></div>';
   } else {
-    list.innerHTML = msgs.map(m => `
-      <div class="message-item">
-        <div class="msg-header">
-          <span class="msg-name">${escapeHtml(m.name)}</span>
-          <span class="msg-time">${m.time}</span>
-        </div>
-        <div class="msg-body">${escapeHtml(m.content)}</div>
-      </div>
-    `).join('');
+    approvedMsgs.forEach(function(m){
+      html += '<div class="message-item"><div class="msg-header"><span class="msg-name">'+escapeHtml(m.userName)+'</span><span class="msg-time">'+m.time+'</span></div><div class="msg-body">'+escapeHtml(m.content)+'</div></div>';
+    });
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ==================== 法律咨询系统（含审查） ====================
+function getLegalInquiries() {
+  return JSON.parse(localStorage.getItem('legal_review')||'[]');
+}
+function saveLegalInquiries(items) {
+  localStorage.setItem('legal_review', JSON.stringify(items));
+}
+
+function submitLegal() {
+  var category = document.getElementById('legalCategory').value;
+  var content = document.getElementById('legalContent').value.trim();
+  if (!category) { alert('请选择咨询类型'); return; }
+  if (!content) { alert('请描述您的问题'); return; }
+  var user = getCurrentUser();
+  var items = getLegalInquiries();
+  items.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2,5),
+    userId: user.name,
+    userName: user.name,
+    category: category,
+    content: content,
+    status: 'pending',
+    time: new Date().toLocaleString('zh-CN')
+  });
+  saveLegalInquiries(items);
+  document.getElementById('legalCategory').value = '';
+  document.getElementById('legalContent').value = '';
+  renderLegalPage();
+  showToast('咨询已提交', '等待管理员审核后回复');
+}
+
+function getApprovedLegalInquiries() {
+  return getLegalInquiries().filter(function(i){return i.status==='approved';});
+}
+
+function renderLegalPage() {
+  var container = document.getElementById('legalPageContent');
+  if (!isLoggedIn()) {
+    container.innerHTML = '<div class="login-gate"><div class="gate-icon">🔒</div><h3>请先登录</h3><p>登录后即可使用法律咨询</p><button class="gate-btn" onclick="showLogin()">💚 微信登录</button></div>';
+    return;
+  }
+  var user = getCurrentUser();
+  var pendingItems = getLegalInquiries().filter(function(i){return i.userId===user.name&&i.status==='pending';});
+  var approvedItems = getApprovedLegalInquiries();
+
+  var html = '<div class="section-label">📌 热门法律话题</div><div class="legal-topics">';
+  html += '<div class="legal-topic"><h3>🔹 劳动合同纠纷常见问题</h3><p>未签劳动合同如何维权？被违法辞退能拿多少赔偿？</p><div class="topic-arrow">查看详情 →</div></div>';
+  html += '<div class="legal-topic"><h3>🔹 民间借贷法律风险防范</h3><p>借条怎么写才有效？利率超过多少不受法律保护？</p><div class="topic-arrow">查看详情 →</div></div>';
+  html += '<div class="legal-topic"><h3>🔹 婚姻家庭财产分割指南</h3><p>婚前财产如何界定？离婚时房产怎么分？</p><div class="topic-arrow">查看详情 →</div></div>';
+  html += '<div class="legal-topic"><h3>🔹 消费者权益保护法解读</h3><p>买到假货如何索赔？网购七天无理由退货怎么用？</p><div class="topic-arrow">查看详情 →</div></div>';
+  html += '</div>';
+
+  // 用户自己的待审咨询
+  if (pendingItems.length > 0) {
+    html += '<div style="margin-top:24px;"><div style="font-size:14px;color:#e67e22;margin-bottom:10px;">⏳ 你提交的待审咨询（'+pendingItems.length+'条）</div>';
+    pendingItems.forEach(function(i){
+      html += '<div class="message-item" style="border-left-color:#e67e22;margin-bottom:10px;"><div class="msg-header"><span class="msg-name">'+escapeHtml(i.userName)+'<span class="msg-pending">审核中</span></span><span class="msg-time">'+i.time+'</span></div><div class="admin-item-category">分类：'+i.category+'</div><div class="msg-body">'+escapeHtml(i.content)+'</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // 公开咨询
+  html += '<div style="margin-top:24px;"><div class="section-label">💬 已回复咨询</div>';
+  if (approvedItems.length === 0) {
+    html += '<div class="msg-empty"><p>暂无公开咨询</p></div>';
+  } else {
+    approvedItems.forEach(function(i){
+      html += '<div class="message-item" style="border-left-color:#8e44ad;margin-bottom:10px;"><div class="msg-header"><span class="msg-name">'+escapeHtml(i.userName)+'</span><span class="msg-time">'+i.time+'</span></div><div class="admin-item-category">分类：'+i.category+'</div><div class="msg-body">'+escapeHtml(i.content)+'</div></div>';
+    });
+  }
+  html += '</div>';
+
+  // 提交表单
+  html += '<div class="section-label" style="margin-top:32px;">✉️ 在线咨询</div>';
+  html += '<div class="legal-form"><h3>提交法律咨询</h3><p class="form-hint">请描述您遇到的法律问题，审核通过后将公开回复</p>';
+  html += '<select id="legalCategory"><option value="">请选择咨询类型</option><option value="劳动纠纷">劳动纠纷</option><option value="合同纠纷">合同纠纷</option><option value="婚姻家庭">婚姻家庭</option><option value="民间借贷">民间借贷</option><option value="消费维权">消费维权</option><option value="房产纠纷">房产纠纷</option><option value="公司法律">公司法律</option><option value="其他">其他</option></select>';
+  html += '<textarea id="legalContent" placeholder="请详细描述您的问题..." maxlength="2000"></textarea>';
+  html += '<div class="submit-row"><span class="review-hint">📝 咨询需经管理员审核后公开显示</span><button onclick="submitLegal()">📨 提交咨询</button></div></div>';
+  html += '<div class="footer"><p>免责声明：本栏目提供法律知识参考，不构成正式法律意见。涉及重大权益，请咨询专业律师。</p></div>';
+  container.innerHTML = html;
+}
+
+// ==================== 管理后台 ====================
+var adminTab = 'messages';
+function switchAdminTab(tab) {
+  adminTab = tab;
+  document.querySelectorAll('.admin-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelector('.admin-tab:'+(tab==='messages'?'first':'last')+'-child').classList.add('active');
+  // Update the correct tab
+  var tabs = document.querySelectorAll('.admin-tab');
+  tabs[0].classList.toggle('active', tab==='messages');
+  tabs[1].classList.toggle('active', tab==='legal');
+  renderAdminPanel();
+}
+
+function renderAdminPanel() {
+  // Refresh tab active states
+  var tabs = document.querySelectorAll('.admin-tab');
+  if (tabs.length >= 2) {
+    tabs[0].classList.toggle('active', adminTab==='messages');
+    tabs[1].classList.toggle('active', adminTab==='legal');
+  }
+
+  var msgs = getMessages();
+  var legals = getLegalInquiries();
+  var pendingMsgs = msgs.filter(function(m){return m.status==='pending';});
+  var pendingLegals = legals.filter(function(l){return l.status==='pending';});
+
+  document.getElementById('msgPendingCount').textContent = pendingMsgs.length;
+  document.getElementById('legalPendingCount').textContent = pendingLegals.length;
+
+  if (adminTab === 'messages') {
+    document.getElementById('adminMessagesList').style.display = 'block';
+    document.getElementById('adminLegalList').style.display = 'none';
+    renderAdminMessages(msgs);
+  } else {
+    document.getElementById('adminMessagesList').style.display = 'none';
+    document.getElementById('adminLegalList').style.display = 'block';
+    renderAdminLegal(legals);
   }
 }
 
-// ========== 法律咨询表单 ==========
-function submitLegal() {
-  const name = document.getElementById('legalName').value.trim();
-  const category = document.getElementById('legalCategory').value;
-  const content = document.getElementById('legalContent').value.trim();
-  if (!name) { alert('请输入您的称呼'); return; }
-  if (!category) { alert('请选择咨询类型'); return; }
-  if (!content) { alert('请描述您的问题'); return; }
-
-  const inquiries = JSON.parse(localStorage.getItem('legalInquiries') || '[]');
-  inquiries.unshift({
-    name: name,
-    category: category,
-    content: content,
-    time: new Date().toLocaleString('zh-CN')
-  });
-  localStorage.setItem('legalInquiries', JSON.stringify(inquiries));
-
-  document.getElementById('legalName').value = '';
-  document.getElementById('legalCategory').value = '';
-  document.getElementById('legalContent').value = '';
-  alert('咨询已提交成功！我们会尽快回复您。');
+function renderAdminMessages(msgs) {
+  var list = document.getElementById('adminMessagesList');
+  if (msgs.length === 0) {
+    list.innerHTML = '<div class="admin-empty">暂无留言记录</div>'; return;
+  }
+  list.innerHTML = msgs.map(function(m){
+    var statusLabel = m.status==='pending'?'待审核':(m.status==='approved'?'已通过':'已拒绝');
+    return '<div class="admin-item '+m.status+'"><div class="admin-item-header"><span class="admin-item-user">'+escapeHtml(m.userName)+' <span class="admin-status '+m.status+'">'+statusLabel+'</span></span><span class="admin-item-time">'+m.time+'</span></div><div class="admin-item-body">'+escapeHtml(m.content)+'</div>'+(
+      m.status==='pending' ? '<div class="admin-actions"><button class="btn-approve" onclick="approveMessage(\''+m.id+'\')">✓ 审核通过</button><button class="btn-reject" onclick="rejectMessage(\''+m.id+'\')">✕ 拒绝</button></div>' : ''
+    )+'</div>';
+  }).join('');
 }
-</script>
 
+function renderAdminLegal(legals) {
+  var list = document.getElementById('adminLegalList');
+  if (legals.length === 0) {
+    list.innerHTML = '<div class="admin-empty">暂无咨询记录</div>'; return;
+  }
+  list.innerHTML = legals.map(function(l){
+    var statusLabel = l.status==='pending'?'待审核':(l.status==='approved'?'已通过':'已拒绝');
+    return '<div class="admin-item '+l.status+'"><div class="admin-item-header"><span class="admin-item-user">'+escapeHtml(l.userName)+' <span class="admin-status '+l.status+'">'+statusLabel+'</span></span><span class="admin-item-time">'+l.time+'</span></div><div class="admin-item-category">分类：'+l.category+'</div><div class="admin-item-body">'+escapeHtml(l.content)+'</div>'+(
+      l.status==='pending' ? '<div class="admin-actions"><button class="btn-approve" onclick="approveLegal(\''+l.id+'\')">✓ 审核通过</button><button class="btn-reject" onclick="rejectLegal(\''+l.id+'\')">✕ 拒绝</button></div>' : ''
+    )+'</div>';
+  }).join('');
+}
+
+function approveMessage(id) {
+  var msgs = getMessages();
+  for (var i=0;i<msgs.length;i++) { if(msgs[i].id===id){msgs[i].status='approved';break;} }
+  saveMessages(msgs);
+  renderAdminPanel();
+  showToast('已通过','留言已公开显示');
+}
+function rejectMessage(id) {
+  var msgs = getMessages();
+  for (var i=0;i<msgs.length;i++) { if(msgs[i].id===id){msgs[i].status='rejected';break;} }
+  saveMessages(msgs);
+  renderAdminPanel();
+  showToast('已拒绝','留言已被拒绝');
+}
+function approveLegal(id) {
+  var items = getLegalInquiries();
+  for (var i=0;i<items.length;i++) { if(items[i].id===id){items[i].status='approved';break;} }
+  saveLegalInquiries(items);
+  renderAdminPanel();
+  showToast('已通过','咨询已公开显示');
+}
+function rejectLegal(id) {
+  var items = getLegalInquiries();
+  for (var i=0;i<items.length;i++) { if(items[i].id===id){items[i].status='rejected';break;} }
+  saveLegalInquiries(items);
+  renderAdminPanel();
+  showToast('已拒绝','咨询已被拒绝');
+}
+
+// 管理员快捷入口：在控制台输入 makeAdmin() 将当前登录用户设为管理员
+window.makeAdmin = function() {
+  var user = getCurrentUser();
+  if (!user) { console.log('请先登录'); return; }
+  user.role = 'admin';
+  setCurrentUser(user);
+  updateUserUI();
+  console.log(user.name + ' 已设为管理员');
+};
+</script>
 </body>
 </html>
