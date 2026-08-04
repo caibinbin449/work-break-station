@@ -737,14 +737,8 @@ async function sendSmsCode(){
         toast('发送失败', msg || '接口不可用(需在真实浏览器中打开网站)');
         btn.disabled = false; btn.textContent = '获取验证码'; return;
       }
-    } else {
-      toast('发送失败', 'SDK不支持getVerification，请确认在真实浏览器中打开(非App内置预览)');
-      btn.disabled = false; btn.textContent = '获取验证码'; return;
-    }
-  } else {
-    toast('发送失败', 'SDK未加载getVerification方法，请使用Chrome/Edge浏览器打开网站');
-    btn.disabled = false; btn.textContent = '获取验证码'; return;
   }
+  // 方案A未成功，继续尝试方案B
 
   // 方案B: Supabase 风格 — signInWithOtp + verifyOtp
   if (typeof auth.signInWithOtp === 'function') {
@@ -1606,8 +1600,6 @@ function navigateTo(view, data){
   }
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
-document.getElementById('landing').addEventListener('click',openHub);
 
 function goToNews(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
 function goToShare(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
