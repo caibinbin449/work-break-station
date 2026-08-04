@@ -138,6 +138,88 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 .resource-item .res-info p{font-size:13px;color:#999;line-height:1.5}
 .resource-item .res-tag{font-size:11px;padding:3px 10px;border-radius:12px;background:#eef6fd;color:#2980b9;font-weight:500;flex-shrink:0}
 
+/* 信息分享板块 */
+.share-tabs{display:flex;gap:0;max-width:680px;margin:0 auto 24px;padding:0 20px}
+.share-tab{flex:1;text-align:center;padding:12px 0;background:#f0f0f0;cursor:pointer;font-size:15px;font-weight:500;color:#888;transition:all .2s}
+.share-tab:first-child{border-radius:10px 0 0 10px}
+.share-tab:last-child{border-radius:0 10px 10px 0}
+.share-tab.active{background:linear-gradient(135deg,#2980b9,#3498db);color:#fff;font-weight:600}
+.share-tab:hover:not(.active){background:#e8e8e8;color:#555}
+.share-tab .tab-num{display:inline-block;background:rgba(255,255,255,.35);border-radius:10px;padding:1px 8px;font-size:12px;margin-left:6px}
+
+.article-list{display:flex;flex-direction:column;gap:16px}
+.article-card{background:#fff;border-radius:14px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .25s;border-left:4px solid transparent;position:relative;overflow:hidden}
+.article-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);border-left-color:#2980b9}
+.article-card .article-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;margin-bottom:10px;letter-spacing:1px}
+.article-card .article-tag.original{background:#eef6fd;color:#2980b9}
+.article-card .article-tag.hot{background:#fef3e2;color:#e67e22}
+.article-card h3{font-size:17px;font-weight:700;color:#222;margin-bottom:8px;line-height:1.5}
+.article-card .article-excerpt{font-size:14px;color:#666;line-height:1.8;margin-bottom:14px}
+.article-card .article-footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#aaa}
+.article-card .article-footer .author-info{display:flex;align-items:center;gap:6px}
+.article-card .article-footer .author-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#2980b9,#6dd5fa);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.article-card .article-stats{display:flex;gap:12px;color:#bbb;font-size:12px}
+
+.download-list{display:flex;flex-direction:column;gap:14px}
+.download-item{background:#fff;border-radius:14px;padding:18px 24px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;align-items:center;gap:16px;transition:all .25s;border-left:4px solid transparent}
+.download-item:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-left-color:#e67e22}
+.download-item .dl-icon{font-size:36px;flex-shrink:0;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:#fef9f0;border-radius:12px}
+.download-item .dl-info{flex:1}
+.download-item .dl-info h3{font-size:16px;font-weight:600;color:#222;margin-bottom:4px}
+.download-item .dl-info p{font-size:13px;color:#999;line-height:1.5}
+.download-item .dl-meta{display:flex;gap:8px;align-items:center;margin-top:4px}
+.download-item .dl-meta span{font-size:11px;padding:2px 8px;border-radius:10px;background:#f5f0eb;color:#8b4513}
+.download-item .dl-actions{flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.download-item .dl-btn{padding:8px 16px;background:#e67e22;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;white-space:nowrap;transition:background .2s}
+.download-item .dl-btn:hover{background:#d35400}
+.download-item .dl-btn.view{background:none;color:#2980b9;border:1px solid #2980b9;padding:6px 14px}
+.download-item .dl-btn.view:hover{background:#eef6fd}
+
+/* 文章详情弹窗 */
+.article-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 16px;animation:fadeIn .3s}
+.article-overlay.hidden{display:none}
+.article-modal{background:#fff;border-radius:16px;width:800px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.article-modal-header{padding:30px 30px 20px;border-bottom:1px solid #eee;position:relative}
+.article-modal-header .article-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;background:#f5f5f5;border:none;color:#666;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.article-modal-header .article-close:hover{background:#e74c3c;color:#fff}
+.article-modal-header h1{font-size:24px;font-weight:700;color:#222;line-height:1.5;padding-right:40px}
+.article-modal-header .article-meta{display:flex;gap:16px;margin-top:12px;font-size:13px;color:#999}
+.article-share-bar{display:flex;align-items:center;gap:10px;padding:14px 30px;background:#fafafa;border-bottom:1px solid #eee;flex-wrap:wrap}
+.article-share-bar .share-label{font-size:14px;color:#666;font-weight:500}
+.article-share-bar .share-btn{padding:8px 16px;border-radius:8px;border:none;font-size:13px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .2s}
+.article-share-bar .share-btn.wechat{background:#07c160;color:#fff}
+.article-share-bar .share-btn.wechat:hover{background:#06ad56}
+.article-share-bar .share-btn.link{background:#f0f0f0;color:#555}
+.article-share-bar .share-btn.link:hover{background:#e0e0e0}
+.article-body{padding:30px;font-size:16px;color:#333;line-height:2.1;letter-spacing:.5px}
+.article-body p{margin-bottom:18px;text-indent:2em}
+.article-body h2{font-size:20px;font-weight:700;color:#8b4513;margin:28px 0 14px}
+.article-body h3{font-size:17px;font-weight:600;color:#555;margin:20px 0 10px}
+.article-body blockquote{padding:14px 20px;margin:18px 0;background:#fafaf7;border-left:4px solid #e67e22;color:#666;font-style:italic;border-radius:0 8px 8px 0}
+.article-body ul,.article-body ol{margin:14px 0;padding-left:28px}
+.article-body li{margin-bottom:8px}
+.article-modal-footer{padding:20px 30px;border-top:1px solid #eee;text-align:center;font-size:13px;color:#bbb}
+
+.qr-popup{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s}
+.qr-popup.hidden{display:none}
+.qr-content{background:#fff;border-radius:16px;padding:30px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.qr-content p{font-size:16px;color:#333;margin-bottom:20px;font-weight:600}
+.qr-content #qrCode{display:inline-block;padding:12px;background:#fff;border-radius:8px;border:1px solid #eee;margin-bottom:18px}
+.qr-content #qrCode canvas,.qr-content #qrCode img{display:block}
+.qr-content .qr-close{padding:10px 36px;background:#e67e22;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:500;transition:background .2s}
+.qr-content .qr-close:hover{background:#d35400}
+.qr-content .qr-url{font-size:12px;color:#999;margin-top:12px;word-break:break-all;max-width:280px}
+
+@media(max-width:600px){
+.article-modal-header{padding:24px 18px 16px}
+.article-modal-header h1{font-size:20px;padding-right:30px}
+.article-share-bar{padding:12px 18px;gap:8px}
+.article-body{padding:20px 18px;font-size:15px}
+.article-body p{text-indent:2em;margin-bottom:14px}
+.download-item{flex-direction:column;text-align:center}
+.download-item .dl-actions{flex-direction:row;gap:8px}
+}
+
 .message-form{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:24px}
 .message-form .form-row{display:flex;gap:12px;margin-bottom:12px}
 .message-form textarea{width:100%;padding:12px 16px;border:1px solid #e0d5c8;border-radius:10px;font-size:14px;font-family:inherit;outline:none;min-height:80px;resize:vertical;background:#fafaf7;transition:border-color .2s}
@@ -293,7 +375,7 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
   <div class="page-content">
     <div class="hub-grid">
       <div class="hub-card news" onclick="goToNews()"><span class="hub-icon">📰</span><h2>新闻信息</h2><p>每日要闻 · 财经动态 · 国际观察</p></div>
-      <div class="hub-card share" onclick="goToShare()"><span class="hub-icon">📂</span><h2>资料分享</h2><p>实用资料 · 模板工具 · 学习资源</p></div>
+      <div class="hub-card share" onclick="goToShare()"><span class="hub-icon">📡</span><h2>信息分享</h2><p>作者文章 · 法规下载 · 实用资源</p></div>
       <div class="hub-card message login-required" onclick="goToMessage()"><span class="hub-icon">💬</span><h2>留言互动</h2><p>交流讨论 · 心得分享 · 问题反馈</p><span class="lock-icon">🔒 需登录</span></div>
       <div class="hub-card legal login-required" onclick="goToLegal()"><span class="hub-icon">⚖️</span><h2>法律咨询</h2><p>法律知识 · 案例解析 · 合规指南</p><span class="lock-icon">🔒 需登录</span></div>
     </div>
@@ -332,14 +414,45 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
   <div class="page-content"><div class="detail-content" id="detailContent"></div></div>
 </div>
 
-<!-- 资料分享 -->
+<!-- 信息分享 -->
 <div class="page" id="sharePage">
   <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
   <div class="page-header">
-    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 资料分享</h1></div>
-    <div class="date">📂 实用资料 · 模板工具 · 学习资源</div>
+    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 信息分享</h1></div>
+    <div class="date">📡 作者文章 · 法规下载 · 实用资源</div>
+  </div>
+  <div class="share-tabs" id="shareTabs">
+    <div class="share-tab active" onclick="switchShareTab('articles')">✍️ 作者分享</div>
+    <div class="share-tab" onclick="switchShareTab('downloads')">📥 资料下载</div>
   </div>
   <div class="page-content" id="sharePageContent"></div>
+</div>
+
+<!-- 文章详情弹窗 -->
+<div class="article-overlay hidden" id="articleOverlay">
+  <div class="article-modal">
+    <div class="article-modal-header">
+      <button class="article-close" onclick="closeArticle()">✕</button>
+      <h1 id="articleTitle"></h1>
+      <div class="article-meta">
+        <span id="articleAuthor"></span>
+        <span id="articleDate"></span>
+      </div>
+    </div>
+    <div class="article-share-bar" id="articleShareBar">
+      <span class="share-label">📤 分享到：</span>
+      <button class="share-btn wechat" onclick="shareToWechat()" title="微信分享"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM9.53 4.97a.8.8 0 0 1 .806.79.796.796 0 0 1-.806.79.796.796 0 0 1-.806-.79.8.8 0 0 1 .806-.79zm-4.535 0a.8.8 0 0 1 .806.79.796.796 0 0 1-.806.79.796.796 0 0 1-.806-.79.8.8 0 0 1 .806-.79zm13.817 2.55c-2.853 0-5.17 2.058-5.17 4.596 0 2.538 2.317 4.596 5.17 4.596.568 0 1.119-.082 1.633-.233a.484.484 0 0 1 .398.055l1.07.626a.183.183 0 0 0 .093.03c.09 0 .16-.073.16-.165 0-.04-.014-.08-.026-.119l-.22-.832a.33.33 0 0 1 .12-.374C23.91 15.205 24 14.154 24 13.95c0-2.539-2.317-4.596-5.17-4.596-.006 0 0 0 0 0zm-1.11 2.16a.444.444 0 0 1 .448.44.442.442 0 0 1-.449.44.442.442 0 0 1-.448-.44.444.444 0 0 1 .448-.44zm-3.33 0a.444.444 0 0 1 .448.44.442.442 0 0 1-.449.44.442.442 0 0 1-.448-.44.444.444 0 0 1 .448-.44z"/></svg> 微信分享</button>
+      <button class="share-btn link" onclick="copyArticleLink()" title="复制链接">🔗 复制链接</button>
+    </div>
+    <div class="article-body" id="articleBody"></div>
+    <div class="qr-popup hidden" id="qrPopup">
+      <div class="qr-content">
+        <p>📱 用微信扫一扫打开文章</p>
+        <div id="qrCode"></div>
+        <button class="qr-close" onclick="closeQrPopup()">关闭</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- 留言互动 -->
@@ -604,20 +717,234 @@ function renderNewsPage(){
   document.getElementById('newsToday').textContent = todayCN();
 }
 
-// ==================== 资料分享 ====================
+// ==================== 信息分享 ====================
+var shareTabState = 'articles';
+
+function switchShareTab(tab){
+  shareTabState = tab;
+  document.querySelectorAll('.share-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('.share-tab[onclick="switchShareTab(\''+tab+'\')"]').classList.add('active');
+  renderSharePage();
+}
+
+var authorArticles = [
+  {
+    id:'a1',tag:'原创',tagClass:'original',
+    title:'从茶山到餐桌：一条烤鱼的互联网创业之路',
+    excerpt:'在数字化浪潮席卷各行各业的今天，传统餐饮如何借助互联网实现转型升级？本文以茶山烤鱼为例，深入探讨小而美品牌的生存与发展之道...',
+    author:'茶山老蔡',date:'2026-08-01',reads:1256,
+    body:'<p>十年前，我还在深圳一家互联网公司做程序员，每天对着屏幕敲代码。那时的生活很规律，朝九晚九，唯一的慰藉就是周末约上三五好友，去街边小摊吃烤鱼。</p><p>重庆烤鱼，万州风味，炭火慢烤，麻辣鲜香。每次吃到满头大汗的时候，我都会想：如果能把这个味道带出那条小巷，带到更多人面前，该多好。</p><h2>从程序员的工位到烤鱼的灶台</h2><p>2018年春天，我递交了辞职信。同事们觉得我疯了——放着月薪两万的工作不做，要去开烤鱼店？但我心里清楚，互联网行业虽然光鲜，却不是我想要的生活方式。</p><p>最初的三个月最难熬。找店面、办营业执照、学配方、招厨师，每一件事都比写代码复杂十倍。有段时间我甚至怀疑自己的选择，但每当炉火升起，当第一条鱼在炭火上滋滋作响时，那种满足感告诉我：这条路值得走。</p><h2>为什么叫"茶山烤鱼"</h2><p>店址选在深圳南山区的茶光村附近，背靠茶山。每天清晨，山上的雾气还没散，我就在店里准备食材了。这个名字就是这样来的：茶山，是我创业的地方，也是我重新认识自己的地方。</p><p>我们的鱼全部选用新鲜活鱼，现杀现烤。配方是我花了三个月，跑了八趟重庆，拜访了七位老师傅之后反复调试出来的。不追求刺激的重麻重辣，而是讲究麻、辣、鲜、香、嫩五味的平衡。</p><blockquote>"做餐饮和写代码其实很像——好的产品，都是在无数次debug中打磨出来的。"</blockquote><h2>互联网思维做传统餐饮</h2><p>虽然离开了互联网行业，但思维方式没有离开。我们用数据管理库存、用线上平台引流、用会员系统沉淀客户。更重要的是，我们坚持了互联网最核心的理念：用户至上。</p><p>每一条评价我都会认真看，每一个建议我都会考虑。有人说太辣了我们就调整辣度，有人说配菜太少我们就增加份量。这种快速迭代的思维，恰恰是互联网给我的最大财富。</p><h2>展望未来</h2><p>现在茶山烤鱼已经从一家小店发展到深圳有三家分店，每天服务超过五百位食客。但我们没有停止探索：标准化流程、中央厨房、线上商城、品牌输出……每一个环节都在不断完善。</p><p>我想说的是：无论你在什么行业，无论你做什么工作，保持热爱、持续学习、不断创新，就一定能把一件事情做好。就像烤鱼一样，火候到了，味道自然就出来了。</p><p>感谢每一位支持茶山烤鱼的朋友，我们继续努力，让你每一口都吃到幸福。</p>'
+  },
+  {
+    id:'a2',tag:'原创',tagClass:'original',
+    title:'2026年中国餐饮行业数字化趋势报告',
+    excerpt:'餐饮行业正经历前所未有的变革：AI点餐、无人配送、智能厨房...本文将全面分析2026年餐饮数字化的五大趋势及其对中小餐饮企业的影响...',
+    author:'茶山老蔡',date:'2026-07-28',reads:2389,
+    body:'<h2>引言</h2><p>2026年，中国餐饮市场规模预计突破6万亿元人民币。与此同时，数字化渗透率从2020年的15%增长到了目前的38%。对于中小餐饮企业而言，数字化转型已经从"选择题"变成了"必答题"。</p><h2>趋势一：AI驱动的智能点餐系统</h2><p>传统的扫码点餐正在被AI语义点餐取代。顾客只需要说出"我今天想吃辣的，预算80块左右"，AI系统就能自动推荐最匹配的菜品组合。这种体验的提升，让中小餐厅也能提供五星级的服务。</p><h2>趋势二：全渠道会员运营</h2><p>单一平台的会员体系已经成为过去。2026年，成功的餐饮品牌都在构建自己的私域流量池——微信社群、小程序、抖音、小红书，全渠道触达客户，用数据指导营销决策。</p><h2>趋势三：智能厨房管理系统</h2><p>IoT设备在厨房中的普及率大幅提升。智能温控、自动排烟、食材库存预警……这些技术在降低人力成本的同时，也显著提升了出品的稳定性。</p><h2>趋势四：即时零售与外卖3.0</h2><p>外卖不再只是配送现做餐食。预制菜、半成品食材包、品牌周边产品通过即时零售渠道触达消费者，拓展了餐饮的消费场景。</p><h2>趋势五：ESG与绿色餐饮</h2><p>消费者越来越关注食品的来源和环保性。数字化溯源系统让每一条鱼、每一棵菜都能追溯到产地。绿色餐饮不仅是社会责任，更是品牌溢价的重要来源。</p><h2>给中小餐饮企业的建议</h2><p>数字化不是大品牌的专利。从最简单的微信小程序点餐开始，逐步延伸到会员管理、数据分析和供应链优化。关键不是一步到位，而是迈出第一步并持续迭代。</p>'
+  },
+  {
+    id:'a3',tag:'热点',tagClass:'hot',
+    title:'劳动合同法修订解读：2026年中小企业用工新规',
+    excerpt:'2026年7月，人社部发布劳动合同法修订草案征求意见稿。本文对新规变化进行逐一解读，帮助企业HR和法务快速掌握要点...',
+    author:'法务小张',date:'2026-07-25',reads:4210,
+    body:'<h2>修订背景</h2><p>2026年7月15日，人力资源和社会保障部发布《劳动合同法（修订草案征求意见稿）》，这是自2008年劳动合同法实施以来最大规模的一次修订。此次修订聚焦新就业形态劳动者权益保障、灵活用工规范、竞业限制范围调整等社会关注热点。</p><h2>一、竞业限制范围收窄</h2><p>修订草案第24条明确：竞业限制仅适用于高级管理人员、高级技术人员和其他负有保密义务的人员。普通岗位员工不得设置竞业限制条款。这意味着大量此前被"泛竞业"困扰的普通员工将获得更大的职业自由。</p><h2>二、试用期工资标准上调</h2><p>试用期工资不得低于本单位相同岗位最低档工资的80%，且不低于用人单位所在地的最低工资标准的120%。这一调整对于一线城市的新入职员工尤为有利。</p><h2>三、灵活用工入法</h2><p>新规首次将平台用工、共享用工等新型用工形式纳入调整范围。平台企业需要为符合条件的灵活就业人员缴纳工伤保险，这是对零工经济从业者权益的重大保障。</p><h2>四、加班费计算基数明确</h2><p>加班费计算基数以劳动者本人正常工作时间的工资为准，包括基本工资、岗位工资、绩效工资等固定收入。奖金、津贴等浮动收入是否纳入由双方约定。</p><h2>五、经济补偿金上限调整</h2><p>经济补偿金的计算基数上限由原来的"本地区上年度职工月平均工资三倍"调整为"五倍"，显著提高了高薪员工被裁时的补偿标准。</p><blockquote>建议所有企业HR和法务部门尽快组织学习新规草案，提前做好合规准备。正式实施日期预计为2027年1月1日。</blockquote>'
+  },
+  {
+    id:'a4',tag:'原创',tagClass:'original',
+    title:'开一家烤鱼店的完整指南：从选址到盈利',
+    excerpt:'从0到1开一家烤鱼店需要做什么？选址秘诀、装修预算、设备清单、人员配置、营销方案...这份万字指南帮你全面避坑...',
+    author:'茶山老蔡',date:'2026-07-20',reads:5873,
+    body:'<h2>写在前面</h2><p>经常有朋友问我："蔡哥，我也想开一家烤鱼店，你觉得能做吗？"我的回答永远是：能做，但不是人人都适合。餐饮行业看似门槛低，实际上水很深。这份指南是我花了八年时间、踩了无数坑之后总结的经验，希望对你有帮助。</p><h2>第一步：自我评估</h2><p>开烤鱼店需要三个基本条件：一是至少30万的启动资金（以二线城市、100平米店面为例）；二是每天至少12小时的工作时间；三是有一定的烹饪基础或能管好厨师。三个条件缺任何一个，都建议慎重考虑。</p><h2>第二步：选址</h2><p>烤鱼店的选址有几个硬指标：<br>1）人流量：日均人流量不低于5000人次的临街商铺<br>2）竞争密度：半径一公里内同品类不超过3家<br>3）交通便利：有停车位或靠近地铁站<br>4）面积要求：80-150平米，需要有排烟条件</p><h2>第三步：装修与设备</h2><p>烤鱼店的装修投入建议控制在总预算的25%以内。核心设备包括：烤鱼炉（炭火/电烤）、排烟系统、冷藏冰柜、制冰机、厨房操作台。设备总投入约5-8万元。</p><h2>第四步：人员配置</h2><p>标准配置：主厨1名（月薪8000-12000）、帮厨1名（月薪5000-7000）、服务员2名（月薪4000-5000）、收银员1名（月薪4500-5500）。前三个月建议多配1名机动人员。</p><h2>第五步：盈利模型</h2><p>以二线城市100平米烤鱼店为例：月租金12000元、人工35000元、食材成本占营收35%、水电气5000元、其他3000元。客单价80元、日接待80桌左右即可实现月净利润3-5万元。</p><h2>最重要的忠告</h2><p>味道是根本，服务是关键，成本控制是生命线。这三条做到了，你的烤鱼店就有了活下去的基础。剩下的，就是坚持和运气了。</p>'
+  }
+];
+
+var lawDocuments = [
+  {id:'d1',icon:'📕',title:'中华人民共和国民法典',desc:'2021年1月1日起施行，共7编1260条',tag:'民事基本法',size:'10.2万字'},
+  {id:'d2',icon:'📗',title:'中华人民共和国民事诉讼法',desc:'2024年1月1日最新修订版',tag:'程序法',size:'3.8万字'},
+  {id:'d3',icon:'📘',title:'中华人民共和国刑法',desc:'2024年3月1日起施行的刑法修正案(十二)',tag:'刑事基本法',size:'7.5万字'},
+  {id:'d4',icon:'📙',title:'中华人民共和国刑事诉讼法',desc:'2018年10月26日修订版',tag:'程序法',size:'4.2万字'},
+  {id:'d5',icon:'📓',title:'中华人民共和国劳动合同法',desc:'2013年7月1日修订版（2026修订草案审议中）',tag:'劳动法',size:'2.1万字'},
+  {id:'d6',icon:'📔',title:'中华人民共和国公司法',desc:'2024年7月1日起施行的新公司法',tag:'商法',size:'4.5万字'},
+  {id:'d7',icon:'📒',title:'中华人民共和国行政诉讼法',desc:'2017年7月1日修订版',tag:'程序法',size:'2.8万字'},
+  {id:'d8',icon:'📌',title:'中华人民共和国消费者权益保护法',desc:'2014年3月15日修订版',tag:'经济法',size:'1.6万字'}
+];
+
+var currentArticle = null;
+
 function renderSharePage(){
-  var resources = [
-    {icon:'📋',title:'常用合同模板合集',desc:'劳动合同、租赁合同、合作协议等实用模板',tag:'法律文书'},
-    {icon:'📊',title:'2026年度个税计算器',desc:'最新个税政策下的薪资计算与筹划工具',tag:'财务工具'},
-    {icon:'📖',title:'劳动法实务手册',desc:'劳动合同签订、解除、加班费计算等常见问题解答',tag:'实用指南'},
-    {icon:'🏢',title:'公司注册流程指引',desc:'有限责任公司注册全流程，含材料清单与注意事项',tag:'创业指南'},
-    {icon:'🛡️',title:'知识产权保护指南',desc:'商标注册、专利申请、著作权保护实用手册',tag:'法律文书'},
-    {icon:'💼',title:'社保公积金政策汇编',desc:'2026年最新五险一金缴纳比例、基数及政策解读',tag:'政策法规'}
-  ];
-  var h = '<div class="resource-list">';
-  resources.forEach(function(r){h += '<div class="resource-item"><div class="res-icon">'+r.icon+'</div><div class="res-info"><h3>'+r.title+'</h3><p>'+r.desc+'</p></div><span class="res-tag">'+r.tag+'</span></div>'});
-  h += '</div><div class="footer"><p>更多资料持续更新中，敬请关注</p></div>';
-  document.getElementById('sharePageContent').innerHTML = h;
+  var c = document.getElementById('sharePageContent');
+  if (shareTabState === 'articles') {
+    var h = '<div class="article-list">';
+    authorArticles.forEach(function(a){
+      h += '<div class="article-card" onclick="openArticle(\''+a.id+'\')">';
+      h += '<span class="article-tag '+a.tagClass+'">'+a.tag+'</span>';
+      h += '<h3>'+a.title+'</h3>';
+      h += '<p class="article-excerpt">'+a.excerpt+'</p>';
+      h += '<div class="article-footer">';
+      h += '<div class="author-info"><div class="author-avatar">'+a.author.charAt(0)+'</div><span>'+a.author+'</span></div>';
+      h += '<div class="article-stats"><span>📅 '+a.date+'</span><span>👁 '+a.reads.toLocaleString()+' 阅读</span></div>';
+      h += '</div></div>';
+    });
+    h += '</div><div class="footer"><p>✍️ 原创文章 · 持续更新中</p></div>';
+    c.innerHTML = h;
+  } else {
+    var h = '<div class="download-list">';
+    lawDocuments.forEach(function(d){
+      h += '<div class="download-item">';
+      h += '<div class="dl-icon">'+d.icon+'</div>';
+      h += '<div class="dl-info">';
+      h += '<h3>'+d.title+'</h3>';
+      h += '<p>'+d.desc+'</p>';
+      h += '<div class="dl-meta"><span>📂 '+d.tag+'</span><span>📏 '+d.size+'</span></div>';
+      h += '</div>';
+      h += '<div class="dl-actions">';
+      h += '<button class="dl-btn view" onclick="event.stopPropagation();viewLawDocument(\''+d.id+'\')">📖 在线阅读</button>';
+      h += '<button class="dl-btn" onclick="event.stopPropagation();shareLawDocument(\''+d.id+'\')">📤 分享</button>';
+      h += '</div>';
+      h += '</div>';
+    });
+    h += '</div><div class="footer"><p>📥 更多法规持续更新 · 来源：国家法律法规数据库</p></div>';
+    c.innerHTML = h;
+  }
+}
+
+function openArticle(id){
+  var a = authorArticles.find(function(x){return x.id===id});
+  if (!a) return;
+  currentArticle = a;
+  document.getElementById('articleTitle').textContent = a.title;
+  document.getElementById('articleAuthor').innerHTML = '✍️ '+a.author;
+  document.getElementById('articleDate').textContent = '📅 '+a.date;
+  document.getElementById('articleBody').innerHTML = a.body;
+  document.getElementById('articleOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  // 更新分享链接
+  updateArticleShareUrl();
+}
+
+function closeArticle(){
+  document.getElementById('articleOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+  currentArticle = null;
+  closeQrPopup();
+  // 恢复 share 页面状态
+  history.replaceState({view:'share'}, '', '#share');
+}
+
+function getArticleUrl(){
+  if (!currentArticle) return window.location.origin + window.location.pathname;
+  return window.location.origin + window.location.pathname + '#article=' + currentArticle.id;
+}
+
+function updateArticleShareUrl(){
+  if (!currentArticle) return;
+  // 用 history.replaceState 更新当前 URL 但不触发导航
+  try { history.replaceState({view:'article',articleId:currentArticle.id}, '', '#article='+currentArticle.id); } catch(e){}
+}
+
+function shareToWechat(){
+  if (!currentArticle) return;
+  var url = getArticleUrl();
+
+  // 手机端：尝试原生分享（微信内置浏览器会直接调用微信分享）
+  if (/Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent)) {
+    if (navigator.share) {
+      navigator.share({
+        title: currentArticle.title,
+        text: currentArticle.excerpt,
+        url: url
+      }).catch(function(){});
+    } else {
+      // 不支持原生分享，显示二维码
+      showQrCode(url);
+    }
+    return;
+  }
+  // 桌面端：显示二维码
+  showQrCode(url);
+}
+
+function showQrCode(url){
+  var popup = document.getElementById('qrPopup');
+  var qrDiv = document.getElementById('qrCode');
+  popup.classList.remove('hidden');
+  // 使用 QRServer API 生成二维码
+  var qrImg = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(url)+'" alt="微信扫码阅读" width="200" height="200" style="display:block">';
+  qrImg += '<div class="qr-url" style="margin-top:10px">'+url+'</div>';
+  qrDiv.innerHTML = qrImg;
+}
+
+function closeQrPopup(){
+  document.getElementById('qrPopup').classList.add('hidden');
+}
+
+function copyArticleLink(){
+  if (!currentArticle) return;
+  var url = getArticleUrl();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function(){
+      toast('已复制','文章链接已复制到剪贴板，快去分享吧');
+    }).catch(function(){
+      fallbackCopy(url);
+    });
+  } else {
+    fallbackCopy(url);
+  }
+}
+
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('已复制','文章链接已复制到剪贴板'); } catch(e) { toast('复制失败','手动复制：'+text); }
+  document.body.removeChild(ta);
+}
+
+// ==================== 法规文档查看 ====================
+var lawContentCache = {};
+
+function getLawContent(id){
+  var contents = {
+    'd1': {title:'中华人民共和国民法典',content:'<p>《中华人民共和国民法典》已由中华人民共和国第十三届全国人民代表大会第三次会议于2020年5月28日通过，自2021年1月1日起施行。</p><h2>第一编 总则</h2><h3>第一章 基本规定</h3><p>第一条 为了保护民事主体的合法权益，调整民事关系，维护社会和经济秩序，适应中国特色社会主义发展要求，弘扬社会主义核心价值观，根据宪法，制定本法。</p><p>第二条 民法调整平等主体的自然人、法人和非法人组织之间的人身关系和财产关系。</p><p>第三条 民事主体的人身权利、财产权利以及其他合法权益受法律保护，任何组织或者个人不得侵犯。</p><h2>第二编 物权</h2><h3>第一分编 通则</h3><p>第二百零五条 本编调整因物的归属和利用产生的民事关系。</p><p>第二百零六条 国家坚持和完善公有制为主体、多种所有制经济共同发展，按劳分配为主体、多种分配方式并存，社会主义市场经济体制等社会主义基本经济制度。</p><h2>第三编 合同</h2><p>第四百六十三条 本编调整因合同产生的民事关系。</p><p>第四百六十四条 合同是民事主体之间设立、变更、终止民事法律关系的协议。婚姻、收养、监护等有关身份关系的协议，适用有关该身份关系的法律规定；没有规定的，可以根据其性质参照适用本编规定。</p><h2>第四编 人格权</h2><p>第九百九十条 人格权是民事主体享有的生命权、身体权、健康权、姓名权、名称权、肖像权、名誉权、荣誉权、隐私权等权利。除前款规定的人格权外，自然人享有基于人身自由、人格尊严产生的其他人格权益。</p><h2>第五编 婚姻家庭</h2><p>第一千零四十条 本编调整因婚姻家庭产生的民事关系。</p><p>第一千零四十一条 婚姻家庭受国家保护。实行婚姻自由、一夫一妻、男女平等的婚姻制度。保护妇女、未成年人、老年人、残疾人的合法权益。</p><h2>第六编 继承</h2><p>第一千一百一十九条 本编调整因继承产生的民事关系。</p><p>第一千一百二十条 国家保护自然人的继承权。</p><h2>第七编 侵权责任</h2><p>第一千一百六十四条 本编调整因侵害民事权益产生的民事关系。</p><p>第一千一百六十五条 行为人因过错侵害他人民事权益造成损害的，应当承担侵权责任。依照法律规定推定行为人有过错，其不能证明自己没有过错的，应当承担侵权责任。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容，全文共1260条 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd2': {title:'中华人民共和国民事诉讼法',content:'<p>《中华人民共和国民事诉讼法》于1991年4月9日第七届全国人民代表大会第四次会议通过，历经2007年、2012年、2017年、2021年、2023年多次修正修订。</p><h2>第一编 总则</h2><h3>第一章 任务、适用范围和基本原则</h3><p>第一条 中华人民共和国民事诉讼法以宪法为根据，结合我国民事审判工作的经验和实际情况制定。</p><p>第二条 中华人民共和国民事诉讼法的任务，是保护当事人行使诉讼权利，保证人民法院查明事实，分清是非，正确适用法律，及时审理民事案件，确认民事权利义务关系，制裁民事违法行为，保护当事人的合法权益，教育公民自觉遵守法律，维护社会秩序、经济秩序，保障社会主义建设事业顺利进行。</p><h2>第二编 审判程序</h2><h3>第十二章 第一审普通程序</h3><p>第一百二十二条 起诉必须符合下列条件：（一）原告是与本案有直接利害关系的公民、法人和其他组织；（二）有明确的被告；（三）有具体的诉讼请求和事实、理由；（四）属于人民法院受理民事诉讼的范围和受诉人民法院管辖。</p><p>第一百二十三条 起诉应当向人民法院递交起诉状，并按照被告人数提出副本。书写起诉状确有困难的，可以口头起诉，由人民法院记入笔录，并告知对方当事人。</p><h3>第十三章 简易程序</h3><p>第一百六十条 基层人民法院和它派出的法庭审理事实清楚、权利义务关系明确、争议不大的简单的民事案件，适用本章规定。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd3': {title:'中华人民共和国刑法',content:'<p>《中华人民共和国刑法》于1979年7月1日第五届全国人民代表大会第二次会议通过，1997年3月14日第八届全国人民代表大会第五次会议修订。最新为刑法修正案（十二），自2024年3月1日起施行。</p><h2>第一编 总则</h2><h3>第一章 刑法的任务、基本原则和适用范围</h3><p>第一条 为了惩罚犯罪，保护人民，根据宪法，结合我国同犯罪作斗争的具体经验及实际情况，制定本法。</p><p>第二条 中华人民共和国刑法的任务，是用刑罚同一切犯罪行为作斗争，以保卫国家安全，保卫人民民主专政的政权和社会主义制度，保护国有财产和劳动群众集体所有的财产，保护公民私人所有的财产，保护公民的人身权利、民主权利和其他权利，维护社会秩序、经济秩序，保障社会主义建设事业的顺利进行。</p><h2>第二编 分则</h2><h3>第四章 侵犯公民人身权利、民主权利罪</h3><p>第二百三十二条 故意杀人的，处死刑、无期徒刑或者十年以上有期徒刑；情节较轻的，处三年以上十年以下有期徒刑。</p><p>第二百三十四条 故意伤害他人身体的，处三年以下有期徒刑、拘役或者管制。犯前款罪，致人重伤的，处三年以上十年以下有期徒刑；致人死亡或者以特别残忍手段致人重伤造成严重残疾的，处十年以上有期徒刑、无期徒刑或者死刑。</p><h3>第五章 侵犯财产罪</h3><p>第二百六十三条 以暴力、胁迫或者其他方法抢劫公私财物的，处三年以上十年以下有期徒刑，并处罚金；有下列情形之一的，处十年以上有期徒刑、无期徒刑或者死刑，并处罚金或者没收财产...</p><h3>第八章 贪污贿赂罪</h3><p>第三百八十二条 国家工作人员利用职务上的便利，侵吞、窃取、骗取或者以其他手段非法占有公共财物的，是贪污罪。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd4': {title:'中华人民共和国刑事诉讼法',content:'<p>《中华人民共和国刑事诉讼法》于1979年7月1日第五届全国人民代表大会第二次会议通过，历经1996年、2012年、2018年三次重大修订。</p><h2>第一编 总则</h2><h3>第一章 任务和基本原则</h3><p>第一条 为了保证刑法的正确实施，惩罚犯罪，保护人民，保障国家安全和社会公共安全，维护社会主义社会秩序，根据宪法，制定本法。</p><p>第二条 中华人民共和国刑事诉讼法的任务，是保证准确、及时地查明犯罪事实，正确应用法律，惩罚犯罪分子，保障无罪的人不受刑事追究，教育公民自觉遵守法律，积极同犯罪行为作斗争，维护社会主义法制，尊重和保障人权，保护公民的人身权利、财产权利、民主权利和其他权利，保障社会主义建设事业的顺利进行。</p><h2>第二编 立案、侦查和提起公诉</h2><h3>第一章 立案</h3><p>第一百一十条 任何单位和个人发现有犯罪事实或者犯罪嫌疑人，有权利也有义务向公安机关、人民检察院或者人民法院报案或者举报。被害人对侵犯其人身、财产权利的犯罪事实或者犯罪嫌疑人，有权向公安机关、人民检察院或者人民法院报案或者控告。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd5': {title:'中华人民共和国劳动合同法',content:'<p>《中华人民共和国劳动合同法》于2007年6月29日第十届全国人民代表大会常务委员会第二十八次会议通过，2012年12月28日修订，自2013年7月1日起施行。</p><h2>第一章 总则</h2><p>第一条 为了完善劳动合同制度，明确劳动合同双方当事人的权利和义务，保护劳动者的合法权益，构建和发展和谐稳定的劳动关系，制定本法。</p><p>第二条 中华人民共和国境内的企业、个体经济组织、民办非企业单位等组织（以下称用人单位）与劳动者建立劳动关系，订立、履行、变更、解除或者终止劳动合同，适用本法。</p><h2>第二章 劳动合同的订立</h2><p>第七条 用人单位自用工之日起即与劳动者建立劳动关系。用人单位应当建立职工名册备查。</p><p>第十条 建立劳动关系，应当订立书面劳动合同。已建立劳动关系，未同时订立书面劳动合同的，应当自用工之日起一个月内订立书面劳动合同。用人单位与劳动者在用工前订立劳动合同的，劳动关系自用工之日起建立。</p><h2>第三章 劳动合同的履行和变更</h2><p>第二十九条 用人单位与劳动者应当按照劳动合同的约定，全面履行各自的义务。</p><h2>第四章 劳动合同的解除和终止</h2><p>第三十六条 用人单位与劳动者协商一致，可以解除劳动合同。</p><p>第三十七条 劳动者提前三十日以书面形式通知用人单位，可以解除劳动合同。劳动者在试用期内提前三日通知用人单位，可以解除劳动合同。</p><p>第三十八条 用人单位有下列情形之一的，劳动者可以解除劳动合同：（一）未按照劳动合同约定提供劳动保护或者劳动条件的；（二）未及时足额支付劳动报酬的；（三）未依法为劳动者缴纳社会保险费的...</p><h2>第七章 法律责任</h2><p>第八十二条 用人单位自用工之日起超过一个月不满一年未与劳动者订立书面劳动合同的，应当向劳动者每月支付二倍的工资。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd6': {title:'中华人民共和国公司法',content:'<p>《中华人民共和国公司法》于2023年12月29日第十四届全国人民代表大会常务委员会第七次会议第二次修订，自2024年7月1日起施行。</p><h2>第一章 总则</h2><p>第一条 为了规范公司的组织和行为，保护公司、股东、职工和债权人的合法权益，完善中国特色现代企业制度，弘扬企业家精神，维护社会经济秩序，促进社会主义市场经济的发展，根据宪法，制定本法。</p><h2>第二章 公司登记</h2><p>第二十九条 设立公司，应当依法向公司登记机关申请设立登记。法律、行政法规规定设立公司必须报经批准的，应当在公司登记前依法办理批准手续。</p><h2>第三章 有限责任公司的设立和组织机构</h2><p>第四十二条 有限责任公司由一个以上五十个以下股东出资设立。</p><p>第四十七条 有限责任公司的注册资本为在公司登记机关登记的全体股东认缴的出资额。全体股东认缴的出资额由股东按照公司章程的规定自公司成立之日起五年内缴足。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd7': {title:'中华人民共和国行政诉讼法',content:'<p>《中华人民共和国行政诉讼法》于1989年4月4日第七届全国人民代表大会第二次会议通过，2014年11月1日修订，2017年6月27日修正。</p><h2>第一章 总则</h2><p>第一条 为保证人民法院公正、及时审理行政案件，解决行政争议，保护公民、法人和其他组织的合法权益，监督行政机关依法行使职权，根据宪法，制定本法。</p><p>第二条 公民、法人或者其他组织认为行政机关和行政机关工作人员的行政行为侵犯其合法权益，有权依照本法向人民法院提起诉讼。</p><h2>第二章 受案范围</h2><p>第十二条 人民法院受理公民、法人或者其他组织提起的下列诉讼：（一）对行政拘留、暂扣或者吊销许可证和执照、责令停产停业、没收违法所得、没收非法财物、罚款、警告等行政处罚不服的；（二）对限制人身自由或者对财产的查封、扣押、冻结等行政强制措施和行政强制执行不服的...</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd8': {title:'中华人民共和国消费者权益保护法',content:'<p>《中华人民共和国消费者权益保护法》于1993年10月31日第八届全国人民代表大会常务委员会第四次会议通过，2013年10月25日修订，自2014年3月15日起施行。</p><h2>第一章 总则</h2><p>第一条 为保护消费者的合法权益，维护社会经济秩序，促进社会主义市场经济健康发展，制定本法。</p><p>第二条 消费者为生活消费需要购买、使用商品或者接受服务，其权益受本法保护；本法未作规定的，受其他有关法律、法规保护。</p><h2>第二章 消费者的权利</h2><p>第七条 消费者在购买、使用商品和接受服务时享有人身、财产安全不受损害的权利。消费者有权要求经营者提供的商品和服务，符合保障人身、财产安全的要求。</p><p>第八条 消费者享有知悉其购买、使用的商品或者接受的服务的真实情况的权利。</p><h2>第七章 法律责任</h2><p>第五十五条 经营者提供商品或者服务有欺诈行为的，应当按照消费者的要求增加赔偿其受到的损失，增加赔偿的金额为消费者购买商品的价款或者接受服务的费用的三倍；增加赔偿的金额不足五百元的，为五百元。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'}
+  };
+  return contents[id] || null;
+}
+
+function viewLawDocument(id){
+  var d = getLawContent(id);
+  if (!d) return;
+  currentArticle = {id:id,title:d.title,body:d.content,author:'国家法律法规数据库',date:'官方发布',excerpt:''};
+  document.getElementById('articleTitle').textContent = d.title;
+  document.getElementById('articleAuthor').innerHTML = '📜 来源：国家法律法规数据库';
+  document.getElementById('articleDate').textContent = '';
+  document.getElementById('articleBody').innerHTML = d.content;
+  document.getElementById('articleOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  var url = window.location.origin + window.location.pathname + '#law=' + id;
+  try { history.replaceState({view:'law',lawId:id}, '', '#law='+id); } catch(e){}
+}
+
+function shareLawDocument(id){
+  var d = lawDocuments.find(function(x){return x.id===id});
+  if (!d) return;
+  var text = '【法规分享】'+d.title+' - '+d.desc;
+  var url = window.location.origin + window.location.pathname + '#law=' + id;
+  if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    navigator.share({title:d.title,text:text,url:url}).catch(function(){});
+  } else {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text+' '+url).then(function(){
+        toast('已复制',d.title+'的链接已复制，可粘贴到微信分享');
+      }).catch(function(){toast('提示','分享链接：'+url)});
+    } else { toast('提示','分享链接：'+url); }
+  }
 }
 
 // ==================== 留言系统 ====================
@@ -875,10 +1202,12 @@ window.addEventListener('popstate',function(event){
       case 'hub': navigateTo('hub'); break;
       case 'news': navigateTo('news'); break;
       case 'detail': navigateTo('detail',event.state.id); break;
-      case 'share': navigateTo('share'); break;
+      case 'share': navigateTo('share'); if(event.state.articleId) openArticle(event.state.articleId); if(event.state.lawId) viewLawDocument(event.state.lawId); break;
       case 'message': navigateTo('message'); break;
       case 'legal': navigateTo('legal'); break;
       case 'admin': navigateTo('admin'); break;
+      case 'article': navigateTo('share'); openArticle(event.state.articleId); break;
+      case 'law': navigateTo('share'); viewLawDocument(event.state.lawId); break;
     }
   } else { navigateTo('landing') }
 });
@@ -896,11 +1225,17 @@ window.addEventListener('popstate',function(event){
   if (hash === '#legal') { history.replaceState({view:'legal'},'','#legal'); landing.style.display='none'; navigateTo('legal'); return }
   if (hash === '#admin') { history.replaceState({view:'admin'},'','#admin'); landing.style.display='none'; navigateTo('admin'); return }
   if (hash.startsWith('#detail-')) { var id=hash.replace('#detail-',''); history.replaceState({view:'detail',id:id},'',hash); landing.style.display='none'; navigateTo('detail',id); return }
+  if (hash.startsWith('#article=')) { var aid=hash.replace('#article=',''); history.replaceState({view:'article',articleId:aid},'',hash); landing.style.display='none'; navigateTo('share'); setTimeout(function(){openArticle(aid)},300); return }
+  if (hash.startsWith('#law=')) { var lid=hash.replace('#law=',''); history.replaceState({view:'law',lawId:lid},'',hash); landing.style.display='none'; navigateTo('share'); setTimeout(function(){viewLawDocument(lid)},300); return }
   history.replaceState({view:'landing'},'',window.location.pathname);
   updateUserUI();
 })();
 
 document.getElementById('dailyQuote').addEventListener('click',function(e){e.stopPropagation()});
+// 点击文章弹窗遮罩关闭
+document.getElementById('articleOverlay').addEventListener('click',function(e){if(e.target===this)closeArticle()});
+// ESC 关闭文章弹窗
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!document.getElementById('articleOverlay').classList.contains('hidden'))closeArticle()});
 </script>
 </body>
 </html>
