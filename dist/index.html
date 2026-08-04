@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>茶山烤鱼 - 每日新鲜</title>
+<script>
+// ===== 封面点击逻辑（优先加载，不依赖任何外部库）=====
+function openHub(){
+  var l = document.getElementById('landing'); if (!l) return;
+  try { history.pushState({view:'dash'},'','#dash'); } catch(e) {}
+  l.classList.add('hidden');
+  l.style.display = 'none';
+  setTimeout(function(){
+    var h = document.getElementById('dashPage');
+    if (h) h.style.display = 'block';
+    document.getElementById('todayDate').textContent = todayCN();
+    renderDashboard();
+    updateUserUI();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 600);
+}
+</script>
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/3.0.0/cloudbase.full.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;background:#f5f0eb;color:#333;min-height:100vh;overflow-x:hidden}
+
+.landing{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);z-index:10;transition:all .8s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.landing.hidden{opacity:0;pointer-events:none;transform:scale(1.1)}
+.landing .fish-container{position:relative;width:280px;height:280px;border-radius:50%;overflow:hidden;box-shadow:0 0 60px rgba(255,107,53,.4),0 0 120px rgba(255,107,53,.2);animation:pulse 3s ease-in-out infinite;margin-bottom:40px}
+.landing .fish-container img{width:100%;height:100%;object-fit:cover;display:block}
+.landing .fish-container::after{content:'';position:absolute;inset:0;border-radius:50%;border:3px solid rgba(255,255,255,.3);pointer-events:none}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.landing .title{font-size:36px;font-weight:700;color:#fff;letter-spacing:6px;text-shadow:0 2px 20px rgba(255,107,53,.6);margin-bottom:16px}
+.landing .subtitle{font-size:15px;color:rgba(255,255,255,.6);letter-spacing:3px}
+.landing .hint{margin-top:40px;font-size:14px;color:rgba(255,255,255,.4);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:.8}}
+.landing .daily-quote{margin-top:28px;padding:18px 28px;background:rgba(255,255,255,.05);border-radius:14px;border:1px solid rgba(255,255,255,.08);max-width:460px;text-align:center}
+.landing .daily-quote .quote-label{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:3px;margin-bottom:10px}
+.landing .daily-quote .quote-text{font-size:15px;color:rgba(255,255,255,.8);line-height:1.9;letter-spacing:1px;min-height:28px}
+.landing .daily-quote .quote-date{font-size:11px;color:rgba(255,255,255,.25);margin-top:10px;letter-spacing:1px}
+
+.page{display:none}
+.page.active{display:block}
+.page-header{text-align:center;padding:18px 20px 14px;border-bottom:1px solid #e0d5c8;margin-bottom:16px}
+.page-header .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;cursor:pointer;transition:opacity .2s}.page-header .brand:hover{opacity:.75}
+.page-header .brand .mini-fish{width:40px;height:40px;border-radius:50%;overflow:hidden}
+.page-header .brand .mini-fish img{width:100%;height:100%;object-fit:cover}
+.page-header .brand h1{font-size:24px;font-weight:700;color:#8b4513;letter-spacing:3px}
+.page-header .date{font-size:14px;color:#999;margin-top:8px}
+.page-header .date span{color:#e67e22;font-weight:600}
+.page-back{display:inline-flex;align-items:center;gap:6px;padding:10px 0;font-size:15px;color:#8b4513;cursor:pointer;margin:20px 0 0 20px;font-weight:500;transition:color .2s}
+.page-back:hover{color:#e67e22}
+.page-content{max-width:1200px;margin:0 auto;padding:0 24px 40px}
+.footer{text-align:center;padding:30px 0;color:#bbb;font-size:13px;border-top:1px solid #e0d5c8;margin-top:20px}
+.footer .back-btn{display:inline-block;margin-top:16px;padding:8px 24px;background:#8b4513;color:#fff;border-radius:20px;font-size:13px;cursor:pointer;transition:background .2s}
+.footer .back-btn:hover{background:#a0522d}
+
+.user-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:10px 24px;max-width:1200px;margin:0 auto}
+.user-bar .user-avatar{width:32px;height:32px;border-radius:50%;background:#e67e22;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.user-bar .user-name{font-size:14px;color:#666}
+.user-bar .login-btn{padding:6px 18px;background:#07c160;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px;transition:background .2s}
+.user-bar .login-btn:hover{background:#06ad56}
+.user-bar .logout-btn{padding:4px 12px;background:none;color:#999;border:1px solid #ddd;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+.user-bar .logout-btn:hover{color:#e74c3c;border-color:#e74c3c}
+.user-bar .admin-link{padding:4px 12px;background:none;color:#8e44ad;border:1px solid #8e44ad;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+.user-bar .admin-link:hover{background:#8e44ad;color:#fff}
+
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.login-overlay.hidden{display:none}
+.login-card{background:#fff;border-radius:18px;width:420px;max-width:92vw;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-card .login-header{background:linear-gradient(135deg,#07c160,#06ad56);padding:28px 24px;text-align:center;color:#fff;position:relative}
+.login-card .login-header .close-btn{position:absolute;top:12px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.login-card .login-header .wx-icon{font-size:36px;margin-bottom:8px}
+.login-card .login-header h2{font-size:20px;font-weight:600;letter-spacing:2px}
+.login-card .login-header p{font-size:13px;opacity:.85;margin-top:4px}
+.login-card .login-body{padding:24px}
+.login-card .login-tabs{display:flex;border-bottom:2px solid #eee;margin-bottom:20px}
+.login-card .login-tab{flex:1;text-align:center;padding:10px 0;cursor:pointer;font-size:13px;color:#999;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.login-card .login-tab.active{color:#07c160;border-bottom-color:#07c160;font-weight:600}
+.login-card .login-tab:hover{color:#07c160}
+.login-card .login-panel{display:none}
+.login-card .login-panel.active{display:block}
+.login-card .form-group{margin-bottom:14px}
+.login-card .form-group label{display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:500}
+.login-card .form-group input{width:100%;padding:12px 14px;border:1px solid #e0d5c8;border-radius:10px;font-size:14px;outline:none;transition:border-color .2s;background:#fafaf7}
+.login-card .form-group input:focus{border-color:#07c160}
+.login-card .sms-row{display:flex;gap:10px}
+.login-card .sms-row .form-group{flex:1;margin-bottom:0}
+.login-card .sms-row .sms-btn{flex-shrink:0;width:110px;padding:12px 8px;background:#f0f0f0;color:#666;border:1px solid #e0d5c8;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.login-card .sms-row .sms-btn:hover{background:#e8f5e9;color:#07c160;border-color:#07c160}
+.login-card .sms-row .sms-btn:disabled{background:#f5f5f5;color:#ccc;cursor:not-allowed;border-color:#eee}
+.login-card .sms-row .sms-btn.counting{background:#e8f5e9;color:#07c160;border-color:#a5d6a7}
+.login-card .submit-btn{width:100%;padding:12px;background:#07c160;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;letter-spacing:2px;transition:background .2s;margin-top:6px}
+.login-card .submit-btn:hover{background:#06ad56}
+.login-card .submit-btn:disabled{background:#ccc;cursor:not-allowed}
+.login-card .register-switch{text-align:center;margin-top:12px;font-size:13px;color:#999}
+.login-card .register-switch a{color:#07c160;cursor:pointer}
+
+.hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:680px;margin:0 auto}
+.hub-card{background:#fff;border-radius:16px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 8px rgba(0,0,0,.05);position:relative;overflow:hidden}
+.hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;transition:height .3s}
+.hub-card:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.hub-card:hover::before{height:6px}
+.hub-card.news::before{background:linear-gradient(90deg,#e67e22,#f39c12)}
+.hub-card.share::before{background:linear-gradient(90deg,#2980b9,#3498db)}
+.hub-card.message::before{background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.hub-card.legal::before{background:linear-gradient(90deg,#8e44ad,#9b59b6)}
+.hub-card .hub-icon{font-size:48px;margin-bottom:16px;display:block}
+.hub-card h2{font-size:20px;font-weight:700;color:#333;margin-bottom:10px;letter-spacing:2px}
+.hub-card p{font-size:13px;color:#999;line-height:1.6}
+.hub-card.news:hover h2{color:#e67e22}
+.hub-card.share:hover h2{color:#2980b9}
+.hub-card.message:hover h2{color:#27ae60}
+.hub-card.legal:hover h2{color:#8e44ad}
+.hub-card .lock-icon{font-size:13px;color:#ccc;margin-top:6px;display:none}
+.hub-card.login-required .lock-icon{display:block}
+
+.news-section{margin-bottom:32px}
+.news-section .section-title{font-size:18px;font-weight:700;color:#8b4513;padding-left:14px;border-left:4px solid #e67e22;margin-bottom:16px;line-height:1.4}
+.news-section .card{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:transform .2s,box-shadow .2s;cursor:pointer;border-left:3px solid transparent}
+.news-section .card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);border-left-color:#e67e22}
+.news-section .card .card-tag{display:inline-block;font-size:11px;font-weight:600;color:#fff;background:#e67e22;padding:2px 8px;border-radius:4px;margin-bottom:8px;letter-spacing:1px}
+.news-section .card .card-tag.politics{background:#c0392b}
+.news-section .card .card-tag.economy{background:#2980b9}
+.news-section .card .card-tag.tech{background:#8e44ad}
+.news-section .card .card-tag.world{background:#16a085}
+.news-section .card h3{font-size:16px;font-weight:600;color:#222;margin-bottom:6px;line-height:1.6}
+.news-section .card p{font-size:14px;color:#666;line-height:1.8}
+.news-section .card .card-more{font-size:13px;color:#e67e22;margin-top:8px;font-weight:500}
+
+.detail-content{background:#fff;border-radius:12px;padding:30px 30px 40px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:10px}
+.detail-content .detail-tag{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:#e67e22;padding:3px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:1px}
+.detail-content .detail-tag.politics{background:#c0392b}
+.detail-content .detail-tag.economy{background:#2980b9}
+.detail-content .detail-tag.tech{background:#8e44ad}
+.detail-content .detail-tag.world{background:#16a085}
+.detail-content h1{font-size:24px;font-weight:700;color:#222;line-height:1.5;margin-bottom:16px}
+.detail-content .detail-meta{display:flex;gap:16px;font-size:13px;color:#999;padding-bottom:20px;margin-bottom:24px;border-bottom:1px solid #eee}
+.detail-content .detail-body{font-size:16px;color:#333;line-height:2;letter-spacing:.5px}
+.detail-content .detail-body p{margin-bottom:16px}
+.detail-content .detail-source{margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:13px;color:#999}
+
+.resource-list{display:flex;flex-direction:column;gap:14px}
+.resource-item{background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;align-items:center;gap:16px;transition:transform .2s,box-shadow .2s;border-left:4px solid transparent}
+.resource-item:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);border-left-color:#2980b9}
+.resource-item .res-icon{font-size:36px;flex-shrink:0;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:#eef6fd;border-radius:12px}
+.resource-item .res-info{flex:1}
+.resource-item .res-info h3{font-size:15px;font-weight:600;color:#222;margin-bottom:4px}
+.resource-item .res-info p{font-size:13px;color:#999;line-height:1.5}
+.resource-item .res-tag{font-size:11px;padding:3px 10px;border-radius:12px;background:#eef6fd;color:#2980b9;font-weight:500;flex-shrink:0}
+
+/* 信息分享板块 */
+.share-tabs{display:flex;gap:0;max-width:680px;margin:0 auto 24px;padding:0 20px}
+.share-tab{flex:1;text-align:center;padding:12px 0;background:#f0f0f0;cursor:pointer;font-size:15px;font-weight:500;color:#888;transition:all .2s}
+.share-tab:first-child{border-radius:10px 0 0 10px}
+.share-tab:last-child{border-radius:0 10px 10px 0}
+.share-tab.active{background:linear-gradient(135deg,#2980b9,#3498db);color:#fff;font-weight:600}
+.share-tab:hover:not(.active){background:#e8e8e8;color:#555}
+.share-tab .tab-num{display:inline-block;background:rgba(255,255,255,.35);border-radius:10px;padding:1px 8px;font-size:12px;margin-left:6px}
+
+.article-list{display:flex;flex-direction:column;gap:16px}
+.article-card{background:#fff;border-radius:14px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .25s;border-left:4px solid transparent;position:relative;overflow:hidden}
+.article-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);border-left-color:#2980b9}
+.article-card .article-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;margin-bottom:10px;letter-spacing:1px}
+.article-card .article-tag.original{background:#eef6fd;color:#2980b9}
+.article-card .article-tag.hot{background:#fef3e2;color:#e67e22}
+.article-card h3{font-size:17px;font-weight:700;color:#222;margin-bottom:8px;line-height:1.5}
+.article-card .article-excerpt{font-size:14px;color:#666;line-height:1.8;margin-bottom:14px}
+.article-card .article-footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#aaa}
+.article-card .article-footer .author-info{display:flex;align-items:center;gap:6px}
+.article-card .article-footer .author-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#2980b9,#6dd5fa);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.article-card .article-stats{display:flex;gap:12px;color:#bbb;font-size:12px}
+
+.download-list{display:flex;flex-direction:column;gap:14px}
+.download-item{background:#fff;border-radius:14px;padding:18px 24px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;align-items:center;gap:16px;transition:all .25s;border-left:4px solid transparent}
+.download-item:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-left-color:#e67e22}
+.download-item .dl-icon{font-size:36px;flex-shrink:0;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:#fef9f0;border-radius:12px}
+.download-item .dl-info{flex:1}
+.download-item .dl-info h3{font-size:16px;font-weight:600;color:#222;margin-bottom:4px}
+.download-item .dl-info p{font-size:13px;color:#999;line-height:1.5}
+.download-item .dl-meta{display:flex;gap:8px;align-items:center;margin-top:4px}
+.download-item .dl-meta span{font-size:11px;padding:2px 8px;border-radius:10px;background:#f5f0eb;color:#8b4513}
+.download-item .dl-actions{flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.download-item .dl-btn{padding:8px 16px;background:#e67e22;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;white-space:nowrap;transition:background .2s}
+.download-item .dl-btn:hover{background:#d35400}
+.download-item .dl-btn.view{background:none;color:#2980b9;border:1px solid #2980b9;padding:6px 14px}
+.download-item .dl-btn.view:hover{background:#eef6fd}
+
+/* 文章详情弹窗 */
+.article-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 16px;animation:fadeIn .3s}
+.article-overlay.hidden{display:none}
+.article-modal{background:#fff;border-radius:16px;width:800px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.article-modal-header{padding:30px 30px 20px;border-bottom:1px solid #eee;position:relative}
+.article-modal-header .article-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;background:#f5f5f5;border:none;color:#666;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.article-modal-header .article-close:hover{background:#e74c3c;color:#fff}
+.article-modal-header h1{font-size:24px;font-weight:700;color:#222;line-height:1.5;padding-right:40px}
+.article-modal-header .article-meta{display:flex;gap:16px;margin-top:12px;font-size:13px;color:#999}
+.article-share-bar{display:flex;align-items:center;gap:10px;padding:14px 30px;background:#fafafa;border-bottom:1px solid #eee;flex-wrap:wrap}
+.article-share-bar .share-label{font-size:14px;color:#666;font-weight:500}
+.article-share-bar .share-btn{padding:8px 16px;border-radius:8px;border:none;font-size:13px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .2s}
+.article-share-bar .share-btn.wechat{background:#07c160;color:#fff}
+.article-share-bar .share-btn.wechat:hover{background:#06ad56}
+.article-share-bar .share-btn.link{background:#f0f0f0;color:#555}
+.article-share-bar .share-btn.link:hover{background:#e0e0e0}
+.article-body{padding:30px;font-size:16px;color:#333;line-height:2.1;letter-spacing:.5px}
+.article-body p{margin-bottom:18px;text-indent:2em}
+.article-body h2{font-size:20px;font-weight:700;color:#8b4513;margin:28px 0 14px}
+.article-body h3{font-size:17px;font-weight:600;color:#555;margin:20px 0 10px}
+.article-body blockquote{padding:14px 20px;margin:18px 0;background:#fafaf7;border-left:4px solid #e67e22;color:#666;font-style:italic;border-radius:0 8px 8px 0}
+.article-body ul,.article-body ol{margin:14px 0;padding-left:28px}
+.article-body li{margin-bottom:8px}
+.article-modal-footer{padding:20px 30px;border-top:1px solid #eee;text-align:center;font-size:13px;color:#bbb}
+
+.qr-popup{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s}
+.qr-popup.hidden{display:none}
+.qr-content{background:#fff;border-radius:16px;padding:30px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.qr-content p{font-size:16px;color:#333;margin-bottom:20px;font-weight:600}
+.qr-content #qrCode{display:inline-block;padding:12px;background:#fff;border-radius:8px;border:1px solid #eee;margin-bottom:18px}
+.qr-content #qrCode canvas,.qr-content #qrCode img{display:block}
+.qr-content .qr-close{padding:10px 36px;background:#e67e22;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:500;transition:background .2s}
+.qr-content .qr-close:hover{background:#d35400}
+.qr-content .qr-url{font-size:12px;color:#999;margin-top:12px;word-break:break-all;max-width:280px}
+
+@media(max-width:600px){
+.article-modal-header{padding:24px 18px 16px}
+.article-modal-header h1{font-size:20px;padding-right:30px}
+.article-share-bar{padding:12px 18px;gap:8px}
+.article-body{padding:20px 18px;font-size:15px}
+.article-body p{text-indent:2em;margin-bottom:14px}
+.download-item{flex-direction:column;text-align:center}
+.download-item .dl-actions{flex-direction:row;gap:8px}
+}
+
+.message-form{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:24px}
+.message-form .form-row{display:flex;gap:12px;margin-bottom:12px}
+.message-form textarea{width:100%;padding:12px 16px;border:1px solid #e0d5c8;border-radius:10px;font-size:14px;font-family:inherit;outline:none;min-height:80px;resize:vertical;background:#fafaf7;transition:border-color .2s}
+.message-form textarea:focus{border-color:#27ae60}
+.message-form .submit-row{display:flex;justify-content:space-between;align-items:center}
+.message-form button{padding:10px 32px;background:#27ae60;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;font-weight:600;letter-spacing:1px;transition:background .2s}
+.message-form button:hover{background:#219a52}
+.message-form button:disabled{background:#ccc;cursor:not-allowed}
+.message-form .review-hint{font-size:12px;color:#e67e22;display:flex;align-items:center;gap:4px}
+.login-gate{text-align:center;padding:60px 20px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.login-gate .gate-icon{font-size:56px;margin-bottom:16px}
+.login-gate h3{font-size:18px;color:#333;margin-bottom:8px}
+.login-gate p{font-size:14px;color:#999;margin-bottom:20px}
+.login-gate .gate-btn{padding:10px 32px;background:#07c160;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:background .2s}
+.login-gate .gate-btn:hover{background:#06ad56}
+.message-list{display:flex;flex-direction:column;gap:12px}
+.message-item{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.04);border-left:3px solid #27ae60}
+.message-item .msg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.message-item .msg-name{font-size:15px;font-weight:600;color:#27ae60}
+.message-item .msg-time{font-size:12px;color:#bbb}
+.message-item .msg-body{font-size:14px;color:#555;line-height:1.8}
+.message-item .msg-pending{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:#fef3e2;color:#e67e22;margin-left:8px}
+.msg-empty{text-align:center;padding:50px 20px;color:#bbb}
+.msg-empty .empty-icon{font-size:56px;margin-bottom:14px}
+
+.legal-topics{display:flex;flex-direction:column;gap:16px;margin-bottom:32px}
+.legal-topic{background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer;transition:transform .2s,box-shadow .2s;border-left:4px solid transparent}
+.legal-topic:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);border-left-color:#8e44ad}
+.legal-topic h3{font-size:16px;font-weight:600;color:#222;margin-bottom:6px}
+.legal-topic p{font-size:13px;color:#999;line-height:1.6}
+.legal-topic .topic-arrow{color:#8e44ad;font-weight:700;margin-top:6px;font-size:13px}
+.legal-form{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.legal-form h3{font-size:18px;font-weight:700;color:#8b4513;margin-bottom:6px}
+.legal-form .form-hint{font-size:13px;color:#999;margin-bottom:18px}
+.legal-form select,.legal-form textarea{width:100%;padding:12px 16px;border:1px solid #e0d5c8;border-radius:10px;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;background:#fafaf7;transition:border-color .2s}
+.legal-form select:focus,.legal-form textarea:focus{border-color:#8e44ad}
+.legal-form textarea{min-height:100px;resize:vertical}
+.legal-form .submit-row{display:flex;justify-content:space-between;align-items:center}
+.legal-form button{padding:10px 32px;background:#8e44ad;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;font-weight:600;letter-spacing:1px;transition:background .2s}
+.legal-form button:hover{background:#7d3c98}
+.legal-form button:disabled{background:#ccc;cursor:not-allowed}
+.section-label{display:inline-block;font-size:18px;font-weight:700;color:#8b4513;padding-left:14px;border-left:4px solid #8e44ad;margin-bottom:16px}
+
+.admin-panel{max-width:1200px;margin:0 auto;padding:0 24px 60px}
+.admin-panel .admin-header{background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff;border-radius:12px;padding:24px;margin-bottom:24px;text-align:center}
+.admin-panel .admin-header h2{font-size:20px;letter-spacing:2px}
+.admin-panel .admin-tabs{display:flex;gap:0;margin-bottom:20px}
+.admin-panel .admin-tab{flex:1;text-align:center;padding:12px 0;background:#f0f0f0;cursor:pointer;font-size:14px;font-weight:500;color:#666;transition:all .2s}
+.admin-panel .admin-tab:first-child{border-radius:8px 0 0 8px}
+.admin-panel .admin-tab:last-child{border-radius:0 8px 8px 0}
+.admin-panel .admin-tab.active{background:#8e44ad;color:#fff}
+.admin-panel .admin-tab .badge{display:inline-block;background:#e74c3c;color:#fff;font-size:11px;padding:1px 7px;border-radius:10px;margin-left:6px;min-width:20px}
+.admin-item{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);border-left:4px solid #e67e22}
+.admin-item .admin-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.admin-item .admin-item-user{font-size:14px;font-weight:600;color:#333}
+.admin-item .admin-item-time{font-size:12px;color:#bbb}
+.admin-item .admin-item-body{font-size:14px;color:#555;line-height:1.8;margin-bottom:14px}
+.admin-item .admin-item-category{font-size:12px;color:#8e44ad;margin-bottom:8px}
+.admin-item .admin-actions{display:flex;gap:10px;justify-content:flex-end}
+.admin-item .btn-approve{padding:6px 16px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:background .2s}
+.admin-item .btn-approve:hover{background:#219a52}
+.admin-item .btn-reject{padding:6px 16px;background:#e74c3c;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:background .2s}
+.admin-item .btn-reject:hover{background:#c0392b}
+.admin-item.approved{border-left-color:#27ae60}
+.admin-status{display:inline-block;font-size:11px;padding:2px 10px;border-radius:10px}
+.admin-status.pending{background:#fef3e2;color:#e67e22}
+.admin-status.approved{background:#e8f8ef;color:#27ae60}
+.admin-status.rejected{background:#fde8e8;color:#e74c3c}
+.admin-empty{text-align:center;padding:50px 20px;color:#bbb}
+
+@media(max-width:600px){
+.landing .fish-container{width:220px;height:220px}
+.landing .title{font-size:26px;letter-spacing:4px}
+.detail-content{padding:20px 18px 30px}
+.detail-content h1{font-size:20px}
+.detail-content .detail-body{font-size:15px}
+.message-form .submit-row{flex-direction:column;gap:12px;align-items:flex-start}
+.login-card{width:95vw}
+.dash-news .dash-news-grid{grid-template-columns:1fr}
+.dash-section-header h2{font-size:18px}
+.dash-article-card h3{font-size:15px}
+.dash-dl-item .dl-actions{flex-direction:row}
+}
+
+/* ===== Dashboard 2×2 网格布局 ===== */
+.dash-page{padding-bottom:40px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dash-section{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;flex-direction:column}
+.dash-section-header{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid #f0ebe0;cursor:default;flex-shrink:0}
+.dash-section-header .dash-icon{font-size:20px;flex-shrink:0}
+.dash-section-header h2{font-size:16px;font-weight:700;color:#333;letter-spacing:1px;flex:1}
+.dash-section-header .dash-badge{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500;flex-shrink:0}
+.dash-section-header .dash-badge.orange{background:#fef3e2;color:#e67e22}
+.dash-section-header .dash-badge.blue{background:#eef6fd;color:#2980b9}
+.dash-section-header .dash-badge.green{background:#e8f8ef;color:#27ae60}
+.dash-section-header .dash-badge.purple{background:#f5eef8;color:#8e44ad}
+.dash-section-body{padding:14px 18px;flex:1;overflow-y:auto;max-height:460px}
+.dash-section-body.noscroll{max-height:none;overflow-y:visible}
+
+/* 新闻：3列紧凑卡片 + 分类合并 */
+.dash-news .dash-news-cat{font-size:13px;font-weight:700;color:#8b4513;margin:0 0 8px;padding-left:10px;border-left:3px solid #e67e22}
+.dash-news .dash-news-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.dash-news .dash-news-grid:last-child{margin-bottom:0}
+.dash-news .dash-news-card{background:#fafaf7;border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;border-left:2px solid transparent}
+.dash-news .dash-news-card:hover{background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.06);border-left-color:#e67e22;transform:translateX(2px)}
+.dash-news .dash-news-card .nc-tag{display:inline-block;font-size:10px;font-weight:600;color:#fff;padding:1px 6px;border-radius:3px;margin-bottom:4px;letter-spacing:.5px}
+.dash-news .dash-news-card .nc-tag.politics{background:#c0392b}
+.dash-news .dash-news-card .nc-tag.economy{background:#2980b9}
+.dash-news .dash-news-card .nc-tag.tech{background:#8e44ad}
+.dash-news .dash-news-card .nc-tag.world{background:#16a085}
+.dash-news .dash-news-card .nc-title{font-size:13px;font-weight:600;color:#222;line-height:1.4;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dash-news .dash-news-card .nc-brief{display:none}
+
+/* 信息分享 */
+.dash-article-list{display:flex;flex-direction:column;gap:6px}
+.dash-article-card{background:#fafaf7;border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .15s;border-left:2px solid transparent;display:flex;align-items:center;gap:10px}
+.dash-article-card:hover{background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.06);border-left-color:#2980b9;transform:translateX(2px)}
+.dash-article-card .ac-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.dash-article-card .ac-info{flex:1;min-width:0}
+.dash-article-card .ac-info h3{font-size:13px;font-weight:600;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.dash-article-card .ac-info .ac-meta{font-size:11px;color:#999}
+.dash-article-card .ac-arrow{color:#2980b9;font-weight:700;flex-shrink:0;font-size:13px}
+
+/* 资料下载 */
+.dash-dl-list{display:flex;flex-direction:column;gap:6px}
+.dash-dl-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fafaf7;border-radius:8px;transition:all .15s}
+.dash-dl-item:hover{background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.dash-dl-item .dl-icon{font-size:24px;flex-shrink:0;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:#fef9f0;border-radius:8px}
+.dash-dl-item .dl-info{flex:1;min-width:0}
+.dash-dl-item .dl-info h4{font-size:13px;font-weight:600;color:#222;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-dl-item .dl-info span{font-size:11px;color:#999}
+.dash-dl-item .dl-actions{flex-shrink:0;display:flex;gap:6px}
+.dash-dl-item .dl-btn{padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:500;border:none;transition:all .15s}
+.dash-dl-item .dl-btn.read{background:none;color:#2980b9;border:1px solid #2980b9}
+.dash-dl-item .dl-btn.read:hover{background:#eef6fd}
+.dash-dl-item .dl-btn.share{background:#e67e22;color:#fff}
+.dash-dl-item .dl-btn.share:hover{background:#d35400}
+
+/* 留言互动 */
+.dash-msg-form{padding:12px;background:#f9faf8;border-radius:10px;margin-bottom:10px}
+.dash-msg-form textarea{width:100%;padding:8px 12px;border:1px solid #e0d5c8;border-radius:6px;font-size:13px;font-family:inherit;outline:none;min-height:50px;resize:vertical;background:#fff;transition:border-color .2s;box-sizing:border-box}
+.dash-msg-form textarea:focus{border-color:#27ae60}
+.dash-msg-form .msg-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.dash-msg-form .msg-bar button{padding:6px 20px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;transition:background .2s}
+.dash-msg-form .msg-bar button:hover{background:#219a52}
+.dash-msg-form .msg-bar button:disabled{background:#ccc;cursor:not-allowed}
+.dash-msg-form .msg-bar .hint{font-size:11px;color:#e67e22}
+.dash-msg-item{background:#fafaf7;border-radius:6px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #27ae60}
+.dash-msg-item .mi-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.dash-msg-item .mi-name{font-size:12px;font-weight:600;color:#27ae60}
+.dash-msg-item .mi-time{font-size:10px;color:#bbb}
+.dash-msg-item .mi-body{font-size:12px;color:#555;line-height:1.6}
+
+/* 法律咨询 */
+.dash-legal-topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.dash-legal-topic{background:#fafaf7;border-radius:8px;padding:10px 14px;transition:all .15s;border-left:2px solid transparent}
+.dash-legal-topic:hover{background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.06);border-left-color:#8e44ad}
+.dash-legal-topic h4{font-size:13px;font-weight:600;color:#222;margin-bottom:2px}
+.dash-legal-topic p{font-size:11px;color:#999;line-height:1.4}
+.dash-legal-form{padding:12px;background:#f9f8fa;border-radius:10px}
+.dash-legal-form select,.dash-legal-form textarea{width:100%;padding:8px 12px;border:1px solid #e0d5c8;border-radius:6px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;background:#fff;transition:border-color .2s;box-sizing:border-box}
+.dash-legal-form select:focus,.dash-legal-form textarea:focus{border-color:#8e44ad}
+.dash-legal-form textarea{min-height:50px;resize:vertical}
+.dash-legal-form .legal-bar{display:flex;justify-content:space-between;align-items:center}
+.dash-legal-form .legal-bar button{padding:6px 20px;background:#8e44ad;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;transition:background .2s}
+.dash-legal-form .legal-bar button:hover{background:#7d3c98}
+.dash-legal-form .legal-bar button:disabled{background:#ccc;cursor:not-allowed}
+.dash-legal-form .legal-bar .hint{font-size:11px;color:#999}
+
+/* Mini tabs */
+.dash-mini-tabs{display:flex;gap:0;margin-bottom:10px;border-radius:6px;overflow:hidden}
+.dash-mini-tab{flex:1;text-align:center;padding:7px 0;background:#f0f0f0;cursor:pointer;font-size:12px;font-weight:500;color:#888;transition:all .2s}
+.dash-mini-tab.active{background:#2980b9;color:#fff}
+.dash-mini-tab:hover:not(.active){background:#e0e0e0}
+
+/* Login gate */
+.dash-login-gate{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;background:#f0faf4;border-radius:10px}
+.dash-login-gate .gate-text{font-size:13px;color:#666}
+.dash-login-gate .gate-btn{padding:6px 16px;background:#07c160;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;transition:background .2s}
+.dash-login-gate .gate-btn:hover{background:#06ad56}
+.dash-login-gate.purple{background:#f5eef8}
+.dash-login-gate.purple .gate-btn{background:#8e44ad}
+.dash-login-gate.purple .gate-btn:hover{background:#7d3c98}
+
+.dash-empty{text-align:center;padding:14px;color:#bbb;font-size:12px}
+
+/* 文章/法规详情页面 */
+.article-page-inner{background:#fff;border-radius:12px;padding:30px 32px 40px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:10px}
+.article-page-header{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #eee}
+.article-page-header .article-page-tag{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:#8e44ad;padding:3px 12px;border-radius:4px;margin-bottom:14px;letter-spacing:1px}
+.article-page-header h1{font-size:24px;font-weight:700;color:#222;line-height:1.5;margin-bottom:12px}
+.article-page-header .article-page-meta{display:flex;gap:16px;font-size:13px;color:#999;flex-wrap:wrap}
+.article-page-share{display:flex;align-items:center;gap:10px;padding:14px 0;margin-bottom:10px;border-bottom:1px dashed #eee;flex-wrap:wrap}
+.article-page-share .share-label{font-size:13px;color:#666}
+.article-page-share .share-btn{padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:none;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.article-page-share .share-btn.wechat{background:#07c160;color:#fff}
+.article-page-share .share-btn.wechat:hover{background:#06ad56}
+.article-page-share .share-btn.link{background:#f0f0f0;color:#555}
+.article-page-share .share-btn.link:hover{background:#e0e0e0}
+.article-page-body{font-size:16px;color:#333;line-height:2.1;letter-spacing:.5px}
+.article-page-body p{margin-bottom:18px;text-indent:2em}
+.article-page-body h2{font-size:20px;font-weight:700;color:#8b4513;margin:28px 0 14px;text-indent:0}
+.article-page-body h3{font-size:17px;font-weight:600;color:#555;margin:20px 0 10px;text-indent:0}
+.article-page-body blockquote{padding:14px 20px;margin:18px 0;background:#fafaf7;border-left:4px solid #e67e22;color:#666;font-style:italic;border-radius:0 8px 8px 0;text-indent:0}
+.article-page-body ul,.article-page-body ol{margin:14px 0;padding-left:28px}
+.article-page-body li{margin-bottom:8px}
+.article-page-footer{padding-top:20px;margin-top:30px;border-top:1px solid #eee;text-align:center;font-size:13px;color:#bbb}
+@media(max-width:768px){
+  .article-page-inner{padding:20px 18px 30px}
+  .article-page-header h1{font-size:20px}
+  .article-page-body{font-size:15px}
+  .article-page-body p{text-indent:2em;margin-bottom:14px}
+}
+
+/* 宽屏优化 */
+@media(min-width:1100px){
+  .dash-news .dash-news-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+}
+
+/* 移动端适配 */
+@media(max-width:768px){
+  .dash-grid{grid-template-columns:1fr;gap:12px}
+  .dash-section-body{max-height:none}
+  .dash-news .dash-news-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .dash-legal-topics{grid-template-columns:1fr}
+  .dash-section-body{padding:12px 14px}
+  .dash-section-header{padding:10px 14px}
+  .dash-section-header h2{font-size:15px}
+  .dash-article-card{flex-wrap:wrap}
+  .dash-article-card .ac-arrow{display:none}
+  .dash-dl-item .dl-actions{flex-direction:row;flex-wrap:wrap}
+  .dash-news .dash-news-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:400px){
+  .dash-news .dash-news-grid{grid-template-columns:1fr}
+}
+
+</style>
+</head>
+<body>
+
+<!-- 登录弹窗 -->
+<div class="login-overlay hidden" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-header">
+      <button class="close-btn" onclick="closeLogin()">✕</button>
+      <div class="wx-icon">📱</div>
+      <h2>手机登录</h2>
+      <p>首次登录自动注册，也可使用账号密码</p>
+    </div>
+    <div class="login-body">
+      <div class="login-tabs">
+        <div class="login-tab active" data-tab="phone" onclick="switchLoginTab('phone')">📱 手机验证码</div>
+        <div class="login-tab" data-tab="login" onclick="switchLoginTab('login')">🔑 账号密码</div>
+      </div>
+      <!-- 手机短信登录 -->
+      <div class="login-panel active" id="panel-phone">
+        <div class="form-group"><label>手机号</label><input type="tel" id="phoneNum" placeholder="请输入手机号" maxlength="11"></div>
+        <div class="sms-row">
+          <div class="form-group"><label>验证码</label><input type="text" id="smsCode" placeholder="6位验证码" maxlength="6"></div>
+          <button class="sms-btn" id="sendSmsBtn" onclick="sendSmsCode()">获取验证码</button>
+        </div>
+        <button class="submit-btn" id="phoneLoginBtn" onclick="doPhoneLogin()">📱 登录 / 注册</button>
+        <div class="register-switch">首次使用手机号登录将自动创建账号</div>
+      </div>
+      <!-- 账号密码登录 -->
+      <div class="login-panel" id="panel-login">
+        <div class="form-group"><label>用户名</label><input type="text" id="loginUser" placeholder="请输入用户名" maxlength="20"></div>
+        <div class="form-group"><label>密码</label><input type="password" id="loginPass" placeholder="请输入密码" maxlength="30"></div>
+        <button class="submit-btn" id="loginBtn" onclick="doLogin()">🔑 登录</button>
+        <div class="register-switch">请先用手机号登录，然后在「账号密码」中设置用户名和密码</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 烤鱼封面 -->
+<div class="landing" id="landing" onclick="openHub()">
+  <div class="fish-container"><img src="images/grilled-fish.png" alt="烤鱼"></div>
+  <div class="title">茶山烤鱼欢迎您</div>
+  <div class="subtitle">—— 香辣鲜美 · 每日新鲜 ——</div>
+  <div class="daily-quote" id="dailyQuote">
+    <div class="quote-label">✦ 今日话语 ✦</div>
+    <div class="quote-text" id="quoteText">加载中...</div>
+    <div class="quote-date" id="quoteDate"></div>
+  </div>
+  <div class="hint">👆 点击进入</div>
+</div>
+
+<!-- Dashboard 一体化信息页面 -->
+<div class="page" id="dashPage">
+  <div class="user-bar">
+    <div id="userInfo" style="display:none;display:flex;align-items:center;gap:10px;">
+      <div class="user-avatar" id="userAvatar"></div>
+      <span class="user-name" id="userNameDisplay"></span>
+      <button class="admin-link" id="adminBtn" style="display:none;" onclick="goToAdmin()">⚙ 管理后台</button>
+      <button class="logout-btn" onclick="doLogout()">退出</button>
+    </div>
+    <div id="loginBtnArea"><button class="login-btn" onclick="showLogin()">📱 手机登录</button></div>
+  </div>
+  <div class="page-header">
+    <div class="brand" onclick="goBackToLanding()" title="回到封面"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼</h1></div>
+    <div class="date">📅 <span id="todayDate"></span></div>
+  </div>
+  <div class="page-content dash-page" id="dashContent">
+    <!-- 动态渲染 -->
+  </div>
+  <div class="footer"><p>茶山烤鱼 · 每日新鲜 | <a onclick="goBackToLanding()" style="cursor:pointer;color:#8b4513;">🐟 返回烤鱼</a></p></div>
+</div>
+
+<!-- 管理后台 -->
+<div class="page" id="adminPage">
+  <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
+  <div class="admin-panel">
+    <div class="admin-header"><h2>🛡 管理后台</h2><p style="margin-top:6px;font-size:13px;opacity:.8;">审核留言和法律咨询</p></div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="switchAdminTab('messages')">留言审核 <span class="badge" id="msgPendingCount">0</span></div>
+      <div class="admin-tab" onclick="switchAdminTab('legal')">法律咨询 <span class="badge" id="legalPendingCount">0</span></div>
+    </div>
+    <div id="adminMessagesList"></div>
+    <div id="adminLegalList" style="display:none;"></div>
+    <div class="footer"><p>管理后台 · 数据存储在 CloudBase 云端</p></div>
+  </div>
+</div>
+
+<!-- 新闻信息 -->
+<div class="page" id="newsPage">
+  <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
+  <div class="page-header">
+    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 新闻信息</h1></div>
+    <div class="date">📅 <span id="newsToday"></span> · 每日新闻速览</div>
+  </div>
+  <div class="page-content" id="newsPageContent"></div>
+</div>
+
+<!-- 新闻详情 -->
+<div class="page" id="detailPage">
+  <div class="page-back" onclick="backToNews()">← 返回导航页</div>
+  <div class="page-content"><div class="detail-content" id="detailContent"></div></div>
+</div>
+
+<!-- 文章/法规详情页面 -->
+<div class="page" id="articlePage">
+  <div class="page-back" onclick="goBackToHub()">← 返回导航页</div>
+  <div class="page-content" id="articlePageContent"></div>
+</div>
+
+<!-- 信息分享 -->
+<div class="page" id="sharePage">
+  <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
+  <div class="page-header">
+    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 信息分享</h1></div>
+    <div class="date">📡 作者文章 · 法规下载 · 实用资源</div>
+  </div>
+  <div class="share-tabs" id="shareTabs">
+    <div class="share-tab active" onclick="switchShareTab('articles')">✍️ 作者分享</div>
+    <div class="share-tab" onclick="switchShareTab('downloads')">📥 资料下载</div>
+  </div>
+  <div class="page-content" id="sharePageContent"></div>
+</div>
+
+<!-- 文章详情弹窗 -->
+<div class="article-overlay hidden" id="articleOverlay">
+  <div class="article-modal">
+    <div class="article-modal-header">
+      <button class="article-close" onclick="closeArticle()">✕</button>
+      <h1 id="articleTitle"></h1>
+      <div class="article-meta">
+        <span id="articleAuthor"></span>
+        <span id="articleDate"></span>
+      </div>
+    </div>
+    <div class="article-share-bar" id="articleShareBar">
+      <span class="share-label">📤 分享到：</span>
+      <button class="share-btn wechat" onclick="shareToWechat()" title="微信分享"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM9.53 4.97a.8.8 0 0 1 .806.79.796.796 0 0 1-.806.79.796.796 0 0 1-.806-.79.8.8 0 0 1 .806-.79zm-4.535 0a.8.8 0 0 1 .806.79.796.796 0 0 1-.806.79.796.796 0 0 1-.806-.79.8.8 0 0 1 .806-.79zm13.817 2.55c-2.853 0-5.17 2.058-5.17 4.596 0 2.538 2.317 4.596 5.17 4.596.568 0 1.119-.082 1.633-.233a.484.484 0 0 1 .398.055l1.07.626a.183.183 0 0 0 .093.03c.09 0 .16-.073.16-.165 0-.04-.014-.08-.026-.119l-.22-.832a.33.33 0 0 1 .12-.374C23.91 15.205 24 14.154 24 13.95c0-2.539-2.317-4.596-5.17-4.596-.006 0 0 0 0 0zm-1.11 2.16a.444.444 0 0 1 .448.44.442.442 0 0 1-.449.44.442.442 0 0 1-.448-.44.444.444 0 0 1 .448-.44zm-3.33 0a.444.444 0 0 1 .448.44.442.442 0 0 1-.449.44.442.442 0 0 1-.448-.44.444.444 0 0 1 .448-.44z"/></svg> 微信分享</button>
+      <button class="share-btn link" onclick="copyArticleLink()" title="复制链接">🔗 复制链接</button>
+    </div>
+    <div class="article-body" id="articleBody"></div>
+    <div class="qr-popup hidden" id="qrPopup">
+      <div class="qr-content">
+        <p>📱 用微信扫一扫打开文章</p>
+        <div id="qrCode"></div>
+        <button class="qr-close" onclick="closeQrPopup()">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 留言互动 -->
+<div class="page" id="messagePage">
+  <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
+  <div class="page-header">
+    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 留言互动</h1></div>
+    <div class="date">💬 交流讨论 · 心得分享 · 问题反馈</div>
+  </div>
+  <div class="page-content" id="messagePageContent"></div>
+</div>
+
+<!-- 法律咨询 -->
+<div class="page" id="legalPage">
+  <div class="page-back" onclick="goBackToHub()">← 返回板块导航</div>
+  <div class="page-header">
+    <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 法律咨询</h1></div>
+    <div class="date">⚖️ 法律知识 · 案例解析 · 合规指南</div>
+  </div>
+  <div class="page-content" id="legalPageContent"></div>
+</div>
+
+<script>
+// ==================== CloudBase 初始化 ====================
+var app = null, auth = null, db = null, _ = null, cloudbaseReady = false;
+var CLOUD_FN = 'https://stanley-d4g7lox50fc500e67-1300214987.ap-shanghai.app.tcloudbase.com/daily-quote';
+
+(function initCloudBase(){
+  if (typeof cloudbase === 'undefined') {
+    console.warn('[茶山烤鱼] CloudBase SDK 未加载，使用离线模式');
+    return;
+  }
+  try {
+    app = cloudbase.init({
+      env: 'stanley-d4g7lox50fc500e67',
+      region: 'ap-shanghai',
+      accessKey: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjlkMWRjMzFlLWI0ZDAtNDQ4Yi1hNzZmLWIwY2M2M2Q4MTQ5OCJ9.eyJpc3MiOiJodHRwczovL3N0YW5sZXktZDRnN2xveDUwZmM1MDBlNjcuYXAtc2hhbmdoYWkudGNiLWFwaS50ZW5jZW50Y2xvdWRhcGkuY29tIiwic3ViIjoiYW5vbiIsImF1ZCI6InN0YW5sZXktZDRnN2xveDUwZmM1MDBlNjciLCJleHAiOjQwODk1MTA2ODIsImlhdCI6MTc4NTgyNzQ4Miwibm9uY2UiOiItTDJDMUI0MlJqMkNmQW8wSGtOZUxRIiwiYXRfaGFzaCI6Ii1MMkMxQjQyUmoyQ2ZBbzBIa05lTFEiLCJuYW1lIjoiQW5vbnltb3VzIiwic2NvcGUiOiJhbm9ueW11cyIsInByb2plY3RfaWQiOiJzdGFubGV5LWRkNGc3bG94NTBmYzUwMGU2NyIsIm1ldGEiOnsicGxhdGZvcm0iOiJQdWJsaXNoYWJsZUtleSJ9LCJ1c2VyX3R5cGUiOiIiLCJjbGllbnRfdHlwZSI6ImNsaWVudF91c2VyIiwiaXNfc3lzdGVtX2FkbWluIjpmYWxzZX0.Jr1PwSaW0GQfa15KUK6qits5fss7omP2tGq0WE2z69VUGUMS4fnHNYDmbHbelGjQyDhHMBpRzVnoVXTVDPEsCnN4PWfNy5B4fud_i7voU6VhIDbQwbOPAKZdhD1rQh2DNCtIg4xqHKzEpdgqkdhGLr7HdmAy2bP-HNPdlzb1HJgQHKyzGGf4EHH3kV18-g4tdCsPChq1O9ahiz-mf8atr8aVQ6ICicU1aeq_F5t0Eovurg3PX8rYxMAghrQMuwC1q5mAeupLCV609Rn5oF6rGpYPmB-8TKgkZDcfkBnCkmVb5prLy4xiZH9rwxfn2a-gAsZjMx2eBkfM9geD-OpNGg',
+      auth: { detectSessionInUrl: true }
+    });
+    auth = app.auth;
+    db = app.database;
+    _ = db.command;
+    cloudbaseReady = true;
+  } catch(e) {
+    console.warn('[茶山烤鱼] CloudBase 初始化失败:', e.message || e);
+    app = null; auth = null; db = null; _ = null; cloudbaseReady = false;
+  }
+})();
+
+// ==================== 工具函数 ====================
+function eHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function todayCN(){var d=new Date();var w=['日','一','二','三','四','五','六'];return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+w[d.getDay()]}
+function toast(title,msg){var t=document.createElement('div');t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:14px 24px;border-radius:10px;z-index:200;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:fadeIn .3s ease;';t.innerHTML='<strong>'+title+'</strong><br><span style="opacity:.8;font-size:12px;">'+msg+'</span>';document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){t.remove()},400)},2500)}
+
+// ==================== 用户认证 ====================
+var currentUser = null;
+var isAdminUser = false;
+
+async function checkSession(){
+  if (!auth) { currentUser = null; isAdminUser = false; updateUserUI(); return; }
+  try {
+    var r = await auth.getSession();
+    if (r.data && r.data.session) {
+      currentUser = r.data.session.user;
+      await checkAdmin();
+    } else {
+      currentUser = null;
+      isAdminUser = false;
+    }
+  } catch(e) { currentUser = null; isAdminUser = false; }
+  updateUserUI();
+}
+
+async function checkAdmin(){
+  try {
+    if (!currentUser || !db) { isAdminUser = false; return; }
+    var r = await db().collection('user_roles').doc(currentUser.id).get();
+    isAdminUser = (r.data && r.data.length > 0 && r.data[0].role === 'admin');
+  } catch(e) { isAdminUser = false; }
+}
+
+function updateUserUI(){
+  var ui = document.getElementById('userInfo');
+  var lba = document.getElementById('loginBtnArea');
+  var ab = document.getElementById('adminBtn');
+  if (currentUser) {
+    ui.style.display = 'flex'; lba.style.display = 'none';
+    var name = currentUser.user_metadata && currentUser.user_metadata.nickname || currentUser.user_metadata && currentUser.user_metadata.name || currentUser.email || currentUser.id.substring(0,8);
+    document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('userNameDisplay').textContent = name;
+    ab.style.display = isAdminUser ? 'inline-block' : 'none';
+  } else {
+    ui.style.display = 'none'; lba.style.display = 'block'; ab.style.display = 'none';
+  }
+}
+
+function showLogin(){ document.getElementById('loginOverlay').classList.remove('hidden'); switchLoginTab('phone'); resetSmsCountdown(); }
+function closeLogin(){ document.getElementById('loginOverlay').classList.add('hidden'); resetSmsCountdown(); }
+function switchLoginTab(tab){
+  document.querySelectorAll('.login-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.login-panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelector('.login-tab[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  var titles = {phone:'手机登录',login:'账号密码'};
+  document.querySelector('.login-header h2').textContent = titles[tab] || '登录';
+}
+
+// ============ 手机短信登录 ============
+var smsTimer = null, smsSeconds = 0;
+var smsVerifyInfo = null; // getVerification 返回的 verificationInfo
+var smsVerifyOtpFn = null;  // signInWithOtp 返回的 verifyOtp 回调
+
+function resetSmsCountdown(){
+  if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
+  smsSeconds = 0;
+  smsVerifyInfo = null;
+  smsVerifyOtpFn = null;
+  var b = document.getElementById('sendSmsBtn');
+  b.disabled = false; b.classList.remove('counting'); b.textContent = '获取验证码';
+}
+
+// 发送短信验证码：优先使用 CloudBase 推荐的 getVerification，失败则用 signInWithOtp
+async function sendSmsCode(){
+  if (!auth) { toast('提示','服务暂不可用，请稍后重试'); return; }
+  var phoneRaw = document.getElementById('phoneNum').value.trim();
+  if (!/^1[3-9]\d{9}$/.test(phoneRaw)) { toast('提示','请输入正确的11位手机号'); return; }
+  var btn = document.getElementById('sendSmsBtn');
+  btn.disabled = true; btn.textContent = '发送中...';
+
+  var phoneFull = '+86' + phoneRaw;
+  console.log('[SMS] 开始发送验证码, phone:', phoneFull);
+
+  // 方案A: CloudBase 官方推荐 — getVerification + signInWithSms
+  if (typeof auth.getVerification === 'function') {
+    try {
+      console.log('[SMS] 尝试 getVerification({ phone_number: ' + phoneFull + ' })');
+      var r1 = await auth.getVerification({ phone_number: phoneFull });
+      console.log('[SMS] getVerification 返回:', JSON.stringify(r1));
+
+      var e1 = r1 && r1.error;
+      if (e1) {
+        console.error('[SMS] getVerification 错误:', e1.message || e1);
+        toast('发送失败', (e1 && e1.message) || '短信通道返回错误');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
+      } else {
+        // 提取 verificationInfo — 可能在 r1.data.verificationInfo 或 r1.verificationInfo
+        var vInfo = (r1.data && r1.data.verificationInfo) || r1.data || r1.verificationInfo;
+        console.log('[SMS] 提取到的 verificationInfo:', typeof vInfo, JSON.stringify(vInfo).slice(0,200));
+        if (vInfo && typeof vInfo === 'object') {
+          smsVerifyInfo = vInfo;
+          smsVerifyOtpFn = null;
+          toast('已发送','验证码已发送到 ' + phoneRaw);
+          console.log('[SMS] ✅ getVerification 成功');
+          startSmsCountdown(); return;
+        } else {
+          console.warn('[SMS] getVerification 成功但无法提取 verificationInfo，vInfo 类型:', typeof vInfo);
+        }
+      }
+      } catch(e1) {
+        var msg = e1 && e1.message;
+        console.error('[SMS] getVerification 异常:', msg || e1);
+        toast('发送失败', msg || '接口不可用(需在真实浏览器中打开网站)');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
+      }
+  }
+  // 方案A未成功，继续尝试方案B
+
+  // 方案B: Supabase 风格 — signInWithOtp + verifyOtp
+  if (typeof auth.signInWithOtp === 'function') {
+    try {
+      console.log('[SMS] 尝试 signInWithOtp({ phone: ' + phoneFull + ' })');
+      var r2 = await auth.signInWithOtp({ phone: phoneFull });
+      console.log('[SMS] signInWithOtp 返回:', JSON.stringify(r2));
+
+      var e2 = r2 && r2.error;
+      if (e2) {
+        console.error('[SMS] signInWithOtp 错误:', e2.message || e2);
+        toast('发送失败', e2.message || '短信发送失败');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
+      }
+
+      if (r2.data && typeof r2.data.verifyOtp === 'function') {
+        smsVerifyOtpFn = r2.data.verifyOtp;
+        smsVerifyInfo = null;
+        toast('已发送','验证码已发送到 ' + phoneRaw);
+        console.log('[SMS] ✅ signInWithOtp 成功');
+        startSmsCountdown(); return;
+      } else {
+        var keys = r2.data ? Object.keys(r2.data) : '无data';
+        console.warn('[SMS] signInWithOtp 成功但没有 verifyOtp 回调, keys:', keys);
+        toast('发送失败','接口返回异常，缺少验证回调(' + keys.join(',') + ')');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
+      }
+    } catch(e2) {
+      var msg2 = e2 && e2.message;
+      console.error('[SMS] signInWithOtp 异常:', msg2 || e2);
+      toast('发送失败', msg2 || '接口不可用(需在真实浏览器中打开网站)');
+      btn.disabled = false; btn.textContent = '获取验证码'; return;
+    }
+  }
+
+  // 全部失败
+  console.error('[SMS] ❌ 所有短信 API 均不可用');
+  toast('发送失败', 'CloudBase SDK未正确加载。请用Chrome/Edge浏览器打开 chashankaoyu.com 重试');
+  btn.disabled = false; btn.textContent = '获取验证码';
+}
+
+function startSmsCountdown(){
+  smsSeconds = 60;
+  var btn = document.getElementById('sendSmsBtn');
+  btn.classList.add('counting');
+  function tick(){
+    smsSeconds--;
+    btn.textContent = smsSeconds + 's 后重发';
+    if (smsSeconds <= 0) { clearInterval(smsTimer); smsTimer = null; btn.disabled = false; btn.classList.remove('counting'); btn.textContent = '获取验证码'; return; }
+    smsTimer = setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+async function doPhoneLogin(){
+  if (!auth) { toast('提示','服务暂不可用'); return; }
+  var phoneRaw = document.getElementById('phoneNum').value.trim();
+  var code = document.getElementById('smsCode').value.trim();
+  if (!/^1[3-9]\d{9}$/.test(phoneRaw)) { toast('提示','请输入正确的手机号'); return; }
+  if (!/^\d{6}$/.test(code)) { toast('提示','请输入6位验证码'); return; }
+  var btn = document.getElementById('phoneLoginBtn');
+  btn.disabled = true; btn.textContent = '验证中...';
+  console.log('[SMS] 开始验证登录, phone:', '+86' + phoneRaw, 'code:', code);
+
+  try {
+    var lr;
+    if (smsVerifyInfo) {
+      // getVerification 路径
+      console.log('[SMS] 使用 getVerification → signInWithSms 验证');
+      lr = await auth.signInWithSms({
+        verificationInfo: smsVerifyInfo,
+        verificationCode: code,
+        phoneNum: '+86' + phoneRaw
+      });
+      console.log('[SMS] signInWithSms 返回:', JSON.stringify(lr));
+    } else if (smsVerifyOtpFn) {
+      // signInWithOtp 路径
+      console.log('[SMS] 使用 signInWithOtp → verifyOtp 验证');
+      lr = await smsVerifyOtpFn({ token: code });
+      console.log('[SMS] verifyOtp 返回:', JSON.stringify(lr));
+    } else {
+      toast('提示','请先获取验证码'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return;
+    }
+
+    var e = lr && lr.error;
+    if (e) {
+      console.error('[SMS] 验证失败:', e.message || e);
+      toast('验证失败', e.message || '验证码错误或已过期');
+      btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return;
+    }
+
+    // 登录成功
+    smsVerifyInfo = null;
+    smsVerifyOtpFn = null;
+    document.getElementById('phoneNum').value = '';
+    document.getElementById('smsCode').value = '';
+    resetSmsCountdown();
+    await checkSession();
+    closeLogin();
+    console.log('[SMS] ✅ 登录成功');
+    toast('登录成功','欢迎回来！');
+    if (pendingCallback) { var cb = pendingCallback; pendingCallback = null; cb(); }
+  } catch(e) {
+    console.error('[SMS] 登录异常:', e.message || e);
+    toast('登录失败', (e && e.message) || '请检查验证码');
+  }
+  btn.disabled = false; btn.textContent = '📱 登录 / 注册';
+}
+
+async function doLogin(){
+  if (!auth) { toast('提示','服务暂不可用'); return; }
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPass').value;
+  if (!u || !p) { toast('提示','请输入用户名和密码'); return; }
+  var btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = '登录中...';
+  try {
+    var r = await auth.signInWithPassword({ username: u, password: p });
+    if (r.error) { toast('登录失败', r.error.message || '用户名或密码错误'); btn.disabled = false; btn.textContent = '🔑 登录'; return; }
+    await checkSession();
+    closeLogin();
+    toast('登录成功','欢迎回来！');
+    toast('登录成功','欢迎回来！');
+    if (pendingCallback) { var cb = pendingCallback; pendingCallback = null; cb(); }
+  } catch(e) { toast('登录失败', e.message || '请检查用户名和密码'); }
+  btn.disabled = false; btn.textContent = '🔑 登录';
+}
+
+var pendingCallback = null;
+
+async function doLogout(){
+  if (auth) { try { await auth.signOut(); } catch(e) {} }
+  currentUser = null; isAdminUser = false;
+  updateUserUI();
+  if (['message','legal','admin'].indexOf(currentView) !== -1) {
+    navigateTo('dash'); history.replaceState({view:'dash'},'','#dash');
+  }
+  toast('已退出','你已退出登录');
+}
+
+function requireLogin(cb){
+  if (currentUser) { cb(); return; }
+  pendingCallback = cb;
+  showLogin();
+}
+
+// ==================== 每日话语 ====================
+async function loadDailyQuote(){
+  var dt = document.getElementById('dailyQuote');
+  try {
+    var r = await fetch(CLOUD_FN + '/get-quote?date=' + todayStr());
+    var d = await r.json();
+    if (d.success && d.quote) {
+      dt.innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+eHtml(d.quote.text)+'</div><div class="quote-date">'+todayStr()+'</div>';
+      return;
+    }
+  } catch(e) {}
+  // 降级：使用本地默认话语
+  var autoQuotes = ['每一天都是崭新的开始，用热爱奔赴山海，用坚持书写答案。','你只管努力，剩下的交给时间。星光不负赶路人。','人生没有白走的路，每一步都算数。今天也要加油。','与其仰望别人的光芒，不如点亮自己的灯火。','山有顶峰，湖有彼岸，在人生漫漫长途中，万物皆有回转。'];
+  var d = new Date(); var start = new Date(d.getFullYear(),0,0);
+  var dayOfYear = Math.floor((d-start)/(1000*60*60*24));
+  var text = autoQuotes[dayOfYear % autoQuotes.length];
+  dt.innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+eHtml(text)+'</div><div class="quote-date">'+todayStr()+'</div>';
+}
+
+// ==================== 新闻数据 ====================
+var newsData = {
+  1:{tag:'政策',tagClass:'',title:'新型电力系统建设"十五五"规划发布',date:'2026年8月4日',source:'国家能源局',body:'<p>国家发改委、国家能源局联合印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。这是我国实现"双碳"目标的关键举措之一，标志着能源绿色低碳转型进入加速期。</p><p>规划提出六大重点任务：一是加快新能源大规模开发，重点推进"沙戈荒"大型风电光伏基地建设；二是推动电网全面升级，建设适应新能源占比逐渐提高的智能电网；三是新能源汽车充电基础设施全面升级，实现"县县有站、乡乡有桩"；四是储能规模化发展，新型储能装机规模达到4000万千瓦以上；五是电力市场化改革深化，完善现货市场和辅助服务市场；六是数字化智能化转型，推动虚拟电厂、智能微电网等新模式规模化应用。</p><p>规划特别强调了安全底线，要求增强电力系统韧性，建立健全极端天气和突发事件下的电力应急保障体系。到2030年，非化石能源消费比重将提高到25%左右，风电、太阳能发电总装机容量达到12亿千瓦以上。业内专家认为，该规划的发布将为相关产业链带来超过万亿级的投资机遇。</p>'},
+  2:{tag:'经济',tagClass:'economy',title:'上半年海洋生产总值5.5万亿元，同比增长5.1%',date:'2026年8月4日',source:'新华社',body:'<p>自然资源部最新数据显示，2026年上半年我国海洋生产总值达到5.5万亿元，同比增长5.1%，占国内生产总值的比重稳步提升。海洋经济已成为国民经济的重要增长极，增速高于同期GDP增速约0.3个百分点。</p><p>在海洋能源领域，太平岭核电2号机组正式投产，新增核电装机容量120万千瓦，年发电量可达100亿度。海上风电装机突破5000万千瓦，稳居全球第一。海洋油气产量保持稳定增长，渤海、南海东部等重点海域勘探开发取得新进展。海洋渔业转型升级成效显著，深远海养殖产量同比增长15%，智慧渔业平台建设加快推进。</p><p>不过数据也显示，海洋经济发展仍面临一些挑战，包括近海生态环境压力增大、海洋高端装备自主化率有待提升、海洋灾害风险防控能力需进一步加强等。相关部门表示，下半年将重点推动海洋生物医药、海水淡化、海洋信息等战略性新兴产业的发展。</p>'},
+  3:{tag:'法规',tagClass:'',title:'《集成电路布图设计保护条例》20多年来首次修订',date:'2026年8月4日',source:'国务院',body:'<p>国务院正式公布修订后的《集成电路布图设计保护条例》，这是该条例自2001年颁布实施以来的首次重大修订，将于2026年10月15日起正式施行。此次修订旨在适应集成电路产业快速发展的新形势，加强对芯片设计原创成果的知识产权保护。</p><p>修订的主要亮点包括：一是扩展保护范围，明确将三维集成、先进封装等新型布图设计纳入保护范围，适应Chiplet（芯粒）等新技术发展趋势；二是大幅简化申请程序，将审查周期从原来的6个月缩短至2个月，并引入电子申请和快速审查通道；三是引入惩罚性赔偿制度，对故意侵权行为可判处最高5倍的惩罚性赔偿；四是法定赔偿上限从100万元大幅提高至500万元，显著增强了侵权威慑力度。</p><p>业内律师和半导体企业普遍认为，此次修订回应了集成电路行业长期以来的诉求，特别是在中美科技竞争加剧的背景下，加强知识产权保护将为国内芯片设计企业提供更好的创新环境和法律保障。中国半导体行业协会表示将配合做好新条例的宣传和培训工作。</p>'},
+  4:{tag:'治理',tagClass:'',title:'中央网信办处置违规网络团播账号1840余个',date:'2026年8月4日',source:'中央网信办',body:'<p>中央网信办持续深入推进"清朗·网络娱乐团播乱象整治"专项行动，最新通报显示，自专项行动开展以来，各级网信部门累计处置违规网络团播账号1840余个，关闭问题直播间320余间，约谈平台负责人60余人次，有力净化了网络直播环境。</p><p>本次整治聚焦三大突出问题：一是部分团播账号通过低俗表演、虚假互动等方式诱导观众打赏消费；二是一些直播间存在刷量控评、数据造假等不正当竞争行为；三是部分平台对入驻主播审核不严，为违规内容传播提供了渠道。网信办要求各直播平台切实履行主体责任，完善内容审核机制，建立健全主播信用评价体系。</p><p>多家头部直播平台已表态积极响应，承诺将加强自查自纠，对违规内容"零容忍"。业内人士认为，随着监管规则日益明确，网络直播行业正在从野蛮生长向规范发展转型，合规经营将成为平台长期竞争力的核心要素。</p>'},
+  5:{tag:'科技',tagClass:'tech',title:'我国牵头的区块链国际标准在ISO立项',date:'2026年8月4日',source:'工信部',body:'<p>由我国牵头的"区块链和分布式记账技术 参考架构"国际标准近日在ISO（国际标准化组织）正式立项，这是我国在区块链国际标准化领域取得的又一重要突破，标志着中国在区块链底层技术标准方面的话语权进一步增强。</p><p>该标准将定义区块链系统的参考架构、功能组件和互操作性要求，为全球区块链技术的研发和应用提供统一的技术框架。标准由中国电子技术标准化研究院牵头，联合国内多家科研机构和企业共同提出，得到了来自美国、英国、德国、日本等20多个国家的支持。与此同时，工信部等三部门联合启动了碳效领跑者企业遴选工作，将利用区块链技术实现碳排放数据的可信采集和追溯。</p><p>分析人士指出，掌握国际标准制定权意味着在全球区块链产业竞争中占据了有利位置。我国区块链专利申请量已连续多年位居全球第一，但在国际标准层面的话语权仍然需要加强。此次ISO标准的成功立项，将有助于推动中国区块链企业的国际化发展，促进国产区块链技术和产品的全球应用。</p>'},
+  6:{tag:'金融',tagClass:'economy',title:'人民币国债期货在港交所挂牌上市',date:'2026年8月4日',source:'中国证监会',body:'<p>8月4日，人民币国债期货在香港交易所正式挂牌交易，首批上市合约包括2年期、5年期和10年期三个品种。这是香港资本市场发展的又一里程碑事件，也是人民币国际化进程中的重要一步。</p><p>港交所行政总裁在上市仪式上表示，人民币国债期货的推出将为境外投资者提供重要的利率风险管理工具，有助于进一步提升人民币资产的吸引力。首批参与交易的做市商包括中银国际、工银国际、汇丰银行、渣打银行等16家中外资金融机构。上市首日，三个品种合计成交约2300手，市场反应平稳积极。</p><p>市场分析人士认为，人民币国债期货的推出具有多重意义：一是有助于完善离岸人民币利率曲线，为人民币债券定价提供更准确的参考；二是丰富了离岸人民币投资和风险管理工具，有利于吸引更多国际资本参与中国债券市场；三是进一步巩固了香港作为全球离岸人民币业务枢纽的地位。配合债券通"南向通"的扩容，未来将有更多国际投资者进入中国利率衍生品市场。</p>'},
+  7:{tag:'数据',tagClass:'economy',title:'保险行业上半年接报案53.3万件，已赔付55.3亿元',date:'2026年8月4日',source:'中国保险行业协会',body:'<p>中国保险行业协会发布2026年上半年自然灾害理赔数据。数据显示，上半年保险行业针对暴雨洪涝、台风、地震等自然灾害累计接报案53.3万件，已赔付55.3亿元，整体估损金额约110.5亿元，赔付进度已超过估损金额的50%。</p><p>从灾害类型来看，暴雨洪涝相关报案占比最大，约占总报案数的62%，主要集中在我国长江中下游地区和华南地区。6月份南方持续的强降雨共造成湖南、江西、广西等8个省份大面积受灾，保险理赔已超30亿元。台风灾害报案约占总数的18%，地震和其他灾害占比约20%。从险种分布来看，车险报案最多，占比约45%；农业保险和企业财产保险次之，各占比约20%。</p><p>协会相关负责人表示，各保险公司已开通绿色理赔通道，简化理赔流程，部分地区实现了"快赔先付"，确保受灾群众和企业及时获得经济补偿。同时，协会呼吁社会公众和企业增强风险防范意识，合理配置保险保障，特别是在汛期和台风季节要提前做好防灾减损准备。</p>'},
+  8:{tag:'民生',tagClass:'',title:'上海集中处罚12家网约车平台，总额超2500万元',date:'2026年8月4日',source:'上海市交通委',body:'<p>上海市交通委员会联合市场监管、公安等多部门，对全市网约车平台开展集中执法检查，共对12家平台企业作出行政处罚，罚款总额超过2500万元。这是今年以来上海对网约车行业开出的最大规模"罚单"，彰显了监管部门规范网约车市场的坚定决心。</p><p>检查发现的主要问题集中在三个方面：一是大量向无资质的车辆和驾驶员派单，严重违反"双证齐全"的运营要求，部分平台无证派单比例高达40%以上；二是未按规定向监管平台实时上传运营数据，存在数据缺失、延迟甚至人为篡改的情况；三是对乘客投诉处理不及时、不到位，部分平台投诉解决率不足70%。</p><p>上海市交通委明确表示，下一步将继续加大执法力度，对屡罚不改的平台将依法从重处罚，直至吊销经营许可。同时，将推动建立网约车行业信用评价体系，将平台合规情况与企业信用挂钩。受此消息影响，多家网约车平台表示将立即整改，全面清退不合规车辆和驾驶员，并加强数据对接和乘客权益保障机制建设。</p>'},
+  9:{tag:'中东',tagClass:'world',title:'美伊谈判动态：特朗普称谈判已重启，伊朗否认',date:'2026年8月4日',source:'Reuters',body:'<p>围绕美伊核谈判的最新动态出现矛盾信号。美国总统特朗普8月4日在社交媒体上发文称，与伊朗的谈判"已经重启"，并表示"正在取得良好进展"。然而，伊朗外交部发言人随即作出回应，明确否认重启谈判的说法。</p><p>伊朗外交部发言人在每周例行记者会上表示："目前没有任何关于核谈判的正式或非正式接触。"他强调，除非美国首先解除对伊朗的非法单边制裁，否则伊朗不认为与华盛顿的对话具有任何实质性意义。分析人士指出，双方在谈判前提条件上的根本分歧是导致谈判停滞不前的核心原因。</p><p>与此同时，霍尔木兹海峡的紧张局势持续升级。据海运监测数据显示，霍尔木兹海峡的日均船舶通行量已降至单日仅9艘，远低于正常水平的25-30艘。国际油价受此影响持续走高，布伦特原油期货价格已突破每桶92美元。能源分析机构警告称，如果霍尔木兹海峡通航受阻持续，全球石油供应可能面临每日约1700万桶的缺口风险。</p>'},
+  10:{tag:'贸易',tagClass:'world',title:'美国25州联合起诉特朗普政府301关税政策',date:'2026年8月4日',source:'CNN',body:'<p>据CNN报道，美国25个州的总检察长于8月4日联合提起诉讼，指控特朗普政府依据301条款加征的关税政策违宪，认为总统在未经国会充分授权的情况下滥用关税权力。这是美国国内反对301关税政策的法律行动中规模最大的一次。</p><p>诉讼书指出，美国宪法赋予国会而非总统制定关税和监管对外贸易的权力。特朗普政府利用《贸易法》301条款和《国际紧急经济权力法》单方面加征全面关税的行为，已经超出了法律授权的范围，构成行政权力的严重越权。参与诉讼的包括加利福尼亚州、纽约州、伊利诺伊州等主要经济大州，这些州的进出口贸易因关税政策受到了显著冲击。</p><p>据彼得森国际经济研究所估算，301关税政策已导致美国普通家庭年均支出增加约1300美元，总计给美国消费者和企业带来了超过1500亿美元的额外成本。多个行业协会对此次诉讼表示支持，认为高关税损害了美国制造业的竞争力。白宫方面则回应称，关税政策是保护美国工人和国家安全的必要手段，将坚决捍卫总统依法享有的贸易权力。</p>'},
+  11:{tag:'国际',tagClass:'world',title:'俄乌冲突：俄击落1158架无人机创单日新高',date:'2026年8月4日',source:'俄罗斯国防部',body:'<p>俄罗斯国防部8月4日通报称，俄防空部队在过去24小时内击落乌克兰无人机共计1158架，创下冲突爆发以来单日击落无人机数量的最高纪录。其中，在罗斯托夫州和别尔哥罗德州方向拦截数量最多，分别超过300架。</p><p>乌方此次大规模无人机袭击主要针对俄南部军民用基础设施，包括多个军用机场、油料库和电力设施。俄方表示，袭击造成部分设施受损，但没有人员伤亡报告。军事分析人士指出，无人机已成为现代战场上的核心作战手段，双方都在通过大量使用低成本无人机来消耗对方昂贵的防空导弹资源，这种"不对称作战"正在改变传统战争的面貌。</p><p>与此同时，加沙地带局势仍在持续恶化。以军8月4日对加沙中部的军事行动已造成至少18人死亡、50多人受伤，其中包括多名儿童。联合国秘书长发言人表示，对加沙平民伤亡人数的持续上升深感担忧，再次呼吁各方立即停火并恢复人道主义援助通道。</p>'},
+  12:{tag:'天气',tagClass:'',title:'台风"白海豚"周四起影响我国，18条河流维持超警',date:'2026年8月4日',source:'中央气象台',body:'<p>中央气象台8月4日发布台风蓝色预警：今年第13号台风"白海豚"（强台风级）正以每小时约15公里的速度向西北方向移动，预计将于8月6日至7日移入东海海域，之后可能在我国华东沿海登陆，中心附近最大风力14级（42米/秒）。</p><p>受"白海豚"外围环流影响，8月5日起浙江、福建、上海、江苏等沿海地区将陆续出现强降雨和大风天气，部分地区过程降雨量可达200-300毫米，沿海最大阵风可达12-14级。国家防总已启动防汛防台风四级应急响应，要求相关省份做好船只回港避风、人员转移安置等防御工作。</p><p>此外，受前期持续强降雨影响，全国目前仍有18条河流维持超警戒水位，主要分布在我国长江流域和松花江流域。应急管理部已紧急调拨6.5万件救灾物资支援湖南、江西等重灾区，包括帐篷、折叠床、应急照明设备等。气象部门提醒，在台风来临前的窗口期内，各地应抓紧做好灾后恢复和隐患排查工作，防止台风与前期洪涝叠加造成更大灾害。</p>'},
+  13:{tag:'娱乐',tagClass:'',title:'暑期档电影总票房突破75亿元',date:'2026年8月4日',source:'央视新闻',body:'<p>根据国家电影局和猫眼专业版数据，截至8月4日，2026年暑期档电影总票房（含预售）已突破75亿元，观影人次超过1.8亿，较去年同期增长约12%，创下暑期档同期票房历史新高。暑期档还有近一个月时间，全年票房有望冲击新纪录。</p><p>国产影片表现尤为亮眼，票房占比超过85%。其中科幻片《星辰纪元》、动画电影《山海神话》和现实主义题材的《亲爱的城市》三部国产片票房均突破10亿元，形成明显的"第一梯队"。《星辰纪元》凭借精良的视觉特效和扎实的剧本口碑发酵，上映三周累计票房已达到28亿元，成为年度票房冠军的有力竞争者。</p><p>业内分析认为，今年暑期档的成功得益于多重因素：一是国产电影工业化水平持续提升，特效和叙事质量显著进步；二是影院基础设施不断完善，IMAX、CINITY等高端放映厅覆盖率提升；三是票价趋于合理，平均票价维持在42元左右，观影门槛降低。暑期档国产影片占比超85%的成绩，也充分证明了中国电影市场的本土化竞争力和文化自信。</p>'},
+  14:{tag:'正能量',tagClass:'',title:'00后军人顶着巨浪三次入海救起三人',date:'2026年8月4日',source:'新华社',body:'<p>近日，一段"00后军人巨浪中三次入海救人"的视频在网络上广泛传播，感动了无数网友。事情发生在海南陵水黎族自治县英州镇附近海域。8月3日下午，三名外地游客在未开发海域游泳时遭遇离岸流，被卷入深水区，情况十分危急。</p><p>正在附近休假的海南某部队战士陈海龙（22岁）听到呼救声后，毫不犹豫地冲向海中。当时海面风力达到6级，浪高接近3米，救援条件极为恶劣。他先后三次冲入巨浪，凭借在部队练就的过硬体能和海上救援技能，将三名落水游客逐一营救上岸，整个过程持续约40分钟。三名获救游客中有一名12岁的少年，因溺水时间较长情况最为危险，陈海龙对其进行了心肺复苏，直到120急救人员赶到。</p><p>事后陈海龙因体力严重透支和手臂多处擦伤被送医治疗，目前已恢复健康出院。被救游客家属为他送去了锦旗，当地政府也对其见义勇为的行为予以表彰。面对赞誉，陈海龙表示"作为一名军人，守护人民安全是我的天职。当时心里只想着赶紧把人救上来，其他的没想那么多。"网友们纷纷点赞："这才是00后该有的样子""向中国军人致敬"。</p>'}
+};
+
+function renderNewsPage(){
+  var h='';
+  var sections = [
+    {title:'🔥 国内要闻',ids:[1,2,3,4,5]},
+    {title:'💰 财经速递',ids:[6,7,8]},
+    {title:'🌍 国际观察',ids:[9,10,11]},
+    {title:'📋 社会民生',ids:[12,13,14]}
+  ];
+  sections.forEach(function(s){
+    h += '<div class="news-section"><div class="section-title">'+s.title+'</div>';
+    s.ids.forEach(function(id){
+      var n = newsData[id];
+      h += '<div class="card" data-id="'+id+'"><span class="card-tag '+n.tagClass+'">'+n.tag+'</span><h3>'+n.title+'</h3><p style="margin-bottom:6px;">'+n.body.replace(/<[^>]*>/g,'').substring(0,60)+'...</p><div class="card-more">📖 点击阅读详情 →</div></div>';
+    });
+    h += '</div>';
+  });
+  h += '<div class="footer"><p>茶山烤鱼 · 每日新鲜资讯 | '+todayCN()+'</p><p style="margin-top:4px;font-size:12px">新闻来源：新华社、央视新闻、国务院、证监会、中央气象台 等</p></div>';
+  document.getElementById('newsPageContent').innerHTML = h;
+  // 绑定点击事件
+  document.querySelectorAll('#newsPageContent .card[data-id]').forEach(function(card){
+    card.addEventListener('click',function(){
+      var id = this.getAttribute('data-id');
+      history.pushState({view:'detail',id:id},'','#detail-'+id);
+      navigateTo('detail',id);
+    });
+  });
+  document.getElementById('newsToday').textContent = todayCN();
+}
+
+// ==================== 信息分享 ====================
+var shareTabState = 'articles';
+
+function switchShareTab(tab){
+  shareTabState = tab;
+  document.querySelectorAll('.share-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('.share-tab[onclick="switchShareTab(\''+tab+'\')"]').classList.add('active');
+  renderSharePage();
+}
+
+var authorArticles = [
+  {
+    id:'a1',tag:'原创',tagClass:'original',
+    title:'从茶山到餐桌：一条烤鱼的互联网创业之路',
+    excerpt:'在数字化浪潮席卷各行各业的今天，传统餐饮如何借助互联网实现转型升级？本文以茶山烤鱼为例，深入探讨小而美品牌的生存与发展之道...',
+    author:'茶山老蔡',date:'2026-08-01',reads:1256,
+    body:'<p>十年前，我还在深圳一家互联网公司做程序员，每天对着屏幕敲代码。那时的生活很规律，朝九晚九，唯一的慰藉就是周末约上三五好友，去街边小摊吃烤鱼。</p><p>重庆烤鱼，万州风味，炭火慢烤，麻辣鲜香。每次吃到满头大汗的时候，我都会想：如果能把这个味道带出那条小巷，带到更多人面前，该多好。</p><h2>从程序员的工位到烤鱼的灶台</h2><p>2018年春天，我递交了辞职信。同事们觉得我疯了——放着月薪两万的工作不做，要去开烤鱼店？但我心里清楚，互联网行业虽然光鲜，却不是我想要的生活方式。</p><p>最初的三个月最难熬。找店面、办营业执照、学配方、招厨师，每一件事都比写代码复杂十倍。有段时间我甚至怀疑自己的选择，但每当炉火升起，当第一条鱼在炭火上滋滋作响时，那种满足感告诉我：这条路值得走。</p><h2>为什么叫"茶山烤鱼"</h2><p>店址选在深圳南山区的茶光村附近，背靠茶山。每天清晨，山上的雾气还没散，我就在店里准备食材了。这个名字就是这样来的：茶山，是我创业的地方，也是我重新认识自己的地方。</p><p>我们的鱼全部选用新鲜活鱼，现杀现烤。配方是我花了三个月，跑了八趟重庆，拜访了七位老师傅之后反复调试出来的。不追求刺激的重麻重辣，而是讲究麻、辣、鲜、香、嫩五味的平衡。</p><blockquote>"做餐饮和写代码其实很像——好的产品，都是在无数次debug中打磨出来的。"</blockquote><h2>互联网思维做传统餐饮</h2><p>虽然离开了互联网行业，但思维方式没有离开。我们用数据管理库存、用线上平台引流、用会员系统沉淀客户。更重要的是，我们坚持了互联网最核心的理念：用户至上。</p><p>每一条评价我都会认真看，每一个建议我都会考虑。有人说太辣了我们就调整辣度，有人说配菜太少我们就增加份量。这种快速迭代的思维，恰恰是互联网给我的最大财富。</p><h2>展望未来</h2><p>现在茶山烤鱼已经从一家小店发展到深圳有三家分店，每天服务超过五百位食客。但我们没有停止探索：标准化流程、中央厨房、线上商城、品牌输出……每一个环节都在不断完善。</p><p>我想说的是：无论你在什么行业，无论你做什么工作，保持热爱、持续学习、不断创新，就一定能把一件事情做好。就像烤鱼一样，火候到了，味道自然就出来了。</p><p>感谢每一位支持茶山烤鱼的朋友，我们继续努力，让你每一口都吃到幸福。</p>'
+  },
+  {
+    id:'a2',tag:'原创',tagClass:'original',
+    title:'2026年中国餐饮行业数字化趋势报告',
+    excerpt:'餐饮行业正经历前所未有的变革：AI点餐、无人配送、智能厨房...本文将全面分析2026年餐饮数字化的五大趋势及其对中小餐饮企业的影响...',
+    author:'茶山老蔡',date:'2026-07-28',reads:2389,
+    body:'<h2>引言</h2><p>2026年，中国餐饮市场规模预计突破6万亿元人民币。与此同时，数字化渗透率从2020年的15%增长到了目前的38%。对于中小餐饮企业而言，数字化转型已经从"选择题"变成了"必答题"。</p><h2>趋势一：AI驱动的智能点餐系统</h2><p>传统的扫码点餐正在被AI语义点餐取代。顾客只需要说出"我今天想吃辣的，预算80块左右"，AI系统就能自动推荐最匹配的菜品组合。这种体验的提升，让中小餐厅也能提供五星级的服务。</p><h2>趋势二：全渠道会员运营</h2><p>单一平台的会员体系已经成为过去。2026年，成功的餐饮品牌都在构建自己的私域流量池——微信社群、小程序、抖音、小红书，全渠道触达客户，用数据指导营销决策。</p><h2>趋势三：智能厨房管理系统</h2><p>IoT设备在厨房中的普及率大幅提升。智能温控、自动排烟、食材库存预警……这些技术在降低人力成本的同时，也显著提升了出品的稳定性。</p><h2>趋势四：即时零售与外卖3.0</h2><p>外卖不再只是配送现做餐食。预制菜、半成品食材包、品牌周边产品通过即时零售渠道触达消费者，拓展了餐饮的消费场景。</p><h2>趋势五：ESG与绿色餐饮</h2><p>消费者越来越关注食品的来源和环保性。数字化溯源系统让每一条鱼、每一棵菜都能追溯到产地。绿色餐饮不仅是社会责任，更是品牌溢价的重要来源。</p><h2>给中小餐饮企业的建议</h2><p>数字化不是大品牌的专利。从最简单的微信小程序点餐开始，逐步延伸到会员管理、数据分析和供应链优化。关键不是一步到位，而是迈出第一步并持续迭代。</p>'
+  },
+  {
+    id:'a3',tag:'热点',tagClass:'hot',
+    title:'劳动合同法修订解读：2026年中小企业用工新规',
+    excerpt:'2026年7月，人社部发布劳动合同法修订草案征求意见稿。本文对新规变化进行逐一解读，帮助企业HR和法务快速掌握要点...',
+    author:'法务小张',date:'2026-07-25',reads:4210,
+    body:'<h2>修订背景</h2><p>2026年7月15日，人力资源和社会保障部发布《劳动合同法（修订草案征求意见稿）》，这是自2008年劳动合同法实施以来最大规模的一次修订。此次修订聚焦新就业形态劳动者权益保障、灵活用工规范、竞业限制范围调整等社会关注热点。</p><h2>一、竞业限制范围收窄</h2><p>修订草案第24条明确：竞业限制仅适用于高级管理人员、高级技术人员和其他负有保密义务的人员。普通岗位员工不得设置竞业限制条款。这意味着大量此前被"泛竞业"困扰的普通员工将获得更大的职业自由。</p><h2>二、试用期工资标准上调</h2><p>试用期工资不得低于本单位相同岗位最低档工资的80%，且不低于用人单位所在地的最低工资标准的120%。这一调整对于一线城市的新入职员工尤为有利。</p><h2>三、灵活用工入法</h2><p>新规首次将平台用工、共享用工等新型用工形式纳入调整范围。平台企业需要为符合条件的灵活就业人员缴纳工伤保险，这是对零工经济从业者权益的重大保障。</p><h2>四、加班费计算基数明确</h2><p>加班费计算基数以劳动者本人正常工作时间的工资为准，包括基本工资、岗位工资、绩效工资等固定收入。奖金、津贴等浮动收入是否纳入由双方约定。</p><h2>五、经济补偿金上限调整</h2><p>经济补偿金的计算基数上限由原来的"本地区上年度职工月平均工资三倍"调整为"五倍"，显著提高了高薪员工被裁时的补偿标准。</p><blockquote>建议所有企业HR和法务部门尽快组织学习新规草案，提前做好合规准备。正式实施日期预计为2027年1月1日。</blockquote>'
+  },
+  {
+    id:'a4',tag:'原创',tagClass:'original',
+    title:'开一家烤鱼店的完整指南：从选址到盈利',
+    excerpt:'从0到1开一家烤鱼店需要做什么？选址秘诀、装修预算、设备清单、人员配置、营销方案...这份万字指南帮你全面避坑...',
+    author:'茶山老蔡',date:'2026-07-20',reads:5873,
+    body:'<h2>写在前面</h2><p>经常有朋友问我："蔡哥，我也想开一家烤鱼店，你觉得能做吗？"我的回答永远是：能做，但不是人人都适合。餐饮行业看似门槛低，实际上水很深。这份指南是我花了八年时间、踩了无数坑之后总结的经验，希望对你有帮助。</p><h2>第一步：自我评估</h2><p>开烤鱼店需要三个基本条件：一是至少30万的启动资金（以二线城市、100平米店面为例）；二是每天至少12小时的工作时间；三是有一定的烹饪基础或能管好厨师。三个条件缺任何一个，都建议慎重考虑。</p><h2>第二步：选址</h2><p>烤鱼店的选址有几个硬指标：<br>1）人流量：日均人流量不低于5000人次的临街商铺<br>2）竞争密度：半径一公里内同品类不超过3家<br>3）交通便利：有停车位或靠近地铁站<br>4）面积要求：80-150平米，需要有排烟条件</p><h2>第三步：装修与设备</h2><p>烤鱼店的装修投入建议控制在总预算的25%以内。核心设备包括：烤鱼炉（炭火/电烤）、排烟系统、冷藏冰柜、制冰机、厨房操作台。设备总投入约5-8万元。</p><h2>第四步：人员配置</h2><p>标准配置：主厨1名（月薪8000-12000）、帮厨1名（月薪5000-7000）、服务员2名（月薪4000-5000）、收银员1名（月薪4500-5500）。前三个月建议多配1名机动人员。</p><h2>第五步：盈利模型</h2><p>以二线城市100平米烤鱼店为例：月租金12000元、人工35000元、食材成本占营收35%、水电气5000元、其他3000元。客单价80元、日接待80桌左右即可实现月净利润3-5万元。</p><h2>最重要的忠告</h2><p>味道是根本，服务是关键，成本控制是生命线。这三条做到了，你的烤鱼店就有了活下去的基础。剩下的，就是坚持和运气了。</p>'
+  }
+];
+
+var lawDocuments = [
+  {id:'d1',icon:'📕',title:'中华人民共和国民法典',desc:'2021年1月1日起施行，共7编1260条',tag:'民事基本法',size:'10.2万字'},
+  {id:'d2',icon:'📗',title:'中华人民共和国民事诉讼法',desc:'2024年1月1日最新修订版',tag:'程序法',size:'3.8万字'},
+  {id:'d3',icon:'📘',title:'中华人民共和国刑法',desc:'2024年3月1日起施行的刑法修正案(十二)',tag:'刑事基本法',size:'7.5万字'},
+  {id:'d4',icon:'📙',title:'中华人民共和国刑事诉讼法',desc:'2018年10月26日修订版',tag:'程序法',size:'4.2万字'},
+  {id:'d5',icon:'📓',title:'中华人民共和国劳动合同法',desc:'2013年7月1日修订版（2026修订草案审议中）',tag:'劳动法',size:'2.1万字'},
+  {id:'d6',icon:'📔',title:'中华人民共和国公司法',desc:'2024年7月1日起施行的新公司法',tag:'商法',size:'4.5万字'},
+  {id:'d7',icon:'📒',title:'中华人民共和国行政诉讼法',desc:'2017年7月1日修订版',tag:'程序法',size:'2.8万字'},
+  {id:'d8',icon:'📌',title:'中华人民共和国消费者权益保护法',desc:'2014年3月15日修订版',tag:'经济法',size:'1.6万字'}
+];
+
+var currentArticle = null;
+
+function renderSharePage(){
+  var c = document.getElementById('sharePageContent');
+  if (shareTabState === 'articles') {
+    var h = '<div class="article-list">';
+    authorArticles.forEach(function(a){
+      h += '<div class="article-card" onclick="openArticle(\''+a.id+'\')">';
+      h += '<span class="article-tag '+a.tagClass+'">'+a.tag+'</span>';
+      h += '<h3>'+a.title+'</h3>';
+      h += '<p class="article-excerpt">'+a.excerpt+'</p>';
+      h += '<div class="article-footer">';
+      h += '<div class="author-info"><div class="author-avatar">'+a.author.charAt(0)+'</div><span>'+a.author+'</span></div>';
+      h += '<div class="article-stats"><span>📅 '+a.date+'</span><span>👁 '+a.reads.toLocaleString()+' 阅读</span></div>';
+      h += '</div></div>';
+    });
+    h += '</div><div class="footer"><p>✍️ 原创文章 · 持续更新中</p></div>';
+    c.innerHTML = h;
+  } else {
+    var h = '<div class="download-list">';
+    lawDocuments.forEach(function(d){
+      h += '<div class="download-item">';
+      h += '<div class="dl-icon">'+d.icon+'</div>';
+      h += '<div class="dl-info">';
+      h += '<h3>'+d.title+'</h3>';
+      h += '<p>'+d.desc+'</p>';
+      h += '<div class="dl-meta"><span>📂 '+d.tag+'</span><span>📏 '+d.size+'</span></div>';
+      h += '</div>';
+      h += '<div class="dl-actions">';
+      h += '<button class="dl-btn view" onclick="event.stopPropagation();viewLawDocument(\''+d.id+'\')">📖 在线阅读</button>';
+      h += '<button class="dl-btn" onclick="event.stopPropagation();shareLawDocument(\''+d.id+'\')">📤 分享</button>';
+      h += '</div>';
+      h += '</div>';
+    });
+    h += '</div><div class="footer"><p>📥 更多法规持续更新 · 来源：国家法律法规数据库</p></div>';
+    c.innerHTML = h;
+  }
+}
+
+function openArticle(id){
+  var a = authorArticles.find(function(x){return x.id===id});
+  if (!a) return;
+  currentArticle = a;
+  var h = '';
+  h += '<div class="article-page-inner">';
+  h += '<div class="article-page-header"><h1>'+a.title+'</h1><div class="article-page-meta"><span>✍️ '+a.author+'</span><span>📅 '+a.date+'</span><span>👁️ '+a.reads.toLocaleString()+' 阅读</span></div></div>';
+  h += '<div class="article-page-share">';
+  h += '<span class="share-label">📤 分享到：</span>';
+  h += '<button class="share-btn wechat" onclick="shareToWechat()" title="微信分享"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM9.53 4.97a.8.8 0 0 1 .806.79.796.796 0 0 1-.806.79.796.796 0 0 1-.806-.79.8.8 0 0 1 .806-.79zm-4.535 0a.8.8 0 0 1 .806.79.796.796 0 0 1-.806.79.796.796 0 0 1-.806-.79.8.8 0 0 1 .806-.79zm13.817 2.55c-2.853 0-5.17 2.058-5.17 4.596 0 2.538 2.317 4.596 5.17 4.596.568 0 1.119-.082 1.633-.233a.484.484 0 0 1 .398.055l1.07.626a.183.183 0 0 0 .093.03c.09 0 .16-.073.16-.165 0-.04-.014-.08-.026-.119l-.22-.832a.33.33 0 0 1 .12-.374C23.91 15.205 24 14.154 24 13.95c0-2.539-2.317-4.596-5.17-4.596-.006 0 0 0 0 0zm-1.11 2.16a.444.444 0 0 1 .448.44.442.442 0 0 1-.449.44.442.442 0 0 1-.448-.44.444.444 0 0 1 .448-.44zm-3.33 0a.444.444 0 0 1 .448.44.442.442 0 0 1-.449.44.442.442 0 0 1-.448-.44.444.444 0 0 1 .448-.44z"/></svg> 微信分享</button>';
+  h += '<button class="share-btn link" onclick="copyArticleLink()">🔗 复制链接</button>';
+  h += '</div>';
+  h += '<div class="article-page-body">'+a.body+'</div>';
+  h += '<div class="article-page-footer">茶山烤鱼 · 原创分享 | '+a.author+' · '+a.date+'</div>';
+  h += '</div>';
+  h += '<div class="qr-popup hidden" id="qrPopup"><div class="qr-content"><p>📱 用微信扫一扫打开文章</p><div id="qrCode"></div><button class="qr-close" onclick="closeQrPopup()">关闭</button></div></div>';
+  document.getElementById('articlePageContent').innerHTML = h;
+  navigateTo('article');
+}
+
+function closeArticle(){
+  currentArticle = null;
+  closeQrPopup();
+  history.pushState({view:'dash'}, '', '#dash');
+  navigateTo('dash');
+}
+
+function getArticleUrl(){
+  if (!currentArticle) return window.location.origin + window.location.pathname;
+  return window.location.origin + window.location.pathname + '#article=' + currentArticle.id;
+}
+
+function updateArticleShareUrl(){
+  if (!currentArticle) return;
+  // 用 history.replaceState 更新当前 URL 但不触发导航
+  try { history.replaceState({view:'article',articleId:currentArticle.id}, '', '#article='+currentArticle.id); } catch(e){}
+}
+
+function shareToWechat(){
+  if (!currentArticle) return;
+  var url = getArticleUrl();
+
+  // 手机端：尝试原生分享（微信内置浏览器会直接调用微信分享）
+  if (/Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent)) {
+    if (navigator.share) {
+      navigator.share({
+        title: currentArticle.title,
+        text: currentArticle.excerpt,
+        url: url
+      }).catch(function(){});
+    } else {
+      // 不支持原生分享，显示二维码
+      showQrCode(url);
+    }
+    return;
+  }
+  // 桌面端：显示二维码
+  showQrCode(url);
+}
+
+function showQrCode(url){
+  var popup = document.getElementById('qrPopup');
+  var qrDiv = document.getElementById('qrCode');
+  popup.classList.remove('hidden');
+  // 使用 QRServer API 生成二维码
+  var qrImg = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(url)+'" alt="微信扫码阅读" width="200" height="200" style="display:block">';
+  qrImg += '<div class="qr-url" style="margin-top:10px">'+url+'</div>';
+  qrDiv.innerHTML = qrImg;
+}
+
+function closeQrPopup(){
+  document.getElementById('qrPopup').classList.add('hidden');
+}
+
+function copyArticleLink(){
+  if (!currentArticle) return;
+  var url = getArticleUrl();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function(){
+      toast('已复制','文章链接已复制到剪贴板，快去分享吧');
+    }).catch(function(){
+      fallbackCopy(url);
+    });
+  } else {
+    fallbackCopy(url);
+  }
+}
+
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('已复制','文章链接已复制到剪贴板'); } catch(e) { toast('复制失败','手动复制：'+text); }
+  document.body.removeChild(ta);
+}
+
+// ==================== 法规文档查看 ====================
+var lawContentCache = {};
+
+function getLawContent(id){
+  var contents = {
+    'd1': {title:'中华人民共和国民法典',content:'<p>《中华人民共和国民法典》已由中华人民共和国第十三届全国人民代表大会第三次会议于2020年5月28日通过，自2021年1月1日起施行。</p><h2>第一编 总则</h2><h3>第一章 基本规定</h3><p>第一条 为了保护民事主体的合法权益，调整民事关系，维护社会和经济秩序，适应中国特色社会主义发展要求，弘扬社会主义核心价值观，根据宪法，制定本法。</p><p>第二条 民法调整平等主体的自然人、法人和非法人组织之间的人身关系和财产关系。</p><p>第三条 民事主体的人身权利、财产权利以及其他合法权益受法律保护，任何组织或者个人不得侵犯。</p><h2>第二编 物权</h2><h3>第一分编 通则</h3><p>第二百零五条 本编调整因物的归属和利用产生的民事关系。</p><p>第二百零六条 国家坚持和完善公有制为主体、多种所有制经济共同发展，按劳分配为主体、多种分配方式并存，社会主义市场经济体制等社会主义基本经济制度。</p><h2>第三编 合同</h2><p>第四百六十三条 本编调整因合同产生的民事关系。</p><p>第四百六十四条 合同是民事主体之间设立、变更、终止民事法律关系的协议。婚姻、收养、监护等有关身份关系的协议，适用有关该身份关系的法律规定；没有规定的，可以根据其性质参照适用本编规定。</p><h2>第四编 人格权</h2><p>第九百九十条 人格权是民事主体享有的生命权、身体权、健康权、姓名权、名称权、肖像权、名誉权、荣誉权、隐私权等权利。除前款规定的人格权外，自然人享有基于人身自由、人格尊严产生的其他人格权益。</p><h2>第五编 婚姻家庭</h2><p>第一千零四十条 本编调整因婚姻家庭产生的民事关系。</p><p>第一千零四十一条 婚姻家庭受国家保护。实行婚姻自由、一夫一妻、男女平等的婚姻制度。保护妇女、未成年人、老年人、残疾人的合法权益。</p><h2>第六编 继承</h2><p>第一千一百一十九条 本编调整因继承产生的民事关系。</p><p>第一千一百二十条 国家保护自然人的继承权。</p><h2>第七编 侵权责任</h2><p>第一千一百六十四条 本编调整因侵害民事权益产生的民事关系。</p><p>第一千一百六十五条 行为人因过错侵害他人民事权益造成损害的，应当承担侵权责任。依照法律规定推定行为人有过错，其不能证明自己没有过错的，应当承担侵权责任。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容，全文共1260条 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd2': {title:'中华人民共和国民事诉讼法',content:'<p>《中华人民共和国民事诉讼法》于1991年4月9日第七届全国人民代表大会第四次会议通过，历经2007年、2012年、2017年、2021年、2023年多次修正修订。</p><h2>第一编 总则</h2><h3>第一章 任务、适用范围和基本原则</h3><p>第一条 中华人民共和国民事诉讼法以宪法为根据，结合我国民事审判工作的经验和实际情况制定。</p><p>第二条 中华人民共和国民事诉讼法的任务，是保护当事人行使诉讼权利，保证人民法院查明事实，分清是非，正确适用法律，及时审理民事案件，确认民事权利义务关系，制裁民事违法行为，保护当事人的合法权益，教育公民自觉遵守法律，维护社会秩序、经济秩序，保障社会主义建设事业顺利进行。</p><h2>第二编 审判程序</h2><h3>第十二章 第一审普通程序</h3><p>第一百二十二条 起诉必须符合下列条件：（一）原告是与本案有直接利害关系的公民、法人和其他组织；（二）有明确的被告；（三）有具体的诉讼请求和事实、理由；（四）属于人民法院受理民事诉讼的范围和受诉人民法院管辖。</p><p>第一百二十三条 起诉应当向人民法院递交起诉状，并按照被告人数提出副本。书写起诉状确有困难的，可以口头起诉，由人民法院记入笔录，并告知对方当事人。</p><h3>第十三章 简易程序</h3><p>第一百六十条 基层人民法院和它派出的法庭审理事实清楚、权利义务关系明确、争议不大的简单的民事案件，适用本章规定。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd3': {title:'中华人民共和国刑法',content:'<p>《中华人民共和国刑法》于1979年7月1日第五届全国人民代表大会第二次会议通过，1997年3月14日第八届全国人民代表大会第五次会议修订。最新为刑法修正案（十二），自2024年3月1日起施行。</p><h2>第一编 总则</h2><h3>第一章 刑法的任务、基本原则和适用范围</h3><p>第一条 为了惩罚犯罪，保护人民，根据宪法，结合我国同犯罪作斗争的具体经验及实际情况，制定本法。</p><p>第二条 中华人民共和国刑法的任务，是用刑罚同一切犯罪行为作斗争，以保卫国家安全，保卫人民民主专政的政权和社会主义制度，保护国有财产和劳动群众集体所有的财产，保护公民私人所有的财产，保护公民的人身权利、民主权利和其他权利，维护社会秩序、经济秩序，保障社会主义建设事业的顺利进行。</p><h2>第二编 分则</h2><h3>第四章 侵犯公民人身权利、民主权利罪</h3><p>第二百三十二条 故意杀人的，处死刑、无期徒刑或者十年以上有期徒刑；情节较轻的，处三年以上十年以下有期徒刑。</p><p>第二百三十四条 故意伤害他人身体的，处三年以下有期徒刑、拘役或者管制。犯前款罪，致人重伤的，处三年以上十年以下有期徒刑；致人死亡或者以特别残忍手段致人重伤造成严重残疾的，处十年以上有期徒刑、无期徒刑或者死刑。</p><h3>第五章 侵犯财产罪</h3><p>第二百六十三条 以暴力、胁迫或者其他方法抢劫公私财物的，处三年以上十年以下有期徒刑，并处罚金；有下列情形之一的，处十年以上有期徒刑、无期徒刑或者死刑，并处罚金或者没收财产...</p><h3>第八章 贪污贿赂罪</h3><p>第三百八十二条 国家工作人员利用职务上的便利，侵吞、窃取、骗取或者以其他手段非法占有公共财物的，是贪污罪。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd4': {title:'中华人民共和国刑事诉讼法',content:'<p>《中华人民共和国刑事诉讼法》于1979年7月1日第五届全国人民代表大会第二次会议通过，历经1996年、2012年、2018年三次重大修订。</p><h2>第一编 总则</h2><h3>第一章 任务和基本原则</h3><p>第一条 为了保证刑法的正确实施，惩罚犯罪，保护人民，保障国家安全和社会公共安全，维护社会主义社会秩序，根据宪法，制定本法。</p><p>第二条 中华人民共和国刑事诉讼法的任务，是保证准确、及时地查明犯罪事实，正确应用法律，惩罚犯罪分子，保障无罪的人不受刑事追究，教育公民自觉遵守法律，积极同犯罪行为作斗争，维护社会主义法制，尊重和保障人权，保护公民的人身权利、财产权利、民主权利和其他权利，保障社会主义建设事业的顺利进行。</p><h2>第二编 立案、侦查和提起公诉</h2><h3>第一章 立案</h3><p>第一百一十条 任何单位和个人发现有犯罪事实或者犯罪嫌疑人，有权利也有义务向公安机关、人民检察院或者人民法院报案或者举报。被害人对侵犯其人身、财产权利的犯罪事实或者犯罪嫌疑人，有权向公安机关、人民检察院或者人民法院报案或者控告。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd5': {title:'中华人民共和国劳动合同法',content:'<p>《中华人民共和国劳动合同法》于2007年6月29日第十届全国人民代表大会常务委员会第二十八次会议通过，2012年12月28日修订，自2013年7月1日起施行。</p><h2>第一章 总则</h2><p>第一条 为了完善劳动合同制度，明确劳动合同双方当事人的权利和义务，保护劳动者的合法权益，构建和发展和谐稳定的劳动关系，制定本法。</p><p>第二条 中华人民共和国境内的企业、个体经济组织、民办非企业单位等组织（以下称用人单位）与劳动者建立劳动关系，订立、履行、变更、解除或者终止劳动合同，适用本法。</p><h2>第二章 劳动合同的订立</h2><p>第七条 用人单位自用工之日起即与劳动者建立劳动关系。用人单位应当建立职工名册备查。</p><p>第十条 建立劳动关系，应当订立书面劳动合同。已建立劳动关系，未同时订立书面劳动合同的，应当自用工之日起一个月内订立书面劳动合同。用人单位与劳动者在用工前订立劳动合同的，劳动关系自用工之日起建立。</p><h2>第三章 劳动合同的履行和变更</h2><p>第二十九条 用人单位与劳动者应当按照劳动合同的约定，全面履行各自的义务。</p><h2>第四章 劳动合同的解除和终止</h2><p>第三十六条 用人单位与劳动者协商一致，可以解除劳动合同。</p><p>第三十七条 劳动者提前三十日以书面形式通知用人单位，可以解除劳动合同。劳动者在试用期内提前三日通知用人单位，可以解除劳动合同。</p><p>第三十八条 用人单位有下列情形之一的，劳动者可以解除劳动合同：（一）未按照劳动合同约定提供劳动保护或者劳动条件的；（二）未及时足额支付劳动报酬的；（三）未依法为劳动者缴纳社会保险费的...</p><h2>第七章 法律责任</h2><p>第八十二条 用人单位自用工之日起超过一个月不满一年未与劳动者订立书面劳动合同的，应当向劳动者每月支付二倍的工资。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd6': {title:'中华人民共和国公司法',content:'<p>《中华人民共和国公司法》于2023年12月29日第十四届全国人民代表大会常务委员会第七次会议第二次修订，自2024年7月1日起施行。</p><h2>第一章 总则</h2><p>第一条 为了规范公司的组织和行为，保护公司、股东、职工和债权人的合法权益，完善中国特色现代企业制度，弘扬企业家精神，维护社会经济秩序，促进社会主义市场经济的发展，根据宪法，制定本法。</p><h2>第二章 公司登记</h2><p>第二十九条 设立公司，应当依法向公司登记机关申请设立登记。法律、行政法规规定设立公司必须报经批准的，应当在公司登记前依法办理批准手续。</p><h2>第三章 有限责任公司的设立和组织机构</h2><p>第四十二条 有限责任公司由一个以上五十个以下股东出资设立。</p><p>第四十七条 有限责任公司的注册资本为在公司登记机关登记的全体股东认缴的出资额。全体股东认缴的出资额由股东按照公司章程的规定自公司成立之日起五年内缴足。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd7': {title:'中华人民共和国行政诉讼法',content:'<p>《中华人民共和国行政诉讼法》于1989年4月4日第七届全国人民代表大会第二次会议通过，2014年11月1日修订，2017年6月27日修正。</p><h2>第一章 总则</h2><p>第一条 为保证人民法院公正、及时审理行政案件，解决行政争议，保护公民、法人和其他组织的合法权益，监督行政机关依法行使职权，根据宪法，制定本法。</p><p>第二条 公民、法人或者其他组织认为行政机关和行政机关工作人员的行政行为侵犯其合法权益，有权依照本法向人民法院提起诉讼。</p><h2>第二章 受案范围</h2><p>第十二条 人民法院受理公民、法人或者其他组织提起的下列诉讼：（一）对行政拘留、暂扣或者吊销许可证和执照、责令停产停业、没收违法所得、没收非法财物、罚款、警告等行政处罚不服的；（二）对限制人身自由或者对财产的查封、扣押、冻结等行政强制措施和行政强制执行不服的...</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'},
+    'd8': {title:'中华人民共和国消费者权益保护法',content:'<p>《中华人民共和国消费者权益保护法》于1993年10月31日第八届全国人民代表大会常务委员会第四次会议通过，2013年10月25日修订，自2014年3月15日起施行。</p><h2>第一章 总则</h2><p>第一条 为保护消费者的合法权益，维护社会经济秩序，促进社会主义市场经济健康发展，制定本法。</p><p>第二条 消费者为生活消费需要购买、使用商品或者接受服务，其权益受本法保护；本法未作规定的，受其他有关法律、法规保护。</p><h2>第二章 消费者的权利</h2><p>第七条 消费者在购买、使用商品和接受服务时享有人身、财产安全不受损害的权利。消费者有权要求经营者提供的商品和服务，符合保障人身、财产安全的要求。</p><p>第八条 消费者享有知悉其购买、使用的商品或者接受的服务的真实情况的权利。</p><h2>第七章 法律责任</h2><p>第五十五条 经营者提供商品或者服务有欺诈行为的，应当按照消费者的要求增加赔偿其受到的损失，增加赔偿的金额为消费者购买商品的价款或者接受服务的费用的三倍；增加赔偿的金额不足五百元的，为五百元。</p><p style="text-align:center;color:#999;margin-top:30px">—— 以上为节选内容 ——</p><p style="text-align:center;color:#e67e22">📌 完整版本请访问：<a href="https://flk.npc.gov.cn" target="_blank" style="color:#e67e22">国家法律法规数据库 flk.npc.gov.cn</a></p>'}
+  };
+  return contents[id] || null;
+}
+
+function viewLawDocument(id){
+  var d = getLawContent(id);
+  if (!d) return;
+  currentArticle = {id:id,title:d.title,body:d.content,author:'国家法律法规数据库',date:'官方发布',excerpt:''};
+  var h = '';
+  h += '<div class="article-page-inner">';
+  h += '<div class="article-page-header"><span class="article-page-tag">📜 法规全文</span><h1>'+d.title+'</h1><div class="article-page-meta"><span>📜 来源：国家法律法规数据库</span><span>📅 官方发布</span></div></div>';
+  h += '<div class="article-page-share">';
+  h += '<span class="share-label">📤 分享到：</span>';
+  h += '<button class="share-btn wechat" onclick="shareToWechat()">微信分享</button>';
+  h += '<button class="share-btn link" onclick="copyArticleLink()">🔗 复制链接</button>';
+  h += '</div>';
+  h += '<div class="article-page-body">'+d.content+'</div>';
+  h += '<div class="article-page-footer">来源：国家法律法规数据库 | 仅供参考，以官方最新文本为准</div>';
+  h += '</div>';
+  h += '<div class="qr-popup hidden" id="qrPopup"><div class="qr-content"><p>📱 用微信扫一扫打开</p><div id="qrCode"></div><button class="qr-close" onclick="closeQrPopup()">关闭</button></div></div>';
+  document.getElementById('articlePageContent').innerHTML = h;
+  var url = window.location.origin + window.location.pathname + '#law=' + id;
+  navigateTo('article');
+}
+
+function shareLawDocument(id){
+  var d = lawDocuments.find(function(x){return x.id===id});
+  if (!d) return;
+  var text = '【法规分享】'+d.title+' - '+d.desc;
+  var url = window.location.origin + window.location.pathname + '#law=' + id;
+  if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    navigator.share({title:d.title,text:text,url:url}).catch(function(){});
+  } else {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text+' '+url).then(function(){
+        toast('已复制',d.title+'的链接已复制，可粘贴到微信分享');
+      }).catch(function(){toast('提示','分享链接：'+url)});
+    } else { toast('提示','分享链接：'+url); }
+  }
+}
+
+// ==================== 留言系统 ====================
+async function submitMessage(){
+  var content = document.getElementById('msgContent').value.trim();
+  if (!content) { toast('提示','请输入留言内容'); return; }
+  if (!currentUser) { toast('提示','请先登录'); return; }
+  if (!db) { toast('提示','后端服务暂不可用'); return; }
+  var btn = document.querySelector('#messagePageContent button');
+  btn.disabled = true; btn.textContent = '提交中...';
+  try {
+    var name = currentUser.user_metadata && currentUser.user_metadata.nickname || currentUser.id.substring(0,8);
+    var r = await db().collection('messages').add({
+      userName: name,
+      content: content,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      userId: currentUser.id
+    });
+    document.getElementById('msgContent').value = '';
+    await renderMessagePage();
+    toast('留言已提交','等待管理员审核后公开显示');
+  } catch(e) { toast('提交失败', e.message || '请重试'); }
+  btn.disabled = false; btn.textContent = '💬 发布留言';
+}
+
+async function renderMessagePage(){
+  var container = document.getElementById('messagePageContent');
+  if (!db) { container.innerHTML = '<div class="msg-empty"><p>留言功能暂不可用（后端服务未连接）</p></div>'; return; }
+  if (!currentUser) {
+    container.innerHTML = '<div class="login-gate"><div class="gate-icon">🔒</div><h3>请先登录</h3><p>登录后即可留言互动</p><button class="gate-btn" onclick="showLogin()">💚 账号登录</button></div>';
+    return;
+  }
+  container.innerHTML = '<div class="msg-empty"><div class="empty-icon">⏳</div><p>加载中...</p></div>';
+  try {
+    // 获取所有人的公开留言
+    var ar = await db().collection('messages').where({status:'approved'}).orderBy('createdAt','desc').limit(50).get();
+    var approved = ar.data || [];
+    // 获取当前用户自己的待审留言
+    var pr = await db().collection('messages').where({userId:currentUser.id,status:'pending'}).orderBy('createdAt','desc').get();
+    var pending = pr.data || [];
+
+    var h = '<div class="message-form"><div class="form-row"><textarea id="msgContent" placeholder="说点什么吧..." maxlength="500"></textarea></div><div class="submit-row"><span class="review-hint">📝 留言需经管理员审核后公开显示</span><button onclick="submitMessage()">💬 发布留言</button></div></div>';
+
+    if (pending.length > 0) {
+      h += '<div style="margin-bottom:20px;"><div style="font-size:14px;color:#e67e22;margin-bottom:10px;">⏳ 你提交的待审留言（'+pending.length+'条）</div>';
+      pending.forEach(function(m){h += '<div class="message-item" style="border-left-color:#e67e22;"><div class="msg-header"><span class="msg-name">'+eHtml(m.userName)+'<span class="msg-pending">审核中</span></span><span class="msg-time">'+formatTime(m.createdAt)+'</span></div><div class="msg-body">'+eHtml(m.content)+'</div></div>'});
+      h += '</div>';
+    }
+
+    h += '<div class="message-list">';
+    if (approved.length === 0) { h += '<div class="msg-empty"><div class="empty-icon">💬</div><p>还没有留言，来抢沙发吧！</p></div>'; }
+    else { approved.forEach(function(m){h += '<div class="message-item"><div class="msg-header"><span class="msg-name">'+eHtml(m.userName)+'</span><span class="msg-time">'+formatTime(m.createdAt)+'</span></div><div class="msg-body">'+eHtml(m.content)+'</div></div>'}); }
+    h += '</div>';
+    container.innerHTML = h;
+  } catch(e) { container.innerHTML = '<div class="msg-empty"><p>加载失败：'+eHtml(e.message||'未知错误')+'</p></div>'; }
+}
+
+// ==================== 法律咨询 ====================
+async function submitLegal(){
+  var category = document.getElementById('legalCategory').value;
+  var content = document.getElementById('legalContent').value.trim();
+  if (!category) { toast('提示','请选择咨询类型'); return; }
+  if (!content) { toast('提示','请描述您的问题'); return; }
+  if (!currentUser) { toast('提示','请先登录'); return; }
+  if (!db) { toast('提示','后端服务暂不可用'); return; }
+  var btn = document.querySelector('#legalPageContent button');
+  btn.disabled = true; btn.textContent = '提交中...';
+  try {
+    var name = currentUser.user_metadata && currentUser.user_metadata.nickname || currentUser.id.substring(0,8);
+    await db().collection('consultations').add({
+      userName: name, category: category, content: content,
+      status: 'pending', createdAt: new Date().toISOString(), userId: currentUser.id
+    });
+    document.getElementById('legalCategory').value = '';
+    document.getElementById('legalContent').value = '';
+    await renderLegalPage();
+    toast('咨询已提交','等待管理员审核后回复');
+  } catch(e) { toast('提交失败', e.message || '请重试'); }
+  btn.disabled = false; btn.textContent = '📨 提交咨询';
+}
+
+async function renderLegalPage(){
+  var container = document.getElementById('legalPageContent');
+  if (!db) { container.innerHTML = '<div class="login-gate"><div class="gate-icon">⚠️</div><h3>服务暂不可用</h3><p>后端服务未连接</p></div>'; return; }
+  if (!currentUser) {
+    container.innerHTML = '<div class="login-gate"><div class="gate-icon">🔒</div><h3>请先登录</h3><p>登录后即可使用法律咨询</p><button class="gate-btn" onclick="showLogin()">💚 账号登录</button></div>';
+    return;
+  }
+  container.innerHTML = '<div class="msg-empty"><div class="empty-icon">⏳</div><p>加载中...</p></div>';
+  try {
+    var ar = await db().collection('consultations').where({status:'approved'}).orderBy('createdAt','desc').limit(50).get();
+    var approved = ar.data || [];
+    var pr = await db().collection('consultations').where({userId:currentUser.id,status:'pending'}).orderBy('createdAt','desc').get();
+    var pending = pr.data || [];
+
+    var h = '<div class="section-label">📌 热门法律话题</div><div class="legal-topics">';
+    h += '<div class="legal-topic"><h3>🔹 劳动合同纠纷常见问题</h3><p>未签劳动合同如何维权？被违法辞退能拿多少赔偿？</p><div class="topic-arrow">查看详情 →</div></div>';
+    h += '<div class="legal-topic"><h3>🔹 民间借贷法律风险防范</h3><p>借条怎么写才有效？利率超过多少不受法律保护？</p><div class="topic-arrow">查看详情 →</div></div>';
+    h += '<div class="legal-topic"><h3>🔹 婚姻家庭财产分割指南</h3><p>婚前财产如何界定？离婚时房产怎么分？</p><div class="topic-arrow">查看详情 →</div></div>';
+    h += '<div class="legal-topic"><h3>🔹 消费者权益保护法解读</h3><p>买到假货如何索赔？网购七天无理由退货怎么用？</p><div class="topic-arrow">查看详情 →</div></div>';
+    h += '</div>';
+
+    if (pending.length > 0) {
+      h += '<div style="margin-top:24px;"><div style="font-size:14px;color:#e67e22;margin-bottom:10px;">⏳ 你提交的待审咨询（'+pending.length+'条）</div>';
+      pending.forEach(function(i){h += '<div class="message-item" style="border-left-color:#e67e22;margin-bottom:10px;"><div class="msg-header"><span class="msg-name">'+eHtml(i.userName)+'<span class="msg-pending">审核中</span></span><span class="msg-time">'+formatTime(i.createdAt)+'</span></div><div class="admin-item-category">分类：'+i.category+'</div><div class="msg-body">'+eHtml(i.content)+'</div></div>'});
+      h += '</div>';
+    }
+
+    h += '<div style="margin-top:24px;"><div class="section-label">💬 已回复咨询</div>';
+    if (approved.length === 0) { h += '<div class="msg-empty"><p>暂无公开咨询</p></div>'; }
+    else { approved.forEach(function(i){h += '<div class="message-item" style="border-left-color:#8e44ad;margin-bottom:10px;"><div class="msg-header"><span class="msg-name">'+eHtml(i.userName)+'</span><span class="msg-time">'+formatTime(i.createdAt)+'</span></div><div class="admin-item-category">分类：'+i.category+'</div><div class="msg-body">'+eHtml(i.content)+'</div></div>'}); }
+    h += '</div>';
+
+    h += '<div class="section-label" style="margin-top:32px;">✉️ 在线咨询</div>';
+    h += '<div class="legal-form"><h3>提交法律咨询</h3><p class="form-hint">请描述您遇到的法律问题，审核通过后将公开回复</p>';
+    h += '<select id="legalCategory"><option value="">请选择咨询类型</option><option value="劳动纠纷">劳动纠纷</option><option value="合同纠纷">合同纠纷</option><option value="婚姻家庭">婚姻家庭</option><option value="民间借贷">民间借贷</option><option value="消费维权">消费维权</option><option value="房产纠纷">房产纠纷</option><option value="公司法律">公司法律</option><option value="其他">其他</option></select>';
+    h += '<textarea id="legalContent" placeholder="请详细描述您的问题..." maxlength="2000"></textarea>';
+    h += '<div class="submit-row"><span class="review-hint">📝 咨询需经管理员审核后公开显示</span><button onclick="submitLegal()">📨 提交咨询</button></div></div>';
+    h += '<div class="footer"><p>免责声明：本栏目提供法律知识参考，不构成正式法律意见。涉及重大权益，请咨询专业律师。</p></div>';
+    container.innerHTML = h;
+  } catch(e) { container.innerHTML = '<div class="msg-empty"><p>加载失败：'+eHtml(e.message||'未知错误')+'</p></div>'; }
+}
+
+// ==================== 管理后台 ====================
+var adminTab = 'messages';
+
+async function switchAdminTab(tab){
+  adminTab = tab;
+  var tabs = document.querySelectorAll('.admin-tab');
+  if (tabs.length >= 2) { tabs[0].classList.toggle('active', tab==='messages'); tabs[1].classList.toggle('active', tab==='legal'); }
+  await renderAdminPanel();
+}
+
+async function renderAdminPanel(){
+  var tabs = document.querySelectorAll('.admin-tab');
+  if (tabs.length >= 2) { tabs[0].classList.toggle('active', adminTab==='messages'); tabs[1].classList.toggle('active', adminTab==='legal'); }
+
+  if (adminTab === 'messages') {
+    document.getElementById('adminMessagesList').style.display = 'block';
+    document.getElementById('adminLegalList').style.display = 'none';
+    await renderAdminMessages();
+  } else {
+    document.getElementById('adminMessagesList').style.display = 'none';
+    document.getElementById('adminLegalList').style.display = 'block';
+    await renderAdminLegal();
+  }
+}
+
+async function renderAdminMessages(){
+  var list = document.getElementById('adminMessagesList');
+  list.innerHTML = '<div class="admin-empty">加载中...</div>';
+  try {
+    var all = await db().collection('messages').orderBy('createdAt','desc').limit(100).get();
+    var msgs = all.data || [];
+    var pending = msgs.filter(function(m){return m.status==='pending'});
+    document.getElementById('msgPendingCount').textContent = pending.length;
+    if (msgs.length === 0) { list.innerHTML = '<div class="admin-empty">暂无留言记录</div>'; return; }
+    list.innerHTML = msgs.map(function(m){
+      var sl = m.status==='pending'?'待审核':(m.status==='approved'?'已通过':'已拒绝');
+      return '<div class="admin-item '+m.status+'"><div class="admin-item-header"><span class="admin-item-user">'+eHtml(m.userName)+' <span class="admin-status '+m.status+'">'+sl+'</span></span><span class="admin-item-time">'+formatTime(m.createdAt)+'</span></div><div class="admin-item-body">'+eHtml(m.content)+'</div>'+(
+        m.status==='pending' ? '<div class="admin-actions"><button class="btn-approve" onclick="approveMsg(\''+m._id+'\')">✓ 审核通过</button><button class="btn-reject" onclick="rejectMsg(\''+m._id+'\')">✕ 拒绝</button></div>' : ''
+      )+'</div>';
+    }).join('');
+  } catch(e) { list.innerHTML = '<div class="admin-empty">加载失败：'+eHtml(e.message)+'</div>'; }
+}
+
+async function renderAdminLegal(){
+  var list = document.getElementById('adminLegalList');
+  list.innerHTML = '<div class="admin-empty">加载中...</div>';
+  try {
+    var all = await db().collection('consultations').orderBy('createdAt','desc').limit(100).get();
+    var legals = all.data || [];
+    var pending = legals.filter(function(l){return l.status==='pending'});
+    document.getElementById('legalPendingCount').textContent = pending.length;
+    if (legals.length === 0) { list.innerHTML = '<div class="admin-empty">暂无咨询记录</div>'; return; }
+    list.innerHTML = legals.map(function(l){
+      var sl = l.status==='pending'?'待审核':(l.status==='approved'?'已通过':'已拒绝');
+      return '<div class="admin-item '+l.status+'"><div class="admin-item-header"><span class="admin-item-user">'+eHtml(l.userName)+' <span class="admin-status '+l.status+'">'+sl+'</span></span><span class="admin-item-time">'+formatTime(l.createdAt)+'</span></div><div class="admin-item-category">分类：'+l.category+'</div><div class="admin-item-body">'+eHtml(l.content)+'</div>'+(
+        l.status==='pending' ? '<div class="admin-actions"><button class="btn-approve" onclick="approveLegalItem(\''+l._id+'\')">✓ 审核通过</button><button class="btn-reject" onclick="rejectLegalItem(\''+l._id+'\')">✕ 拒绝</button></div>' : ''
+      )+'</div>';
+    }).join('');
+  } catch(e) { list.innerHTML = '<div class="admin-empty">加载失败：'+eHtml(e.message)+'</div>'; }
+}
+
+async function approveMsg(id){ try { await db().collection('messages').doc(id).update({status:'approved'}); await renderAdminPanel(); toast('已通过','留言已公开显示'); } catch(e) { toast('操作失败',e.message)} }
+async function rejectMsg(id){ try { await db().collection('messages').doc(id).update({status:'rejected'}); await renderAdminPanel(); toast('已拒绝','留言已被拒绝'); } catch(e) { toast('操作失败',e.message)} }
+async function approveLegalItem(id){ try { await db().collection('consultations').doc(id).update({status:'approved'}); await renderAdminPanel(); toast('已通过','咨询已公开显示'); } catch(e) { toast('操作失败',e.message)} }
+async function rejectLegalItem(id){ try { await db().collection('consultations').doc(id).update({status:'rejected'}); await renderAdminPanel(); toast('已拒绝','咨询已被拒绝'); } catch(e) { toast('操作失败',e.message)} }
+
+function formatTime(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+// 管理员快捷入口：makeAdmin('chashan888')
+window.makeAdmin = async function(secret){
+  if (secret !== 'chashan888') { console.log('密钥错误'); return; }
+  if (!currentUser) { console.log('请先登录'); return; }
+  try {
+    // 通过 cloud function 设置管理员角色
+    await fetch(CLOUD_FN + '/set-admin',{
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ secret: secret, userId: currentUser.id })
+    });
+    await checkAdmin();
+    updateUserUI();
+    console.log(currentUser.id + ' 已设为管理员');
+  } catch(e) { console.log('设置失败：'+e.message); }
+};
+
+// ==================== Dashboard 一体化渲染 ====================
+var dashShareTab = 'articles';
+
+function switchDashShareTab(tab){
+  dashShareTab = tab;
+  document.querySelectorAll('.dash-mini-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('.dash-mini-tab[onclick="switchDashShareTab(\''+tab+'\')"]').classList.add('active');
+  renderDashShare();
+}
+
+function renderDashboard(){
+  var c = document.getElementById('dashContent');
+  if (!c) return;
+  var h = '<div class="dash-grid">';
+
+  // ===== 1. 新闻信息 =====
+  h += '<div class="dash-section"><div class="dash-section-header"><span class="dash-icon">📰</span><h2>新闻信息</h2><span class="dash-badge orange">14条</span></div><div class="dash-section-body dash-news">';
+  var sections = [
+    {title:'🔥 国内要闻',ids:[1,2,3,4,5]},
+    {title:'💰 财经速递',ids:[6,7,8]},
+    {title:'🌍 国际观察',ids:[9,10,11]},
+    {title:'📋 社会民生',ids:[12,13,14]}
+  ];
+  sections.forEach(function(s){
+    h += '<div class="dash-news-cat">'+s.title+'</div><div class="dash-news-grid">';
+    s.ids.forEach(function(id){
+      var n = newsData[id];
+      h += '<div class="dash-news-card" onclick="event.stopPropagation();history.pushState({view:\'detail\',id:'+id+'},\'\',\'#detail-'+id+'\');navigateTo(\'detail\','+id+')"><span class="nc-tag '+n.tagClass+'">'+n.tag+'</span><div class="nc-title">'+n.title+'</div></div>';
+    });
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  // ===== 2. 信息分享 =====
+  h += '<div class="dash-section"><div class="dash-section-header"><span class="dash-icon">📡</span><h2>信息分享</h2><span class="dash-badge blue">'+authorArticles.length+'篇+'+lawDocuments.length+'份</span></div><div class="dash-section-body">';
+  h += '<div class="dash-mini-tabs"><div class="dash-mini-tab active" onclick="switchDashShareTab(\'articles\')">✍️ 作者分享</div><div class="dash-mini-tab" onclick="switchDashShareTab(\'downloads\')">📥 资料下载</div></div>';
+  h += '<div id="dashShareContent"></div>';
+  h += '</div></div>';
+
+  // ===== 3. 留言互动 =====
+  h += '<div class="dash-section"><div class="dash-section-header"><span class="dash-icon">💬</span><h2>留言互动</h2><span class="dash-badge green">互动</span></div><div class="dash-section-body" id="dashMessageContent">';
+  if (!currentUser) {
+    h += '<div class="dash-login-gate"><span class="gate-text">🔒 登录后即可留言互动</span><button class="gate-btn" onclick="showLogin()">📱 手机登录</button></div>';
+  } else {
+    h += '<div class="dash-msg-form"><textarea id="dashMsgContent" placeholder="说点什么吧..." maxlength="500"></textarea><div class="msg-bar"><span class="hint">📝 留言需审核后公开</span><button onclick="submitDashMessage()">💬 发布留言</button></div></div>';
+    h += '<div id="dashMsgList"><div class="dash-empty">加载中...</div></div>';
+  }
+  h += '</div></div>';
+
+  // ===== 4. 法律咨询 =====
+  h += '<div class="dash-section"><div class="dash-section-header"><span class="dash-icon">⚖️</span><h2>法律咨询</h2><span class="dash-badge purple">知识</span></div><div class="dash-section-body noscroll">';
+  h += '<div class="dash-legal-topics"><div class="dash-legal-topic"><h4>🔹 劳动合同纠纷</h4><p>未签合同如何维权？被辞退能拿多少赔偿？</p></div><div class="dash-legal-topic"><h4>🔹 民间借贷风险</h4><p>借条怎么写才有效？利率上限是多少？</p></div><div class="dash-legal-topic"><h4>🔹 婚姻家庭财产</h4><p>婚前财产如何界定？离婚房产怎么分？</p></div><div class="dash-legal-topic"><h4>🔹 消费者权益保护</h4><p>买到假货如何索赔？网购无理由退货怎么用？</p></div></div>';
+  if (!currentUser) {
+    h += '<div class="dash-login-gate purple"><span class="gate-text">🔒 登录后即可提交法律咨询</span><button class="gate-btn" onclick="showLogin()">📱 手机登录</button></div>';
+  } else {
+    h += '<div class="dash-legal-form"><select id="dashLegalCategory"><option value="">请选择咨询类型</option><option value="劳动纠纷">劳动纠纷</option><option value="合同纠纷">合同纠纷</option><option value="婚姻家庭">婚姻家庭</option><option value="民间借贷">民间借贷</option><option value="消费维权">消费维权</option><option value="房产纠纷">房产纠纷</option><option value="公司法律">公司法律</option><option value="其他">其他</option></select><textarea id="dashLegalContent" placeholder="请描述您的问题..." maxlength="2000"></textarea><div class="legal-bar"><span class="hint">📝 咨询需审核后公开回复</span><button id="dashLegalFormBtn" onclick="submitDashLegal()">📨 提交咨询</button></div></div>';
+    h += '<div id="dashLegalList"></div>';
+  }
+  h += '<div style="text-align:center;font-size:11px;color:#aaa;margin-top:10px;">免责声明：本栏目提供法律知识参考，不构成正式法律意见</div>';
+  h += '</div></div>';
+
+  h += '</div>'; // close dash-grid
+  c.innerHTML = h;
+
+  // 渲染信息分享子内容
+  renderDashShare();
+
+  // 如果已登录，异步加载留言和法律咨询数据
+  if (currentUser && db) {
+    loadDashMessages();
+    loadDashLegal();
+  }
+}
+
+function renderDashShare(){
+  var c = document.getElementById('dashShareContent');
+  if (!c) return;
+  var h = '';
+  if (dashShareTab === 'articles') {
+    h += '<div class="dash-article-list">';
+    authorArticles.forEach(function(a){
+      h += '<div class="dash-article-card" onclick="openArticle(\''+a.id+'\')">';
+      h += '<div class="ac-icon" style="background:'+(a.tagClass==='hot'?'#fef3e2':'#eef6fd')+'">'+a.author.charAt(0)+'</div>';
+      h += '<div class="ac-info"><h3>'+a.title+'</h3><div class="ac-meta">'+a.author+' · '+a.date+' · '+a.reads.toLocaleString()+' 阅读</div></div>';
+      h += '<span class="ac-arrow">→</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+  } else {
+    h += '<div class="dash-dl-list">';
+    lawDocuments.forEach(function(d){
+      h += '<div class="dash-dl-item"><div class="dl-icon">'+d.icon+'</div><div class="dl-info"><h4>'+d.title+'</h4><span>'+d.desc+' · '+d.tag+'</span></div><div class="dl-actions"><button class="dl-btn read" onclick="event.stopPropagation();viewLawDocument(\''+d.id+'\')">📖 阅读</button><button class="dl-btn share" onclick="event.stopPropagation();shareLawDocument(\''+d.id+'\')">📤 分享</button></div></div>';
+    });
+    h += '</div>';
+  }
+  c.innerHTML = h;
+}
+
+// Dashboard 留言提交
+async function submitDashMessage(){
+  var content = document.getElementById('dashMsgContent').value.trim();
+  if (!content) { toast('提示','请输入留言内容'); return; }
+  if (!currentUser) { toast('提示','请先登录'); return; }
+  if (!db) { toast('提示','后端服务暂不可用'); return; }
+  var btn = document.querySelector('#dashMessageContent button');
+  btn.disabled = true; btn.textContent = '提交中...';
+  try {
+    var name = currentUser.user_metadata && currentUser.user_metadata.nickname || currentUser.id.substring(0,8);
+    await db().collection('messages').add({
+      userName: name, content: content, status: 'pending',
+      createdAt: new Date().toISOString(), userId: currentUser.id
+    });
+    document.getElementById('dashMsgContent').value = '';
+    await loadDashMessages();
+    toast('留言已提交','等待管理员审核后公开显示');
+  } catch(e) { toast('提交失败', e.message || '请重试'); }
+  btn.disabled = false; btn.textContent = '💬 发布留言';
+}
+
+// Dashboard 留言列表加载
+async function loadDashMessages(){
+  var list = document.getElementById('dashMsgList');
+  if (!list) return;
+  list.innerHTML = '<div class="dash-empty">加载中...</div>';
+  try {
+    var ar = await db().collection('messages').where({status:'approved'}).orderBy('createdAt','desc').limit(5).get();
+    var msgs = ar.data || [];
+    if (msgs.length === 0) { list.innerHTML = '<div class="dash-empty">💬 暂无留言，来抢沙发吧！</div>'; return; }
+    var h = '';
+    msgs.forEach(function(m){
+      h += '<div class="dash-msg-item"><div class="mi-head"><span class="mi-name">'+eHtml(m.userName)+'</span><span class="mi-time">'+formatTime(m.createdAt)+'</span></div><div class="mi-body">'+eHtml(m.content)+'</div></div>';
+    });
+    list.innerHTML = h;
+  } catch(e) { list.innerHTML = '<div class="dash-empty">加载失败</div>'; }
+}
+
+// Dashboard 法律咨询提交
+async function submitDashLegal(){
+  var cat = document.getElementById('dashLegalCategory').value;
+  var content = document.getElementById('dashLegalContent').value.trim();
+  if (!cat) { toast('提示','请选择咨询类型'); return; }
+  if (!content) { toast('提示','请描述您的问题'); return; }
+  if (!currentUser) { toast('提示','请先登录'); return; }
+  if (!db) { toast('提示','后端服务暂不可用'); return; }
+  var btn = document.querySelector('#dashLegalFormBtn') || document.querySelector('.dash-legal-form button');
+  if (!btn) return;
+  btn.disabled = true; btn.textContent = '提交中...';
+  try {
+    var name = currentUser.user_metadata && currentUser.user_metadata.nickname || currentUser.id.substring(0,8);
+    await db().collection('consultations').add({
+      userName: name, category: cat, content: content,
+      status: 'pending', createdAt: new Date().toISOString(), userId: currentUser.id
+    });
+    document.getElementById('dashLegalCategory').value = '';
+    document.getElementById('dashLegalContent').value = '';
+    await loadDashLegal();
+    toast('咨询已提交','等待管理员审核后回复');
+  } catch(e) { toast('提交失败', e.message || '请重试'); }
+  btn.disabled = false; btn.textContent = '📨 提交咨询';
+}
+
+// Dashboard 法律咨询列表加载
+async function loadDashLegal(){
+  var list = document.getElementById('dashLegalList');
+  if (!list) return;
+  try {
+    var ar = await db().collection('consultations').where({status:'approved'}).orderBy('createdAt','desc').limit(3).get();
+    var legals = ar.data || [];
+    if (legals.length === 0) return;
+    var h = '<div style="margin-top:14px;font-size:14px;font-weight:600;color:#8b4513;padding-left:10px;border-left:3px solid #8e44ad;margin-bottom:10px;">💬 近期回复</div>';
+    legals.forEach(function(l){
+      h += '<div class="dash-msg-item" style="border-left-color:#8e44ad;"><div class="mi-head"><span class="mi-name" style="color:#8e44ad;">'+eHtml(l.userName)+'</span><span class="mi-time">'+formatTime(l.createdAt)+'</span></div><div style="font-size:12px;color:#8e44ad;margin-bottom:4px;">📂 '+l.category+'</div><div class="mi-body">'+eHtml(l.content)+'</div></div>';
+    });
+    list.innerHTML = h;
+  } catch(e) {}
+}
+
+// ==================== 页面导航 ====================
+var currentView = 'landing';
+function hideAll(){
+  var landing = document.getElementById('landing');
+  landing.style.display = 'none'; landing.classList.add('hidden');
+  ['dashPage','newsPage','detailPage','articlePage','sharePage','messagePage','legalPage','adminPage'].forEach(function(id){document.getElementById(id).style.display='none'});
+}
+function navigateTo(view, data){
+  hideAll();
+  currentView = view;
+  switch(view){
+    case 'landing': var l = document.getElementById('landing'); l.style.display='flex'; l.classList.remove('hidden'); break;
+    case 'dash': document.getElementById('dashPage').style.display='block'; updateUserUI(); document.getElementById('todayDate').textContent = todayCN(); renderDashboard(); break;
+    case 'news': document.getElementById('newsPage').style.display='block'; renderNewsPage(); break;
+    case 'detail':
+      var n = newsData[data]; if(!n) return;
+      document.getElementById('detailContent').innerHTML = '<span class="detail-tag '+n.tagClass+'">'+n.tag+'</span><h1>'+n.title+'</h1><div class="detail-meta"><span>📅 '+n.date+'</span><span>📰 '+n.source+'</span></div><div class="detail-body">'+n.body+'</div><div class="detail-source">来源：'+n.source+'</div>';
+      document.getElementById('detailPage').style.display='block'; break;
+    case 'article': document.getElementById('articlePage').style.display='block'; break;
+    case 'share': document.getElementById('sharePage').style.display='block'; renderSharePage(); break;
+    case 'message': document.getElementById('messagePage').style.display='block'; renderMessagePage(); break;
+    case 'legal': document.getElementById('legalPage').style.display='block'; renderLegalPage(); break;
+    case 'admin': document.getElementById('adminPage').style.display='block'; renderAdminPanel(); break;
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goToNews(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
+function goToShare(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
+function goToMessage(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
+function goToLegal(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
+function goToAdmin(){ if(!isAdminUser){toast('提示','仅管理员可访问后台');return} history.pushState({view:'admin'},'','#admin'); navigateTo('admin') }
+function backToNews(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
+function goBackToHub(){ history.pushState({view:'dash'},'','#dash'); navigateTo('dash') }
+function goBackToLanding(){ history.pushState({view:'landing'},'',window.location.pathname); navigateTo('landing') }
+
+window.addEventListener('popstate',function(event){
+  if (event.state) {
+    switch(event.state.view){
+      case 'landing': navigateTo('landing'); break;
+      case 'dash': navigateTo('dash'); break;
+      case 'news': navigateTo('news'); break;
+      case 'detail': navigateTo('detail',event.state.id); break;
+      case 'article': navigateTo('article'); break;
+      case 'share': navigateTo('share'); break;
+      case 'message': navigateTo('message'); break;
+      case 'legal': navigateTo('legal'); break;
+      case 'admin': navigateTo('admin'); break;
+    }
+  } else { navigateTo('landing') }
+});
+
+// 初始化
+(async function init(){
+  loadDailyQuote();
+  await checkSession();
+  var hash = window.location.hash;
+  var landing = document.getElementById('landing');
+  if (hash === '#dash') { history.replaceState({view:'dash'},'','#dash'); landing.style.display='none'; navigateTo('dash'); return }
+  if (hash === '#news') { history.replaceState({view:'dash'},'','#dash'); landing.style.display='none'; navigateTo('dash'); return }
+  if (hash === '#share') { history.replaceState({view:'dash'},'','#dash'); landing.style.display='none'; navigateTo('dash'); return }
+  if (hash === '#message') { history.replaceState({view:'dash'},'','#dash'); landing.style.display='none'; navigateTo('dash'); return }
+  if (hash === '#legal') { history.replaceState({view:'dash'},'','#dash'); landing.style.display='none'; navigateTo('dash'); return }
+  if (hash === '#admin') { history.replaceState({view:'admin'},'','#admin'); landing.style.display='none'; navigateTo('admin'); return }
+  if (hash.startsWith('#detail-')) { var id=hash.replace('#detail-',''); history.replaceState({view:'detail',id:id},'',hash); landing.style.display='none'; navigateTo('detail',id); return }
+  if (hash.startsWith('#article=')) { var aid=hash.replace('#article=',''); history.replaceState({view:'article',articleId:aid},'',hash); landing.style.display='none'; openArticle(aid); return }
+  if (hash.startsWith('#law=')) { var lid=hash.replace('#law=',''); history.replaceState({view:'article',lawId:lid},'',hash); landing.style.display='none'; viewLawDocument(lid); return }
+  history.replaceState({view:'landing'},'',window.location.pathname);
+  updateUserUI();
+})();
+
+document.getElementById('dailyQuote').addEventListener('click',function(e){e.stopPropagation()});
+</script>
+</body>
+</html>
