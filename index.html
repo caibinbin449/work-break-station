@@ -115,58 +115,6 @@
     margin-top: 10px;
     letter-spacing: 1px;
   }
-  .landing .daily-quote .quote-edit {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 15px;
-    color: rgba(255,255,255,0.25);
-    cursor: pointer;
-    transition: color 0.2s;
-    background: none;
-    border: none;
-    padding: 2px 6px;
-  }
-  .landing .daily-quote .quote-edit:hover { color: rgba(255,255,255,0.7); }
-  .landing .daily-quote textarea {
-    width: 100%;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    padding: 12px;
-    resize: vertical;
-    min-height: 70px;
-    font-family: inherit;
-    line-height: 1.7;
-    outline: none;
-  }
-  .landing .daily-quote textarea:focus { border-color: rgba(255,107,53,0.6); }
-  .landing .daily-quote .quote-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 10px;
-  }
-  .landing .daily-quote .quote-actions button {
-    padding: 6px 18px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s;
-  }
-  .landing .daily-quote .quote-actions .btn-save {
-    background: #e67e22;
-    color: #fff;
-  }
-  .landing .daily-quote .quote-actions .btn-save:hover { background: #d35400; }
-  .landing .daily-quote .quote-actions .btn-cancel {
-    background: rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.7);
-  }
-  .landing .daily-quote .quote-actions .btn-cancel:hover { background: rgba(255,255,255,0.2); }
 
   /* ========== 新闻列表页 ========== */
   .news-page { max-width: 800px; margin: 0 auto; padding: 0 20px 60px; display: none; }
@@ -293,7 +241,6 @@
   <div class="title">茶山烤鱼欢迎您</div>
   <div class="subtitle">—— 香辣鲜美 · 每日新鲜 ——</div>
   <div class="daily-quote" id="dailyQuote">
-    <button class="quote-edit" id="quoteEditBtn" title="编辑今日话语">✎</button>
     <div class="quote-label">✦ 今日话语 ✦</div>
     <div class="quote-text" id="quoteText"></div>
     <div class="quote-date" id="quoteDate"></div>
@@ -484,57 +431,16 @@ function renderQuoteView() {
   const isCustom = !!saved[today];
 
   document.getElementById('dailyQuote').innerHTML = `
-    <button class="quote-edit" id="quoteEditBtn" title="编辑今日话语">✎</button>
     <div class="quote-label">✦ 今日话语 ✦</div>
     <div class="quote-text" id="quoteText">${escapeHtml(text)}</div>
     <div class="quote-date" id="quoteDate">${today}${isCustom ? ' · 自定义' : ' · 自动生成'}</div>
   `;
-
-  document.getElementById('quoteEditBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    showQuoteEditor();
-  });
 }
 
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
-}
-
-function showQuoteEditor() {
-  const today = getToday();
-  const saved = JSON.parse(localStorage.getItem('dq') || '{}');
-  const current = saved[today] || getAutoQuoteForToday();
-
-  document.getElementById('dailyQuote').innerHTML = `
-    <div class="quote-label">✦ 写下今天想说的话 ✦</div>
-    <textarea id="quoteInput" placeholder="写下鼓励自己或他人的话语...">${escapeHtml(current)}</textarea>
-    <div class="quote-actions">
-      <button class="btn-save" id="btnSaveQuote">💾 保存</button>
-      <button class="btn-cancel" id="btnCancelQuote">取消</button>
-    </div>
-  `;
-
-  document.getElementById('btnSaveQuote').addEventListener('click', function(e) {
-    e.stopPropagation();
-    const val = document.getElementById('quoteInput').value.trim();
-    const all = JSON.parse(localStorage.getItem('dq') || '{}');
-    if (val) {
-      all[today] = val;
-    } else {
-      delete all[today];
-    }
-    localStorage.setItem('dq', JSON.stringify(all));
-    renderQuoteView();
-  });
-
-  document.getElementById('btnCancelQuote').addEventListener('click', function(e) {
-    e.stopPropagation();
-    renderQuoteView();
-  });
-
-  document.getElementById('quoteInput').focus();
 }
 
 // 预设今日话语
