@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>茶山烤鱼 - 每日新鲜</title>
-<script src="https://static.cloudbase.net/cloudbase-js-sdk/3.16.0/cloudbase.full.js"></script>
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/3.0.0/cloudbase.full.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;background:#f5f0eb;color:#333;min-height:100vh;overflow-x:hidden}
@@ -477,17 +477,30 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 
 <script>
 // ==================== CloudBase 初始化 ====================
-var app = cloudbase.init({
-  env: 'stanley-d4g7lox50fc500e67',
-  region: 'ap-shanghai',
-  accessKey: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjlkMWRjMzFlLWI0ZDAtNDQ4Yi1hNzZmLWIwY2M2M2Q4MTQ5OCJ9.eyJpc3MiOiJodHRwczovL3N0YW5sZXktZDRnN2xveDUwZmM1MDBlNjcuYXAtc2hhbmdoYWkudGNiLWFwaS50ZW5jZW50Y2xvdWRhcGkuY29tIiwic3ViIjoiYW5vbiIsImF1ZCI6InN0YW5sZXktZDRnN2xveDUwZmM1MDBlNjciLCJleHAiOjQwODk1MTA2ODIsImlhdCI6MTc4NTgyNzQ4Miwibm9uY2UiOiItTDJDMUI0MlJqMkNmQW8wSGtOZUxRIiwiYXRfaGFzaCI6Ii1MMkMxQjQyUmoyQ2ZBbzBIa05lTFEiLCJuYW1lIjoiQW5vbnltb3VzIiwic2NvcGUiOiJhbm9ueW1vdXMiLCJwcm9qZWN0X2lkIjoic3RhbmxleS1kNGc3bG94NTBmYzUwMGU2NyIsIm1ldGEiOnsicGxhdGZvcm0iOiJQdWJsaXNoYWJsZUtleSJ9LCJ1c2VyX3R5cGUiOiIiLCJjbGllbnRfdHlwZSI6ImNsaWVudF91c2VyIiwiaXNfc3lzdGVtX2FkbWluIjpmYWxzZX0.Jr1PwSaW0GQfa15KUK6qits5fss7omP2tGq0WE2z69VUGUMS4fnHNYDmbHbelGjQyDhHMBpRzVnoVXTVDPEsCnN4PWfNy5B4fud_i7voU6VhIDbQwbOPAKZdhD1rQh2DNCtIg4xqHKzEpdgqkdhGLr7HdmAy2bP-HNPdlzb1HJgQHKyzGGf4EHH3kV18-g4tdCsPChq1O9ahiz-mf8atr8aVQ6ICicU1aeq_F5t0Eovurg3PX8rYxMAghrQMuwC1q5mAeupLCV609Rn5oF6rGpYPmB-8TKgkZDcfkBnCkmVb5prLy4xiZH9rwxfn2a-gAsZjMx2eBkfM9geD-OpNGg',
-  auth: { detectSessionInUrl: true }
-});
-var auth = app.auth;
-var db = app.database;
-var _ = db.command;
-
+var app = null, auth = null, db = null, _ = null, cloudbaseReady = false;
 var CLOUD_FN = 'https://stanley-d4g7lox50fc500e67-1300214987.ap-shanghai.app.tcloudbase.com/daily-quote';
+
+(function initCloudBase(){
+  if (typeof cloudbase === 'undefined') {
+    console.warn('[茶山烤鱼] CloudBase SDK 未加载，使用离线模式');
+    return;
+  }
+  try {
+    app = cloudbase.init({
+      env: 'stanley-d4g7lox50fc500e67',
+      region: 'ap-shanghai',
+      accessKey: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjlkMWRjMzFlLWI0ZDAtNDQ4Yi1hNzZmLWIwY2M2M2Q4MTQ5OCJ9.eyJpc3MiOiJodHRwczovL3N0YW5sZXktZDRnN2xveDUwZmM1MDBlNjcuYXAtc2hhbmdoYWkudGNiLWFwaS50ZW5jZW50Y2xvdWRhcGkuY29tIiwic3ViIjoiYW5vbiIsImF1ZCI6InN0YW5sZXktZDRnN2xveDUwZmM1MDBlNjciLCJleHAiOjQwODk1MTA2ODIsImlhdCI6MTc4NTgyNzQ4Miwibm9uY2UiOiItTDJDMUI0MlJqMkNmQW8wSGtOZUxRIiwiYXRfaGFzaCI6Ii1MMkMxQjQyUmoyQ2ZBbzBIa05lTFEiLCJuYW1lIjoiQW5vbnltb3VzIiwic2NvcGUiOiJhbm9ueW11cyIsInByb2plY3RfaWQiOiJzdGFubGV5LWRkNGc3bG94NTBmYzUwMGU2NyIsIm1ldGEiOnsicGxhdGZvcm0iOiJQdWJsaXNoYWJsZUtleSJ9LCJ1c2VyX3R5cGUiOiIiLCJjbGllbnRfdHlwZSI6ImNsaWVudF91c2VyIiwiaXNfc3lzdGVtX2FkbWluIjpmYWxzZX0.Jr1PwSaW0GQfa15KUK6qits5fss7omP2tGq0WE2z69VUGUMS4fnHNYDmbHbelGjQyDhHMBpRzVnoVXTVDPEsCnN4PWfNy5B4fud_i7voU6VhIDbQwbOPAKZdhD1rQh2DNCtIg4xqHKzEpdgqkdhGLr7HdmAy2bP-HNPdlzb1HJgQHKyzGGf4EHH3kV18-g4tdCsPChq1O9ahiz-mf8atr8aVQ6ICicU1aeq_F5t0Eovurg3PX8rYxMAghrQMuwC1q5mAeupLCV609Rn5oF6rGpYPmB-8TKgkZDcfkBnCkmVb5prLy4xiZH9rwxfn2a-gAsZjMx2eBkfM9geD-OpNGg',
+      auth: { detectSessionInUrl: true }
+    });
+    auth = app.auth;
+    db = app.database;
+    _ = db.command;
+    cloudbaseReady = true;
+  } catch(e) {
+    console.warn('[茶山烤鱼] CloudBase 初始化失败:', e.message || e);
+    app = null; auth = null; db = null; _ = null; cloudbaseReady = false;
+  }
+})();
 
 // ==================== 工具函数 ====================
 function eHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
@@ -500,6 +513,7 @@ var currentUser = null;
 var isAdminUser = false;
 
 async function checkSession(){
+  if (!auth) { currentUser = null; isAdminUser = false; updateUserUI(); return; }
   try {
     var r = await auth.getSession();
     if (r.data && r.data.session) {
@@ -515,7 +529,7 @@ async function checkSession(){
 
 async function checkAdmin(){
   try {
-    if (!currentUser) { isAdminUser = false; return; }
+    if (!currentUser || !db) { isAdminUser = false; return; }
     var r = await db().collection('user_roles').doc(currentUser.id).get();
     isAdminUser = (r.data && r.data.length > 0 && r.data[0].role === 'admin');
   } catch(e) { isAdminUser = false; }
@@ -563,6 +577,7 @@ function resetSmsCountdown(){
 
 // 发送短信验证码：优先使用 CloudBase 推荐的 getVerification，失败则用 signInWithOtp
 async function sendSmsCode(){
+  if (!auth) { toast('提示','服务暂不可用，请稍后重试'); return; }
   var phoneRaw = document.getElementById('phoneNum').value.trim();
   if (!/^1[3-9]\d{9}$/.test(phoneRaw)) { toast('提示','请输入正确的11位手机号'); return; }
   var btn = document.getElementById('sendSmsBtn');
@@ -666,6 +681,7 @@ function startSmsCountdown(){
 }
 
 async function doPhoneLogin(){
+  if (!auth) { toast('提示','服务暂不可用'); return; }
   var phoneRaw = document.getElementById('phoneNum').value.trim();
   var code = document.getElementById('smsCode').value.trim();
   if (!/^1[3-9]\d{9}$/.test(phoneRaw)) { toast('提示','请输入正确的手机号'); return; }
@@ -720,6 +736,7 @@ async function doPhoneLogin(){
 }
 
 async function doLogin(){
+  if (!auth) { toast('提示','服务暂不可用'); return; }
   var u = document.getElementById('loginUser').value.trim();
   var p = document.getElementById('loginPass').value;
   if (!u || !p) { toast('提示','请输入用户名和密码'); return; }
@@ -740,7 +757,7 @@ async function doLogin(){
 var pendingCallback = null;
 
 async function doLogout(){
-  await auth.signOut();
+  if (auth) { try { await auth.signOut(); } catch(e) {} }
   currentUser = null; isAdminUser = false;
   updateUserUI();
   if (['message','legal','admin'].indexOf(currentView) !== -1) {
@@ -1056,6 +1073,7 @@ async function submitMessage(){
   var content = document.getElementById('msgContent').value.trim();
   if (!content) { toast('提示','请输入留言内容'); return; }
   if (!currentUser) { toast('提示','请先登录'); return; }
+  if (!db) { toast('提示','后端服务暂不可用'); return; }
   var btn = document.querySelector('#messagePageContent button');
   btn.disabled = true; btn.textContent = '提交中...';
   try {
@@ -1076,6 +1094,7 @@ async function submitMessage(){
 
 async function renderMessagePage(){
   var container = document.getElementById('messagePageContent');
+  if (!db) { container.innerHTML = '<div class="msg-empty"><p>留言功能暂不可用（后端服务未连接）</p></div>'; return; }
   if (!currentUser) {
     container.innerHTML = '<div class="login-gate"><div class="gate-icon">🔒</div><h3>请先登录</h3><p>登录后即可留言互动</p><button class="gate-btn" onclick="showLogin()">💚 账号登录</button></div>';
     return;
@@ -1112,6 +1131,7 @@ async function submitLegal(){
   if (!category) { toast('提示','请选择咨询类型'); return; }
   if (!content) { toast('提示','请描述您的问题'); return; }
   if (!currentUser) { toast('提示','请先登录'); return; }
+  if (!db) { toast('提示','后端服务暂不可用'); return; }
   var btn = document.querySelector('#legalPageContent button');
   btn.disabled = true; btn.textContent = '提交中...';
   try {
@@ -1130,6 +1150,7 @@ async function submitLegal(){
 
 async function renderLegalPage(){
   var container = document.getElementById('legalPageContent');
+  if (!db) { container.innerHTML = '<div class="login-gate"><div class="gate-icon">⚠️</div><h3>服务暂不可用</h3><p>后端服务未连接</p></div>'; return; }
   if (!currentUser) {
     container.innerHTML = '<div class="login-gate"><div class="gate-icon">🔒</div><h3>请先登录</h3><p>登录后即可使用法律咨询</p><button class="gate-btn" onclick="showLogin()">💚 账号登录</button></div>';
     return;
