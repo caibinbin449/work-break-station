@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>茶山烤鱼 - 每日新闻</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -653,66 +656,103 @@ const newsData = {
   }
 };
 
-// ========== 页面导航逻辑 ==========
+// ========== 页面导航逻辑（支持浏览器前进/后退） ==========
 const landing = document.getElementById('landing');
 const newsPage = document.getElementById('newsPage');
 const detailPage = document.getElementById('detailPage');
 const detailContent = document.getElementById('detailContent');
 
-// 烤鱼首页 → 新闻列表
-landing.addEventListener('click', function() {
-  landing.classList.add('hidden');
-  setTimeout(() => {
+function navigateTo(view, id) {
+  if (view === 'landing') {
+    newsPage.style.display = 'none';
+    detailPage.style.display = 'none';
+    landing.style.display = 'flex';
+    landing.classList.remove('hidden');
+  } else if (view === 'news') {
     landing.style.display = 'none';
+    landing.classList.add('hidden');
     newsPage.style.display = 'block';
     detailPage.style.display = 'none';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 600);
+  } else if (view === 'detail') {
+    const news = newsData[id];
+    if (!news) return;
+    detailContent.innerHTML = `
+      <span class="detail-tag ${news.tagClass}">${news.tag}</span>
+      <h1>${news.title}</h1>
+      <div class="detail-meta">
+        <span>📅 ${news.date}</span>
+        <span>📰 ${news.source}</span>
+      </div>
+      <div class="detail-body">${news.body}</div>
+      <div class="detail-source">来源：${news.source}</div>
+    `;
+    landing.style.display = 'none';
+    landing.classList.add('hidden');
+    newsPage.style.display = 'none';
+    detailPage.style.display = 'block';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 烤鱼首页 → 新闻列表（带动画）
+landing.addEventListener('click', function() {
+  history.pushState({ view: 'news' }, '', '#news');
+  landing.classList.add('hidden');
+  setTimeout(() => navigateTo('news'), 600);
 });
 
 // 新闻列表 → 新闻详情
 document.querySelectorAll('.card[data-id]').forEach(card => {
   card.addEventListener('click', function() {
     const id = this.getAttribute('data-id');
-    showDetail(id);
+    history.pushState({ view: 'detail', id: id }, '', '#detail-' + id);
+    navigateTo('detail', id);
   });
 });
 
-function showDetail(id) {
-  const news = newsData[id];
-  if (!news) return;
-
-  detailContent.innerHTML = `
-    <span class="detail-tag ${news.tagClass}">${news.tag}</span>
-    <h1>${news.title}</h1>
-    <div class="detail-meta">
-      <span>📅 ${news.date}</span>
-      <span>📰 ${news.source}</span>
-    </div>
-    <div class="detail-body">${news.body}</div>
-    <div class="detail-source">来源：${news.source}</div>
-  `;
-
-  newsPage.style.display = 'none';
-  detailPage.style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// 详情页 → 返回列表
+// 详情页 → 返回列表（利用浏览器后退）
 function backToList() {
-  detailPage.style.display = 'none';
-  newsPage.style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  history.back();
 }
 
 // 返回烤鱼
 function goBack() {
-  newsPage.style.display = 'none';
-  detailPage.style.display = 'none';
-  landing.style.display = 'flex';
-  landing.classList.remove('hidden');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  history.pushState({ view: 'landing' }, '', window.location.pathname);
+  navigateTo('landing');
 }
+
+// 监听浏览器前进/后退按钮
+window.addEventListener('popstate', function(event) {
+  if (event.state) {
+    if (event.state.view === 'landing') {
+      navigateTo('landing');
+    } else if (event.state.view === 'news') {
+      navigateTo('news');
+    } else if (event.state.view === 'detail') {
+      navigateTo('detail', event.state.id);
+    }
+  } else {
+    navigateTo('landing');
+  }
+});
+
+// 初始加载：根据 URL hash 显示对应页面
+(function() {
+  const hash = window.location.hash;
+  if (hash === '#news') {
+    history.replaceState({ view: 'news' }, '', '#news');
+    landing.style.display = 'none';
+    newsPage.style.display = 'block';
+  } else if (hash.startsWith('#detail-')) {
+    const id = hash.replace('#detail-', '');
+    history.replaceState({ view: 'detail', id: id }, '', hash);
+    landing.style.display = 'none';
+    navigateTo('detail', id);
+  } else {
+    const cleanUrl = window.location.pathname + window.location.search;
+    history.replaceState({ view: 'landing' }, '', cleanUrl);
+  }
+})();
 </script>
 
 </body>
