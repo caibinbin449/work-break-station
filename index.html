@@ -7,6 +7,20 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>茶山烤鱼 - 每日新鲜</title>
+<script>
+// ===== 封面点击逻辑（优先加载，不依赖任何外部库）=====
+function openHub(){
+  var l = document.getElementById('landing'); if (!l) return;
+  try { history.pushState({view:'hub'},'','#hub'); } catch(e) {}
+  l.classList.add('hidden');
+  l.style.display = 'none';
+  setTimeout(function(){
+    var h = document.getElementById('hubPage');
+    if (h) h.style.display = 'block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 600);
+}
+</script>
 <script src="https://static.cloudbase.net/cloudbase-js-sdk/3.0.0/cloudbase.full.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -345,7 +359,7 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 </div>
 
 <!-- 烤鱼封面 -->
-<div class="landing" id="landing">
+<div class="landing" id="landing" onclick="openHub()">
   <div class="fish-container"><img src="images/grilled-fish.png" alt="烤鱼"></div>
   <div class="title">茶山烤鱼欢迎您</div>
   <div class="subtitle">—— 香辣鲜美 · 每日新鲜 ——</div>
@@ -1305,11 +1319,7 @@ function navigateTo(view, data){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-document.getElementById('landing').addEventListener('click',function(){
-  history.pushState({view:'hub'},'','#hub');
-  document.getElementById('landing').classList.add('hidden');
-  setTimeout(function(){navigateTo('hub')},600);
-});
+document.getElementById('landing').addEventListener('click',openHub);
 
 function goToNews(){ history.pushState({view:'news'},'','#news'); navigateTo('news') }
 function goToShare(){ history.pushState({view:'share'},'','#share'); navigateTo('share') }
