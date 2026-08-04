@@ -64,7 +64,7 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 .login-card .login-header p{font-size:13px;opacity:.85;margin-top:4px}
 .login-card .login-body{padding:24px}
 .login-card .login-tabs{display:flex;border-bottom:2px solid #eee;margin-bottom:20px}
-.login-card .login-tab{flex:1;text-align:center;padding:10px 0;cursor:pointer;font-size:14px;color:#999;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.login-card .login-tab{flex:1;text-align:center;padding:10px 0;cursor:pointer;font-size:13px;color:#999;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
 .login-card .login-tab.active{color:#07c160;border-bottom-color:#07c160;font-weight:600}
 .login-card .login-tab:hover{color:#07c160}
 .login-card .login-panel{display:none}
@@ -73,6 +73,12 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 .login-card .form-group label{display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:500}
 .login-card .form-group input{width:100%;padding:12px 14px;border:1px solid #e0d5c8;border-radius:10px;font-size:14px;outline:none;transition:border-color .2s;background:#fafaf7}
 .login-card .form-group input:focus{border-color:#07c160}
+.login-card .sms-row{display:flex;gap:10px}
+.login-card .sms-row .form-group{flex:1;margin-bottom:0}
+.login-card .sms-row .sms-btn{flex-shrink:0;width:110px;padding:12px 8px;background:#f0f0f0;color:#666;border:1px solid #e0d5c8;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.login-card .sms-row .sms-btn:hover{background:#e8f5e9;color:#07c160;border-color:#07c160}
+.login-card .sms-row .sms-btn:disabled{background:#f5f5f5;color:#ccc;cursor:not-allowed;border-color:#eee}
+.login-card .sms-row .sms-btn.counting{background:#e8f5e9;color:#07c160;border-color:#a5d6a7}
 .login-card .submit-btn{width:100%;padding:12px;background:#07c160;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;letter-spacing:2px;transition:background .2s;margin-top:6px}
 .login-card .submit-btn:hover{background:#06ad56}
 .login-card .submit-btn:disabled{background:#ccc;cursor:not-allowed}
@@ -226,26 +232,39 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
   <div class="login-card">
     <div class="login-header">
       <button class="close-btn" onclick="closeLogin()">✕</button>
-      <div class="wx-icon">💚</div>
-      <h2>账号登录</h2>
+      <div class="wx-icon">📱</div>
+      <h2>手机登录</h2>
       <p>登录后可留言互动和法律咨询</p>
     </div>
     <div class="login-body">
       <div class="login-tabs">
-        <div class="login-tab active" data-tab="login" onclick="switchLoginTab('login')">登录</div>
-        <div class="login-tab" data-tab="register" onclick="switchLoginTab('register')">注册</div>
+        <div class="login-tab active" data-tab="phone" onclick="switchLoginTab('phone')">📱 手机登录</div>
+        <div class="login-tab" data-tab="login" onclick="switchLoginTab('login')">🔑 账号登录</div>
+        <div class="login-tab" data-tab="register" onclick="switchLoginTab('register')">✍️ 注册</div>
       </div>
-      <div class="login-panel active" id="panel-login">
+      <!-- 手机短信登录 -->
+      <div class="login-panel active" id="panel-phone">
+        <div class="form-group"><label>手机号</label><input type="tel" id="phoneNum" placeholder="请输入手机号" maxlength="11"></div>
+        <div class="sms-row">
+          <div class="form-group"><label>验证码</label><input type="text" id="smsCode" placeholder="6位验证码" maxlength="6"></div>
+          <button class="sms-btn" id="sendSmsBtn" onclick="sendSmsCode()">获取验证码</button>
+        </div>
+        <button class="submit-btn" id="phoneLoginBtn" onclick="doPhoneLogin()">📱 验证码登录</button>
+        <div class="register-switch">首次登录将自动注册账号</div>
+      </div>
+      <!-- 账号密码登录 -->
+      <div class="login-panel" id="panel-login">
         <div class="form-group"><label>用户名</label><input type="text" id="loginUser" placeholder="请输入用户名" maxlength="20"></div>
         <div class="form-group"><label>密码</label><input type="password" id="loginPass" placeholder="请输入密码" maxlength="30"></div>
-        <button class="submit-btn" id="loginBtn" onclick="doLogin()">💚 登录</button>
+        <button class="submit-btn" id="loginBtn" onclick="doLogin()">🔑 登录</button>
         <div class="register-switch">还没有账号？<a onclick="switchLoginTab('register')">立即注册</a></div>
       </div>
+      <!-- 注册 -->
       <div class="login-panel" id="panel-register">
         <div class="form-group"><label>用户名</label><input type="text" id="regUser" placeholder="请设置用户名（至少3位）" maxlength="20"></div>
         <div class="form-group"><label>密码</label><input type="password" id="regPass" placeholder="请设置密码（至少6位）" maxlength="30"></div>
         <div class="form-group"><label>昵称</label><input type="text" id="regName" placeholder="您的显示昵称" maxlength="20"></div>
-        <button class="submit-btn" id="regBtn" onclick="doRegister()">💚 一键注册登录</button>
+        <button class="submit-btn" id="regBtn" onclick="doRegister()">✅ 注册并登录</button>
         <div class="register-switch">已有账号？<a onclick="switchLoginTab('login')">返回登录</a></div>
       </div>
     </div>
@@ -274,7 +293,7 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
       <button class="admin-link" id="adminBtn" style="display:none;" onclick="goToAdmin()">⚙ 管理后台</button>
       <button class="logout-btn" onclick="doLogout()">退出</button>
     </div>
-    <div id="loginBtnArea"><button class="login-btn" onclick="showLogin()">💚 账号登录</button></div>
+    <div id="loginBtnArea"><button class="login-btn" onclick="showLogin()">📱 手机登录</button></div>
   </div>
   <div class="page-header">
     <div class="brand" onclick="goBackToLanding()" title="回到封面"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼</h1></div>
@@ -413,13 +432,83 @@ function updateUserUI(){
   }
 }
 
-function showLogin(){ document.getElementById('loginOverlay').classList.remove('hidden'); switchLoginTab('login'); }
-function closeLogin(){ document.getElementById('loginOverlay').classList.add('hidden'); }
+function showLogin(){ document.getElementById('loginOverlay').classList.remove('hidden'); switchLoginTab('phone'); resetSmsCountdown(); }
+function closeLogin(){ document.getElementById('loginOverlay').classList.add('hidden'); resetSmsCountdown(); }
 function switchLoginTab(tab){
   document.querySelectorAll('.login-tab').forEach(function(t){t.classList.remove('active')});
   document.querySelectorAll('.login-panel').forEach(function(p){p.classList.remove('active')});
   document.querySelector('.login-tab[data-tab="'+tab+'"]').classList.add('active');
   document.getElementById('panel-'+tab).classList.add('active');
+  // 根据 tab 切换标题
+  var titles = {phone:'手机登录',login:'账号登录',register:'注册账号'};
+  document.querySelector('.login-header h2').textContent = titles[tab] || '登录';
+}
+
+// ============ 手机短信登录 ============
+var smsTimer = null, smsSeconds = 0;
+function resetSmsCountdown(){
+  if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
+  smsSeconds = 0;
+  var b = document.getElementById('sendSmsBtn');
+  b.disabled = false; b.classList.remove('counting'); b.textContent = '获取验证码';
+}
+
+async function sendSmsCode(){
+  var phone = document.getElementById('phoneNum').value.trim();
+  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('提示','请输入正确的11位手机号'); return; }
+  var btn = document.getElementById('sendSmsBtn');
+  btn.disabled = true; btn.textContent = '发送中...';
+  try {
+    var r = await auth.signInWithOtp({ phone: '+86' + phone });
+    if (r.error) { toast('发送失败', r.error.message || '验证码发送失败，请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
+    toast('已发送','验证码已发送到 ' + phone);
+    startSmsCountdown();
+  } catch(e) { toast('发送失败', e.message || '请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; }
+}
+
+function startSmsCountdown(){
+  smsSeconds = 60;
+  var btn = document.getElementById('sendSmsBtn');
+  btn.classList.add('counting');
+  function tick(){
+    smsSeconds--;
+    btn.textContent = smsSeconds + 's 后重发';
+    if (smsSeconds <= 0) { clearInterval(smsTimer); smsTimer = null; btn.disabled = false; btn.classList.remove('counting'); btn.textContent = '获取验证码'; return; }
+    smsTimer = setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+var phoneSignInData = null;
+
+async function doPhoneLogin(){
+  var phone = document.getElementById('phoneNum').value.trim();
+  var code = document.getElementById('smsCode').value.trim();
+  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('提示','请输入正确的手机号'); return; }
+  if (!/^\d{6}$/.test(code)) { toast('提示','请输入6位验证码'); return; }
+  var btn = document.getElementById('phoneLoginBtn');
+  btn.disabled = true; btn.textContent = '验证中...';
+  try {
+    // 先发送 OTP 获取 signInData（如果之前没发过或过期）
+    if (!phoneSignInData) {
+      var r = await auth.signInWithOtp({ phone: '+86' + phone });
+      if (r.error) { toast('登录失败', r.error.message); btn.disabled = false; btn.textContent = '📱 验证码登录'; return; }
+      phoneSignInData = r.data;
+    }
+    // 验证 OTP
+    var vr = await phoneSignInData.verifyOtp({ token: code });
+    if (vr.error) { toast('验证失败', vr.error.message || '验证码错误'); btn.disabled = false; btn.textContent = '📱 验证码登录'; return; }
+    // 验证成功，清理状态
+    phoneSignInData = null;
+    document.getElementById('phoneNum').value = '';
+    document.getElementById('smsCode').value = '';
+    resetSmsCountdown();
+    await checkSession();
+    closeLogin();
+    toast('登录成功','欢迎回来！');
+    if (pendingCallback) { var cb = pendingCallback; pendingCallback = null; cb(); }
+  } catch(e) { toast('登录失败', e.message || '请检查验证码'); }
+  btn.disabled = false; btn.textContent = '📱 验证码登录';
 }
 
 async function doLogin(){
