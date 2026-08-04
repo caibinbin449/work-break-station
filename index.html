@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>茶山烤鱼 - 每日新闻</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+    background: #f5f0eb;
+    color: #333;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ========== 烤鱼首页 ========== */
+  .landing {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    z-index: 10;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+  .landing.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.1);
+  }
+  .landing .fish-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(255, 107, 53, 0.4), 0 0 120px rgba(255, 107, 53, 0.2);
+    animation: pulse 3s ease-in-out infinite;
+    margin-bottom: 40px;
+  }
+  .landing .fish-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .landing .fish-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  .landing .title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 6px;
+    text-shadow: 0 2px 20px rgba(255, 107, 53, 0.6);
+    margin-bottom: 16px;
+  }
+  .landing .subtitle {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 3px;
+  }
+  .landing .hint {
+    margin-top: 40px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  /* ========== 每日话语 ========== */
+  .landing .daily-quote {
+    margin-top: 28px;
+    padding: 18px 28px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    max-width: 460px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .landing .daily-quote .quote-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+  .landing .daily-quote .quote-text {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.9;
+    letter-spacing: 1px;
+    min-height: 28px;
+  }
+  .landing .daily-quote .quote-date {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+  .landing .daily-quote .quote-edit {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.25);
+    cursor: pointer;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 2px 6px;
+  }
+  .landing .daily-quote .quote-edit:hover { color: rgba(255,255,255,0.7); }
+  .landing .daily-quote textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 12px;
+    resize: vertical;
+    min-height: 70px;
+    font-family: inherit;
+    line-height: 1.7;
+    outline: none;
+  }
+  .landing .daily-quote textarea:focus { border-color: rgba(255,107,53,0.6); }
+  .landing .daily-quote .quote-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .landing .daily-quote .quote-actions button {
+    padding: 6px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .landing .daily-quote .quote-actions .btn-save {
+    background: #e67e22;
+    color: #fff;
+  }
+  .landing .daily-quote .quote-actions .btn-save:hover { background: #d35400; }
+  .landing .daily-quote .quote-actions .btn-cancel {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+  }
+  .landing .daily-quote .quote-actions .btn-cancel:hover { background: rgba(255,255,255,0.2); }
+
+  /* ========== 新闻列表页 ========== */
+  .news-page { max-width: 800px; margin: 0 auto; padding: 0 20px 60px; display: none; }
+  .news-header {
+    text-align: center;
+    padding: 40px 0 30px;
+    border-bottom: 1px solid #e0d5c8;
+    margin-bottom: 30px;
+  }
+  .news-header .brand {
+    display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;
+  }
+  .news-header .brand .mini-fish {
+    width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+  }
+  .news-header .brand .mini-fish img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .news-header .brand h1 { font-size: 24px; font-weight: 700; color: #8b4513; letter-spacing: 3px; }
+  .news-header .date { font-size: 14px; color: #999; margin-top: 8px; }
+  .news-header .date span { color: #e67e22; font-weight: 600; }
+  .news-section { margin-bottom: 32px; }
+  .news-section .section-title {
+    font-size: 18px; font-weight: 700; color: #8b4513;
+    padding-left: 14px; border-left: 4px solid #e67e22; margin-bottom: 16px; line-height: 1.4;
+  }
+  .news-section .card {
+    background: #fff; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  .news-section .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-left-color: #e67e22;
+  }
+  .news-section .card .card-tag {
+    display: inline-block; font-size: 11px; font-weight: 600; color: #fff;
+    background: #e67e22; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; letter-spacing: 1px;
+  }
+  .news-section .card .card-tag.politics { background: #c0392b; }
+  .news-section .card .card-tag.economy { background: #2980b9; }
+  .news-section .card .card-tag.tech { background: #8e44ad; }
+  .news-section .card .card-tag.world { background: #16a085; }
+  .news-section .card h3 {
+    font-size: 16px; font-weight: 600; color: #222; margin-bottom: 6px; line-height: 1.6;
+  }
+  .news-section .card p {
+    font-size: 14px; color: #666; line-height: 1.8;
+  }
+  .news-section .card .card-more {
+    font-size: 13px; color: #e67e22; margin-top: 8px; font-weight: 500;
+  }
+  .news-section .card .card-source {
+    font-size: 12px; color: #bbb; margin-top: 6px;
+  }
+
+  /* ========== 新闻详情页 ========== */
+  .detail-page { max-width: 800px; margin: 0 auto; padding: 0 20px 60px; display: none; }
+  .detail-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 0; font-size: 15px; color: #8b4513; cursor: pointer;
+    margin: 20px 0; font-weight: 500; transition: color 0.2s;
+  }
+  .detail-back:hover { color: #e67e22; }
+  .detail-content {
+    background: #fff; border-radius: 12px; padding: 30px 30px 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .detail-content .detail-tag {
+    display: inline-block; font-size: 12px; font-weight: 600; color: #fff;
+    background: #e67e22; padding: 3px 12px; border-radius: 4px; margin-bottom: 16px; letter-spacing: 1px;
+  }
+  .detail-content .detail-tag.politics { background: #c0392b; }
+  .detail-content .detail-tag.economy { background: #2980b9; }
+  .detail-content .detail-tag.tech { background: #8e44ad; }
+  .detail-content .detail-tag.world { background: #16a085; }
+  .detail-content h1 {
+    font-size: 24px; font-weight: 700; color: #222; line-height: 1.5; margin-bottom: 16px;
+  }
+  .detail-content .detail-meta {
+    display: flex; gap: 16px; font-size: 13px; color: #999;
+    padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid #eee;
+  }
+  .detail-content .detail-body {
+    font-size: 16px; color: #333; line-height: 2; letter-spacing: 0.5px;
+  }
+  .detail-content .detail-body p { margin-bottom: 16px; }
+  .detail-content .detail-source {
+    margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee;
+    font-size: 13px; color: #999;
+  }
+
+  .footer {
+    text-align: center; padding: 30px 0; color: #bbb; font-size: 13px;
+    border-top: 1px solid #e0d5c8; margin-top: 20px;
+  }
+  .footer .back-btn {
+    display: inline-block; margin-top: 16px; padding: 8px 24px;
+    background: #8b4513; color: #fff; border-radius: 20px; font-size: 13px;
+    cursor: pointer; transition: background 0.2s; text-decoration: none;
+  }
+  .footer .back-btn:hover { background: #a0522d; }
+
+  @media (max-width: 600px) {
+    .landing .fish-container { width: 220px; height: 220px; }
+    .landing .title { font-size: 26px; letter-spacing: 4px; }
+    .news-section .card { padding: 16px 18px; }
+    .detail-content { padding: 20px 18px 30px; }
+    .detail-content h1 { font-size: 20px; }
+    .detail-content .detail-body { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== 烤鱼首页 ========== -->
+<div class="landing" id="landing">
+  <div class="fish-container">
+    <img src="images/grilled-fish.png" alt="烤鱼">
+  </div>
+  <div class="title">茶山烤鱼欢迎您</div>
+  <div class="subtitle">—— 香辣鲜美 · 每日新鲜 ——</div>
+  <div class="daily-quote" id="dailyQuote">
+    <button class="quote-edit" id="quoteEditBtn" title="编辑今日话语">✎</button>
+    <div class="quote-label">✦ 今日话语 ✦</div>
+    <div class="quote-text" id="quoteText"></div>
+    <div class="quote-date" id="quoteDate"></div>
+  </div>
+  <div class="hint">👆 点击图片查看今日新闻</div>
+</div>
+
+<!-- ========== 新闻列表 ========== -->
+<div class="news-page" id="newsPage">
+  <div class="news-header">
+    <div class="brand">
+      <div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div>
+      <h1>茶山烤鱼</h1>
+    </div>
+    <div class="date">📅 <span>2026年8月4日</span> 星期二 · 每日新闻速览</div>
+  </div>
+
+  <!-- 国内要闻 -->
+  <div class="news-section">
+    <div class="section-title">🔥 国内要闻</div>
+    <div class="card" data-id="1">
+      <span class="card-tag">政策</span>
+      <h3>新型电力系统建设"十五五"规划发布</h3>
+      <p>国家发改委、国家能源局印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="2">
+      <span class="card-tag economy">经济</span>
+      <h3>上半年海洋生产总值5.5万亿元，同比增长5.1%</h3>
+      <p>我国海洋经济稳步增长，太平岭核电2号机组正式投产。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="3">
+      <span class="card-tag">法规</span>
+      <h3>《集成电路布图设计保护条例》20多年来首次修订</h3>
+      <p>国务院公布修订后的条例，自2026年10月15日起施行。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="4">
+      <span class="card-tag">治理</span>
+      <h3>中央网信办处置违规网络团播账号1840余个</h3>
+      <p>深入推进"清朗·网络娱乐团播乱象整治"专项行动。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="5">
+      <span class="card-tag tech">科技</span>
+      <h3>我国牵头的区块链国际标准在ISO立项</h3>
+      <p>我国首次开展碳效领跑者企业遴选，三部门联合推进重点行业能效提升。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+  </div>
+
+  <!-- 财经速递 -->
+  <div class="news-section">
+    <div class="section-title">💰 财经速递</div>
+    <div class="card" data-id="6">
+      <span class="card-tag economy">金融</span>
+      <h3>人民币国债期货在港交所挂牌上市</h3>
+      <p>证监会主席吴清出席上市仪式，这是内地与香港深化资本市场合作的重要里程碑。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="7">
+      <span class="card-tag economy">数据</span>
+      <h3>保险行业上半年接报案53.3万件，已赔付55.3亿元</h3>
+      <p>20个省份暴雨洪涝、台风、地震等自然灾害，保险业累计估损110.5亿元。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="8">
+      <span class="card-tag">民生</span>
+      <h3>上海集中处罚12家网约车平台，总额超2500万元</h3>
+      <p>上海市交通管理部门约谈全市网约车平台，同步下达首批集中行政处罚决定书。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+  </div>
+
+  <!-- 国际观察 -->
+  <div class="news-section">
+    <div class="section-title">🌍 国际观察</div>
+    <div class="card" data-id="9">
+      <span class="card-tag world">中东</span>
+      <h3>美伊谈判动态：特朗普称谈判已重启，伊朗否认</h3>
+      <p>美伊双方各执一词，霍尔木兹海峡船舶通行量持续下降至单日9艘。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="10">
+      <span class="card-tag world">贸易</span>
+      <h3>美国25州联合起诉特朗普政府301关税政策</h3>
+      <p>大规模诉讼挑战特朗普关税政策合法性。七国宣布继续增产石油。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="11">
+      <span class="card-tag world">国际</span>
+      <h3>俄乌冲突：俄击落1158架无人机创单日新高</h3>
+      <p>乌克兰对俄境内多处目标实施远程打击，加沙地带以军袭击造成18人死亡。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+  </div>
+
+  <!-- 社会民生 -->
+  <div class="news-section">
+    <div class="section-title">📋 社会民生</div>
+    <div class="card" data-id="12">
+      <span class="card-tag">天气</span>
+      <h3>台风"白海豚"周四起影响我国，18条河流维持超警</h3>
+      <p>第13号台风"白海豚"预计8月6-7日穿过琉球群岛移入东海。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="13">
+      <span class="card-tag">娱乐</span>
+      <h3>暑期档电影总票房突破75亿元</h3>
+      <p>中国烹饪协会等发布公告，全面清理撤销此前颁发的各类称号。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+    <div class="card" data-id="14">
+      <span class="card-tag">正能量</span>
+      <h3>00后军人顶着巨浪三次入海救起三人</h3>
+      <p>海南陵水一名军人奋不顾身救援落水群众，赛里木湖景区自驾费调整为按"车"收费。</p>
+      <div class="card-more">📖 点击阅读详情 →</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>茶山烤鱼 · 每日新鲜资讯 | 2026年8月4日</p>
+    <p style="margin-top:4px;font-size:12px">新闻来源：新华社、央视新闻、国务院、证监会、中央气象台 等</p>
+    <div class="back-btn" onclick="goBack()">🐟 返回烤鱼</div>
+  </div>
+</div>
+
+<!-- ========== 新闻详情页 ========== -->
+<div class="detail-page" id="detailPage">
+  <div class="detail-back" onclick="backToList()">← 返回新闻列表</div>
+  <div class="detail-content" id="detailContent"></div>
+</div>
+
+<script>
+// ========== 每日话语 ==========
+const autoQuotes = [
+  '每一天都是崭新的开始，用热爱奔赴山海，用坚持书写答案。',
+  '你只管努力，剩下的交给时间。星光不负赶路人。',
+  '人生没有白走的路，每一步都算数。今天也要加油。',
+  '与其仰望别人的光芒，不如点亮自己的灯火。',
+  '山有顶峰，湖有彼岸，在人生漫漫长途中，万物皆有回转。',
+  '当你觉得撑不下去的时候，其实你已经比想象中走得更远了。',
+  '生活不会辜负每一个认真努力的人，继续保持。',
+  '做自己的太阳，无需借谁的光。你今天的样子，就是最好的答案。',
+  '世界上最美的风景，是你努力向上的模样。',
+  '不要因为走得太远，而忘记为什么出发。不忘初心。',
+  '所有的逆袭，都是有备而来；所有的光芒，都需要时间沉淀。',
+  '把今天过好，就是对明天最好的准备。',
+  '种一棵树最好的时间是十年前，其次是现在。开始行动吧。',
+  '不必仰望别人，你自己亦是风景。自信一点。',
+  '你以为的极限，可能只是别人的起点。但没关系，按自己的节奏来。',
+  '乾坤未定，你我皆是黑马；乾坤已定，那就扭转乾坤。',
+  '成功的路上并不拥挤，因为坚持的人不多。咬牙撑住。',
+  '别让平凡的生活，耗尽你对未来的向往。保持热爱。',
+  '你所做的事情，也许暂时看不到成果，但不要灰心，你不是在成长，而是在扎根。',
+  '每一个优秀的人，都有一段沉默的时光。那段时光，是付出了很多努力却得不到结果的日子，我们把它叫做扎根。',
+  '你的努力，终将成就无可替代的自己。',
+  '好事总会发生在下个转弯，别急着放弃。',
+  '与其担心未来，不如现在努力。人生没有白费的努力。',
+  '虽然辛苦，但我还是会选择那种滚烫的人生。',
+  '向外探寻，向内思考，向下扎根，向上生长。',
+  '心之所向，素履以往；生如逆旅，一苇以航。',
+  '抱怨身处黑暗，不如提灯前行。愿你成为自己的光。',
+  '没有特别幸运，那就特别努力。越努力，越幸运。',
+  '不要停止奔跑，不要回顾来路。来路无可眷恋，值得期待的只有前方。',
+  '看似不起眼的日复一日，会在将来的某一天，突然让你看到坚持的意义。',
+  '勇敢的人，不是不落泪的人，而是愿意含着泪继续奔跑的人。'
+];
+
+function getToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function getAutoQuoteForToday() {
+  const d = new Date();
+  const start = new Date(d.getFullYear(), 0, 0);
+  const diff = d - start;
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  return autoQuotes[dayOfYear % autoQuotes.length];
+}
+
+function renderQuoteView() {
+  const today = getToday();
+  const saved = JSON.parse(localStorage.getItem('dq') || '{}');
+  const text = saved[today] || getAutoQuoteForToday();
+  const isCustom = !!saved[today];
+
+  document.getElementById('dailyQuote').innerHTML = `
+    <button class="quote-edit" id="quoteEditBtn" title="编辑今日话语">✎</button>
+    <div class="quote-label">✦ 今日话语 ✦</div>
+    <div class="quote-text" id="quoteText">${escapeHtml(text)}</div>
+    <div class="quote-date" id="quoteDate">${today}${isCustom ? ' · 自定义' : ' · 自动生成'}</div>
+  `;
+
+  document.getElementById('quoteEditBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    showQuoteEditor();
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showQuoteEditor() {
+  const today = getToday();
+  const saved = JSON.parse(localStorage.getItem('dq') || '{}');
+  const current = saved[today] || getAutoQuoteForToday();
+
+  document.getElementById('dailyQuote').innerHTML = `
+    <div class="quote-label">✦ 写下今天想说的话 ✦</div>
+    <textarea id="quoteInput" placeholder="写下鼓励自己或他人的话语...">${escapeHtml(current)}</textarea>
+    <div class="quote-actions">
+      <button class="btn-save" id="btnSaveQuote">💾 保存</button>
+      <button class="btn-cancel" id="btnCancelQuote">取消</button>
+    </div>
+  `;
+
+  document.getElementById('btnSaveQuote').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const val = document.getElementById('quoteInput').value.trim();
+    const all = JSON.parse(localStorage.getItem('dq') || '{}');
+    if (val) {
+      all[today] = val;
+    } else {
+      delete all[today];
+    }
+    localStorage.setItem('dq', JSON.stringify(all));
+    renderQuoteView();
+  });
+
+  document.getElementById('btnCancelQuote').addEventListener('click', function(e) {
+    e.stopPropagation();
+    renderQuoteView();
+  });
+
+  document.getElementById('quoteInput').focus();
+}
+
+// 初始化话语
+renderQuoteView();
+// 阻止话语区域点击冒泡到封面
+document.getElementById('dailyQuote').addEventListener('click', function(e) { e.stopPropagation(); });
+
+// ========== 新闻详细数据 ==========
+const newsData = {
+  1: {
+    tag: '政策', tagClass: '',
+    title: '新型电力系统建设"十五五"规划发布',
+    date: '2026年8月4日',
+    source: '国家能源局',
+    body: `
+      <p>国家发改委、国家能源局联合印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。这是我国能源领域的一项重大战略部署。</p>
+      <p>规划提出六大重点任务：</p>
+      <p><strong>一、加快新能源大规模开发。</strong>到2030年风电、太阳能发电总装机容量达到18亿千瓦以上，加快西南水电基地建设，安全有序发展核电。</p>
+      <p><strong>二、推动电网全面升级。</strong>建设适应高比例新能源接入的智慧电网，推进跨省跨区输电通道建设，提升电网柔性调节能力。</p>
+      <p><strong>三、新能源汽车充电全面升级。</strong>未来五年，全国充电基础设施将实现"县县全覆盖、乡乡有覆盖"，高速公路服务区充电站覆盖率提升至95%以上。</p>
+      <p><strong>四、储能规模化发展。</strong>新型储能装机规模达到6000万千瓦以上，推动抽水蓄能电站加快建设。</p>
+      <p><strong>五、电力市场化改革深化。</strong>完善电力现货市场，推动新能源全面参与市场交易。</p>
+      <p><strong>六、数字化智能化转型。</strong>建设数字电网，推动"云大物移智"技术在电力系统深度应用。</p>
+      <p>规划强调，新型电力系统建设将带动超过10万亿元的投资，成为拉动经济增长的重要引擎，同时将有力支撑我国碳达峰碳中和目标的实现。</p>
+    `
+  },
+  2: {
+    tag: '经济', tagClass: 'economy',
+    title: '上半年海洋生产总值5.5万亿元，同比增长5.1%',
+    date: '2026年8月4日',
+    source: '新华社',
+    body: `
+      <p>自然资源部最新数据显示，2026年上半年我国海洋生产总值达到5.5万亿元，同比增长5.1%，海洋经济保持稳步增长态势，发展势头良好。</p>
+      <p>多个重大工程取得突破性进展：</p>
+      <p><strong>太平岭核电2号机组正式投产。</strong>这是粤港澳大湾区首个"华龙一号"核电一期工程全面建成的标志，两台机组年发电量约200亿千瓦时，可满足粤港澳大湾区约1500万人口的年度用电需求。</p>
+      <p><strong>海上风电装机突破5000万千瓦。</strong>我国海上风电累计装机容量已位居全球第一，上半年新增装机超过600万千瓦。</p>
+      <p><strong>海洋油气产量再创新高。</strong>上半年海洋原油产量同比增长4.2%，天然气产量同比增长6.8%，深海一号二期工程加快推进。</p>
+      <p>此外，海洋旅游业持续复苏，上半年沿海城市接待游客同比增长12%，海洋交通运输业保持平稳增长，港口货物吞吐量同比增长3.8%。</p>
+    `
+  },
+  3: {
+    tag: '法规', tagClass: '',
+    title: '《集成电路布图设计保护条例》20多年来首次修订',
+    date: '2026年8月4日',
+    source: '国务院',
+    body: `
+      <p>国务院总理李强签署国务院令，公布修订后的《集成电路布图设计保护条例》，这是该条例自2001年施行以来的首次全面修订，将于2026年10月15日起施行。</p>
+      <p>此次修订的主要亮点包括：</p>
+      <p><strong>一、大幅扩展保护范围。</strong>将保护对象从传统集成电路扩展至三维集成、先进封装等新型布图设计，适应芯片技术快速迭代的需求。</p>
+      <p><strong>二、完善申请登记程序。</strong>简化申请材料，缩短审查周期，建立快速审查通道，对涉及国家重大战略需求的布图设计实行优先审查。</p>
+      <p><strong>三、加大侵权赔偿力度。</strong>引入惩罚性赔偿制度，对故意侵权的可处以实际损失1至5倍的赔偿金；将法定赔偿上限从100万元提高至500万元。</p>
+      <p><strong>四、加强行政保护。</strong>赋予知识产权管理部门更强的执法权限，可对侵权产品进行查封扣押。</p>
+      <p>工业和信息化部相关负责人表示，此次修订将为我国集成电路产业创新发展提供更强法律保障，有助于激发企业创新积极性，推动芯片产业自主可控。</p>
+    `
+  },
+  4: {
+    tag: '治理', tagClass: '',
+    title: '中央网信办处置违规网络团播账号1840余个',
+    date: '2026年8月4日',
+    source: '中央网信办',
+    body: `
+      <p>中央网信办深入推进"清朗·网络娱乐团播乱象整治"专项行动，近期集中处置了一批违规网络团播账号。</p>
+      <p>专项行动重点针对以下突出问题：</p>
+      <p><strong>违规PK刺激打赏。</strong>部分直播间设置高额打赏PK环节，诱导观众非理性消费，单个直播间单场打赏金额高达数十万元。</p>
+      <p><strong>低俗内容泛滥。</strong>一些主播以低俗表演、色情擦边内容吸引流量，严重污染网络环境。</p>
+      <p><strong>侵害未成年人权益。</strong>部分直播间未设置未成年人保护措施，允许未成年人进行大额打赏。</p>
+      <p>治理成果：本次专项行动共处置违规账号1840余个，关闭问题直播间320余间，约谈相关平台负责人60余人次。同时，已建立网络团播长效监管机制，要求平台落实主体责任。</p>
+      <p>中央网信办表示，将持续高压整治网络直播乱象，为广大网民营造清朗网络空间。</p>
+    `
+  },
+  5: {
+    tag: '科技', tagClass: 'tech',
+    title: '我国牵头的区块链国际标准在ISO立项',
+    date: '2026年8月4日',
+    source: '工信部 / 证监会',
+    body: `
+      <p>近期多项科技和产业政策密集出台：</p>
+      <p><strong>区块链国际标准取得重大突破。</strong>由我国牵头的"区块链和分布式记账技术 参考架构"国际标准在ISO正式立项，标志着我国在区块链领域的标准话语权进一步提升。该标准将对区块链系统的架构模型、功能组件、跨链交互等核心内容进行规范。</p>
+      <p><strong>碳效领跑者企业首次遴选。</strong>工信部等三部门联合启动碳效领跑者企业遴选工作，在钢铁、水泥、电解铝等重点行业评选碳效领跑者，引导全行业对标提升能效水平。入选企业将在用能权交易、绿色金融等方面享受政策支持。</p>
+      <p><strong>内地与香港资本市场合作再深化。</strong>证监会同日推出10项举措，包括扩大沪深港通标的范围、优化基金互认安排、支持香港推出国债期货等金融产品、推动跨境理财通业务升级等，进一步巩固香港国际金融中心地位。</p>
+    `
+  },
+  6: {
+    tag: '金融', tagClass: 'economy',
+    title: '人民币国债期货在港交所挂牌上市',
+    date: '2026年8月4日',
+    source: '中国证监会 / 中国银行业协会',
+    body: `
+      <p>人民币国债期货于8月4日在香港交易所正式挂牌交易，这是内地与香港深化资本市场合作的又一重要里程碑。中国证监会主席吴清出席上市仪式并致辞。</p>
+      <p><strong>产品概况：</strong>首批上市合约包括2年期、5年期和10年期三个品种，以境内银行间市场国债为标的，采用人民币计价和现金交割。首个交易日成交活跃，三个品种合计成交超过8000手。</p>
+      <p><strong>战略意义：</strong>人民币国债期货的推出，为境外投资者提供了有效的人民币利率风险管理工具，有助于提升人民币债券市场的深度和广度，推动人民币国际化进程。</p>
+      <p><strong>金融租赁行业数据：</strong>中国银行业协会同日发布报告，截至2025年末，金融租赁行业总资产达5.23万亿元，同比增长6.3%；不良贷款率降至0.91%，较上年末下降0.12个百分点，整体资产质量持续向好。</p>
+      <p>报告显示，金融租赁在支持实体经济方面发挥了重要作用，特别是在航空、船舶、高端装备制造等领域，已成为企业设备更新和技术改造的重要融资渠道。</p>
+    `
+  },
+  7: {
+    tag: '数据', tagClass: 'economy',
+    title: '保险行业上半年接报案53.3万件，已赔付55.3亿元',
+    date: '2026年8月4日',
+    source: '中国保险行业协会 / 财政部',
+    body: `
+      <p>中国保险行业协会发布2026年上半年自然灾害理赔数据，数据显示保险行业积极应对各类自然灾害，保障社会民生。</p>
+      <p><strong>理赔数据：</strong></p>
+      <p>2026年上半年，保险行业针对20个省份的暴雨洪涝、台风、地震等自然灾害，累计接报案53.3万件，已赔付55.3亿元，累计估损金额达110.5亿元。其中，暴雨洪涝灾害赔付占比最高，约为60%。</p>
+      <p><strong>重点灾害：</strong></p>
+      <p>——南方多省暴雨洪涝：6月中下旬，长江中下游地区遭遇持续强降雨，湖南、江西、安徽等省份受灾严重，保险业累计接报案超20万件，赔付金额超30亿元。</p>
+      <p>——台风"格美"：7月下旬登陆福建，造成沿海多地严重损失，保险理赔正在加速推进中。</p>
+      <p><strong>财政支持：</strong>财政部同期下达农业防灾减灾和水利救灾资金21.54亿元，支持受灾地区开展农业救灾和水利设施修复，确保粮食安全和群众饮水安全。</p>
+    `
+  },
+  8: {
+    tag: '民生', tagClass: '',
+    title: '上海集中处罚12家网约车平台，总额超2500万元',
+    date: '2026年8月4日',
+    source: '上海市交通委',
+    body: `
+      <p>上海市交通管理部门近日集中约谈全市网约车平台，同日下达首批集中行政处罚决定书，对12家平台共计处罚超2500万元。这是上海近年来对网约车行业力度最大的一次集中整治。</p>
+      <p><strong>主要违法行为：</strong></p>
+      <p>——向无资质车辆和驾驶员派单，这是本次处罚的主要原因，涉及平台未严格审核司机和车辆资质。</p>
+      <p>——未按规定上传运营数据，部分平台数据上传不及时、不完整，逃避监管。</p>
+      <p>——违规调整计价规则，未向主管部门报备即自行调整运价。</p>
+      <p>——对乘客投诉处理不及时，服务质量问题突出。</p>
+      <p><strong>配套新闻：</strong>多地近期对牛蛙产品抗生素超标问题开展全面核查抽检。市场监管总局要求各地严查养殖环节违规用药行为，确保水产品质量安全，保障消费者"舌尖上的安全"。</p>
+    `
+  },
+  9: {
+    tag: '中东', tagClass: 'world',
+    title: '美伊谈判动态：特朗普称谈判已重启，伊朗否认',
+    date: '2026年8月4日',
+    source: 'Reuters / 伊朗外交部',
+    body: `
+      <p>美伊关系持续紧张，关于谈判进展双方各执一词。美国总统特朗普于8月3日声称与伊朗的谈判已重新启动，但伊朗方面立即予以否认。</p>
+      <p><strong>美方表态：</strong>特朗普在社交媒体上表示，"与伊朗的谈判已于8月3日正式重启，我们希望达成一项公平合理的协议"，但未透露更多谈判细节或参与方。</p>
+      <p><strong>伊朗回应：</strong>伊朗外交部发言人发表声明称，"伊朗目前未与美国进行任何形式的谈判"，但同时确认正就霍尔木兹海峡安全问题与阿曼进行磋商，并欢迎一切有助于缓和地区紧张局势的外交努力。</p>
+      <p><strong>霍尔木兹海峡局势：</strong>受地缘政治紧张影响，霍尔木兹海峡船舶通行量持续下降，已降至单日仅9艘。作为全球约20%石油运输量的必经通道，海峡通行受阻已对国际油价产生显著影响。</p>
+      <p>国际社会普遍呼吁各方保持克制，通过对话解决分歧。中国外交部表示，反对任何可能导致地区局势升级的行为，呼吁有关各方相向而行。</p>
+    `
+  },
+  10: {
+    tag: '贸易', tagClass: 'world',
+    title: '美国25州联合起诉特朗普政府301关税政策',
+    date: '2026年8月4日',
+    source: 'CNN / 新华社',
+    body: `
+      <p>美国25个州的总检察长联合向联邦法院提起诉讼，挑战特朗普政府依据《1974年贸易法》301条款对中国商品加征关税的合法性，这是迄今为止对特朗普关税政策最大规模的法律挑战。</p>
+      <p><strong>诉讼理由：</strong>原告方认为，加征关税的决定权属于国会而非总统，特朗普政府滥用《贸易法》301条款授权，超出法定权限范围。诉讼还指出，关税已对美国消费者和企业造成实质性损害。</p>
+      <p><strong>经济影响：</strong>据美国有关机构估算，301关税已导致美国家庭年均支出增加约1300美元，美国企业增加的进口成本累计超过1500亿美元。</p>
+      <p><strong>石油市场动态：</strong>七国集团成员宣布将继续执行增产计划，沙特、俄罗斯等主要产油国也表达增产意愿。分析师认为，全球原油供应格局正面临新一轮调整，若增产计划全面落实，国际油价可能面临下行压力，布伦特原油价格或在70-75美元/桶区间运行。</p>
+    `
+  },
+  11: {
+    tag: '国际', tagClass: 'world',
+    title: '俄乌冲突：俄击落1158架无人机创单日新高',
+    date: '2026年8月4日',
+    source: '俄罗斯国防部 / 半岛电视台',
+    body: `
+      <p>俄罗斯国防部8月3日通报称，在过去的24小时内，俄防空部队击落了1158架乌克兰无人机，创下冲突以来单日拦截无人机数量最高纪录。</p>
+      <p><strong>战场态势：</strong>乌克兰于近期加大了对俄境内目标的远程打击力度，动用大规模无人机群对俄边境地区多个军事设施和能源基础设施发动攻击。分析认为，这是乌方在冲突新阶段采取的"消耗战"策略。</p>
+      <p><strong>加沙局势：</strong>同日，加沙地带多地遭遇以军袭击，造成至少18名巴勒斯坦人死亡。埃及、卡塔尔、土耳其三国外交部发表联合声明，强烈谴责以色列持续侵犯加沙地带的巴勒斯坦平民，呼吁立即实现全面停火。</p>
+      <p><strong>国际社会反应：</strong>联合国秘书长对加沙平民伤亡表示严重关切，强调保护平民是冲突各方的国际法义务。中国常驻联合国代表呼吁立即停止一切针对平民的暴力行为，推动政治解决进程。</p>
+    `
+  },
+  12: {
+    tag: '天气', tagClass: '',
+    title: '台风"白海豚"周四起影响我国，18条河流维持超警',
+    date: '2026年8月4日',
+    source: '中央气象台 / 应急管理部',
+    body: `
+      <p>中央气象台8月4日继续发布台风蓝色预警：今年第13号台风"白海豚"已于今日凌晨减弱为强台风级，预计将于8月6日至7日穿过琉球群岛移入东海，届时可能对我国东部沿海造成风雨影响。</p>
+      <p><strong>台风动态：</strong>"白海豚"中心附近最大风力14级（42米/秒），将以每小时15-20公里的速度向西北方向移动。受其影响，8月5日起东海大部海域将出现8-10级大风，阵风可达11-12级。</p>
+      <p><strong>暴雨洪涝持续：</strong>陕西中南部暴雨洪涝灾害仍在持续，多条中小河流出现超警洪水。全国共有18条河流维持超警戒水位，其中汉江上游部分河段超保证水位。</p>
+      <p><strong>救援进展：</strong>应急管理部紧急调拨6.5万件（套）救灾物资支援陕西灾区，包括帐篷、折叠床、棉被等生活必需品。国家防总维持防汛四级应急响应，已派出工作组赴灾区指导抢险救援工作。</p>
+      <p>气象部门提醒：台风路径仍有不确定性，请沿海地区居民密切关注最新预报预警，做好防风防雨准备。</p>
+    `
+  },
+  13: {
+    tag: '娱乐', tagClass: '',
+    title: '暑期档电影总票房突破75亿元',
+    date: '2026年8月4日',
+    source: '央视新闻',
+    body: `
+      <p>据灯塔专业版数据显示，截至8月3日，2026年暑期档电影总票房（含预售）突破75亿元，观影人次超过1.8亿，多项指标创历史同期新高。</p>
+      <p><strong>票房亮点：</strong>国产影片继续保持绝对优势，票房占比超过85%。多部国产动画、科幻、喜剧电影表现亮眼，其中3部影片票房超过10亿元。</p>
+      <p><strong>行业整顿：</strong>中国烹饪协会、中国茶叶流通协会近期相继发布公告，宣布全面清理并撤销此前颁发的"烹饪大师""名师""美食地标城市""制茶大师"等各类称号。公告指出，此类称号评选标准和程序不够规范，存在商业化运作倾向，不利于行业健康发展。</p>
+      <p>两协会表示，将建立更加科学、规范、透明的行业评价体系，推动烹饪和茶文化产业高质量发展。</p>
+    `
+  },
+  14: {
+    tag: '正能量', tagClass: '',
+    title: '00后军人顶着巨浪三次入海救起三人',
+    date: '2026年8月4日',
+    source: '新华社',
+    body: `
+      <p>近日，海南陵水发生一起感人救援事件。一名00后海军战士在休假期间，发现三名游客被巨浪卷入深海，他毫不犹豫地三次冲入汹涌的海浪中，成功将三人全部救回岸边。</p>
+      <p><strong>救援经过：</strong>事发当日下午，风浪较大，三名游客在陵水某海滩游玩时不慎被离岸流卷入深水区。正在附近散步的该名战士听到呼救声后，立即冲入海中。他先后三次往返，每次都将一名落水者拖带回岸边。在救援第三名游客时，他已明显体力不支，但仍然坚持将人安全救回。</p>
+      <p><strong>事后回应：</strong>救援结束后，该战士因体力透支和轻微擦伤被送往医院治疗，目前身体状况良好。他表示："作为一名军人，保护人民群众生命安全是我的本能反应，换了谁都会这么做。"</p>
+      <p><strong>旅游资讯：</strong>新疆赛里木湖景区近日宣布，自8月20日起，景区自驾游览收费方式将由按"人"收费调整为按"车"收费，7座以下车辆每车次200元。新标准更加合理，将有效降低家庭出游成本。</p>
+    `
+  }
+};
+
+// ========== 页面导航逻辑 ==========
+const landing = document.getElementById('landing');
+const newsPage = document.getElementById('newsPage');
+const detailPage = document.getElementById('detailPage');
+const detailContent = document.getElementById('detailContent');
+
+// 烤鱼首页 → 新闻列表
+landing.addEventListener('click', function() {
+  landing.classList.add('hidden');
+  setTimeout(() => {
+    landing.style.display = 'none';
+    newsPage.style.display = 'block';
+    detailPage.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 600);
+});
+
+// 新闻列表 → 新闻详情
+document.querySelectorAll('.card[data-id]').forEach(card => {
+  card.addEventListener('click', function() {
+    const id = this.getAttribute('data-id');
+    showDetail(id);
+  });
+});
+
+function showDetail(id) {
+  const news = newsData[id];
+  if (!news) return;
+
+  detailContent.innerHTML = `
+    <span class="detail-tag ${news.tagClass}">${news.tag}</span>
+    <h1>${news.title}</h1>
+    <div class="detail-meta">
+      <span>📅 ${news.date}</span>
+      <span>📰 ${news.source}</span>
+    </div>
+    <div class="detail-body">${news.body}</div>
+    <div class="detail-source">来源：${news.source}</div>
+  `;
+
+  newsPage.style.display = 'none';
+  detailPage.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 详情页 → 返回列表
+function backToList() {
+  detailPage.style.display = 'none';
+  newsPage.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 返回烤鱼
+function goBack() {
+  newsPage.style.display = 'none';
+  detailPage.style.display = 'none';
+  landing.style.display = 'flex';
+  landing.classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
