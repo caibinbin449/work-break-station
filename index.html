@@ -581,6 +581,8 @@ async function sendSmsCode(){
       var e1 = r1 && r1.error;
       if (e1) {
         console.error('[SMS] getVerification 错误:', e1.message || e1);
+        toast('发送失败', (e1 && e1.message) || '短信通道返回错误');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
       } else {
         // 提取 verificationInfo — 可能在 r1.data.verificationInfo 或 r1.verificationInfo
         var vInfo = (r1.data && r1.data.verificationInfo) || r1.data || r1.verificationInfo;
@@ -595,13 +597,19 @@ async function sendSmsCode(){
           console.warn('[SMS] getVerification 成功但无法提取 verificationInfo，vInfo 类型:', typeof vInfo);
         }
       }
-    } catch(e1) {
-      console.error('[SMS] getVerification 异常:', e1.message || e1);
-      toast('发送失败', 'getVerification: ' + (e1.message || '接口不可用'));
+      } catch(e1) {
+        var msg = e1 && e1.message;
+        console.error('[SMS] getVerification 异常:', msg || e1);
+        toast('发送失败', msg || '接口不可用(需在真实浏览器中打开网站)');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
+      }
+    } else {
+      toast('发送失败', 'SDK不支持getVerification，请确认在真实浏览器中打开(非App内置预览)');
       btn.disabled = false; btn.textContent = '获取验证码'; return;
     }
   } else {
-    console.warn('[SMS] auth.getVerification 方法不存在，SDK版本可能不支持');
+    toast('发送失败', 'SDK未加载getVerification方法，请使用Chrome/Edge浏览器打开网站');
+    btn.disabled = false; btn.textContent = '获取验证码'; return;
   }
 
   // 方案B: Supabase 风格 — signInWithOtp + verifyOtp
@@ -614,7 +622,7 @@ async function sendSmsCode(){
       var e2 = r2 && r2.error;
       if (e2) {
         console.error('[SMS] signInWithOtp 错误:', e2.message || e2);
-        toast('发送失败', e2.message || '短信发送失败，请稍后重试');
+        toast('发送失败', e2.message || '短信发送失败');
         btn.disabled = false; btn.textContent = '获取验证码'; return;
       }
 
@@ -625,20 +633,22 @@ async function sendSmsCode(){
         console.log('[SMS] ✅ signInWithOtp 成功');
         startSmsCountdown(); return;
       } else {
-        console.warn('[SMS] signInWithOtp 成功但没有 verifyOtp 回调, data:', typeof r2.data, Object.keys(r2.data || {}));
+        var keys = r2.data ? Object.keys(r2.data) : '无data';
+        console.warn('[SMS] signInWithOtp 成功但没有 verifyOtp 回调, keys:', keys);
+        toast('发送失败','接口返回异常，缺少验证回调(' + keys.join(',') + ')');
+        btn.disabled = false; btn.textContent = '获取验证码'; return;
       }
     } catch(e2) {
-      console.error('[SMS] signInWithOtp 异常:', e2.message || e2);
-      toast('发送失败', 'signInWithOtp: ' + (e2.message || '接口不可用'));
+      var msg2 = e2 && e2.message;
+      console.error('[SMS] signInWithOtp 异常:', msg2 || e2);
+      toast('发送失败', msg2 || '接口不可用(需在真实浏览器中打开网站)');
       btn.disabled = false; btn.textContent = '获取验证码'; return;
     }
-  } else {
-    console.warn('[SMS] auth.signInWithOtp 方法不存在');
   }
 
   // 全部失败
-  console.error('[SMS] ❌ 所有短信 API 均不可用，请检查: 1)CloudBase SDK版本 2)环境ID 3)短信通道状态');
-  toast('发送失败', '短信通道暂不可用。请按F12查看控制台错误信息，或使用账号密码登录');
+  console.error('[SMS] ❌ 所有短信 API 均不可用');
+  toast('发送失败', 'CloudBase SDK未正确加载。请用Chrome/Edge浏览器打开 chashankaoyu.com 重试');
   btn.disabled = false; btn.textContent = '获取验证码';
 }
 
