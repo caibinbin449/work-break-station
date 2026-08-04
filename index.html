@@ -549,12 +549,12 @@ function switchLoginTab(tab){
 
 // ============ 手机短信登录（CloudBase 原生 API） ============
 var smsTimer = null, smsSeconds = 0;
-var smsVerificationInfo = null;
+var smsVerifyOtp = null;
 
 function resetSmsCountdown(){
   if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
   smsSeconds = 0;
-  smsVerificationInfo = null;
+  smsVerifyOtp = null;
   var b = document.getElementById('sendSmsBtn');
   b.disabled = false; b.classList.remove('counting'); b.textContent = '获取验证码';
 }
@@ -565,10 +565,12 @@ async function sendSmsCode(){
   var btn = document.getElementById('sendSmsBtn');
   btn.disabled = true; btn.textContent = '发送中...';
   try {
-    var r = await auth.getVerification({ phone_number: '+86' + phone });
-    if (r.error) { toast('发送失败', r.error.message || '验证码发送失败，请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
-    smsVerificationInfo = r.verificationInfo || r.data && r.data.verificationInfo;
-    if (!smsVerificationInfo) { toast('发送失败','获取验证信息失败，请重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
+    // CloudBase Supabase-like SDK: signInWithOtp 发送验证码
+    var r = await auth.signInWithOtp({ phone: '+86' + phone });
+    if (r.error) { toast('发送失败', r.error.message || '验证码发送失败'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
+    // r.data 包含 verifyOtp 回调函数
+    if (!r.data || !r.data.verifyOtp) { toast('发送失败','接口返回异常，请重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
+    smsVerifyOtp = r.data.verifyOtp;
     toast('已发送','验证码已发送到 ' + phone);
     startSmsCountdown();
   } catch(e) { toast('发送失败', (e && e.message) || '请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; }
@@ -595,15 +597,12 @@ async function doPhoneLogin(){
   var btn = document.getElementById('phoneLoginBtn');
   btn.disabled = true; btn.textContent = '验证中...';
   try {
-    if (!smsVerificationInfo) { toast('提示','请先获取验证码'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
-    var lr = await auth.signInWithSms({
-      verificationInfo: smsVerificationInfo,
-      verificationCode: code,
-      phoneNum: '+86' + phone
-    });
+    if (!smsVerifyOtp) { toast('提示','请先获取验证码'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
+    // CloudBase Supabase-like SDK: verifyOtp 验证短信验证码
+    var lr = await smsVerifyOtp({ token: code });
     if (lr.error) { toast('验证失败', lr.error.message || '验证码错误或已过期'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
-    // 成功
-    smsVerificationInfo = null;
+    // 成功 - lr.data 包含 user 和 session
+    smsVerifyOtp = null;
     document.getElementById('phoneNum').value = '';
     document.getElementById('smsCode').value = '';
     resetSmsCountdown();
