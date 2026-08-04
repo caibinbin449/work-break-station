@@ -433,7 +433,7 @@ function renderQuoteView() {
   document.getElementById('dailyQuote').innerHTML = `
     <div class="quote-label">✦ 今日话语 ✦</div>
     <div class="quote-text" id="quoteText">${escapeHtml(text)}</div>
-    <div class="quote-date" id="quoteDate">${today}${isCustom ? ' · 自定义' : ' · 自动生成'}</div>
+    <div class="quote-date" id="quoteDate">${today}</div>
   `;
 }
 
