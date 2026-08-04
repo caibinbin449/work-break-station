@@ -234,13 +234,12 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
       <button class="close-btn" onclick="closeLogin()">✕</button>
       <div class="wx-icon">📱</div>
       <h2>手机登录</h2>
-      <p>登录后可留言互动和法律咨询</p>
+      <p>首次登录自动注册，也可使用账号密码</p>
     </div>
     <div class="login-body">
       <div class="login-tabs">
-        <div class="login-tab active" data-tab="phone" onclick="switchLoginTab('phone')">📱 手机登录</div>
-        <div class="login-tab" data-tab="login" onclick="switchLoginTab('login')">🔑 账号登录</div>
-        <div class="login-tab" data-tab="register" onclick="switchLoginTab('register')">✍️ 注册</div>
+        <div class="login-tab active" data-tab="phone" onclick="switchLoginTab('phone')">📱 手机验证码</div>
+        <div class="login-tab" data-tab="login" onclick="switchLoginTab('login')">🔑 账号密码</div>
       </div>
       <!-- 手机短信登录 -->
       <div class="login-panel active" id="panel-phone">
@@ -249,23 +248,15 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
           <div class="form-group"><label>验证码</label><input type="text" id="smsCode" placeholder="6位验证码" maxlength="6"></div>
           <button class="sms-btn" id="sendSmsBtn" onclick="sendSmsCode()">获取验证码</button>
         </div>
-        <button class="submit-btn" id="phoneLoginBtn" onclick="doPhoneLogin()">📱 验证码登录</button>
-        <div class="register-switch">首次登录将自动注册账号</div>
+        <button class="submit-btn" id="phoneLoginBtn" onclick="doPhoneLogin()">📱 登录 / 注册</button>
+        <div class="register-switch">首次使用手机号登录将自动创建账号</div>
       </div>
       <!-- 账号密码登录 -->
       <div class="login-panel" id="panel-login">
         <div class="form-group"><label>用户名</label><input type="text" id="loginUser" placeholder="请输入用户名" maxlength="20"></div>
         <div class="form-group"><label>密码</label><input type="password" id="loginPass" placeholder="请输入密码" maxlength="30"></div>
         <button class="submit-btn" id="loginBtn" onclick="doLogin()">🔑 登录</button>
-        <div class="register-switch">还没有账号？<a onclick="switchLoginTab('register')">立即注册</a></div>
-      </div>
-      <!-- 注册 -->
-      <div class="login-panel" id="panel-register">
-        <div class="form-group"><label>用户名</label><input type="text" id="regUser" placeholder="请设置用户名（至少3位）" maxlength="20"></div>
-        <div class="form-group"><label>密码</label><input type="password" id="regPass" placeholder="请设置密码（至少6位）" maxlength="30"></div>
-        <div class="form-group"><label>昵称</label><input type="text" id="regName" placeholder="您的显示昵称" maxlength="20"></div>
-        <button class="submit-btn" id="regBtn" onclick="doRegister()">✅ 注册并登录</button>
-        <div class="register-switch">已有账号？<a onclick="switchLoginTab('login')">返回登录</a></div>
+        <div class="register-switch">请先用手机号登录，然后在「账号密码」中设置用户名和密码</div>
       </div>
     </div>
   </div>
@@ -439,16 +430,18 @@ function switchLoginTab(tab){
   document.querySelectorAll('.login-panel').forEach(function(p){p.classList.remove('active')});
   document.querySelector('.login-tab[data-tab="'+tab+'"]').classList.add('active');
   document.getElementById('panel-'+tab).classList.add('active');
-  // 根据 tab 切换标题
-  var titles = {phone:'手机登录',login:'账号登录',register:'注册账号'};
+  var titles = {phone:'手机登录',login:'账号密码'};
   document.querySelector('.login-header h2').textContent = titles[tab] || '登录';
 }
 
-// ============ 手机短信登录 ============
+// ============ 手机短信登录（CloudBase 原生 API） ============
 var smsTimer = null, smsSeconds = 0;
+var smsVerificationInfo = null;
+
 function resetSmsCountdown(){
   if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
   smsSeconds = 0;
+  smsVerificationInfo = null;
   var b = document.getElementById('sendSmsBtn');
   b.disabled = false; b.classList.remove('counting'); b.textContent = '获取验证码';
 }
@@ -459,11 +452,13 @@ async function sendSmsCode(){
   var btn = document.getElementById('sendSmsBtn');
   btn.disabled = true; btn.textContent = '发送中...';
   try {
-    var r = await auth.signInWithOtp({ phone: '+86' + phone });
+    var r = await auth.getVerification({ phone_number: '+86' + phone });
     if (r.error) { toast('发送失败', r.error.message || '验证码发送失败，请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
+    smsVerificationInfo = r.verificationInfo || r.data && r.data.verificationInfo;
+    if (!smsVerificationInfo) { toast('发送失败','获取验证信息失败，请重试'); btn.disabled = false; btn.textContent = '获取验证码'; return; }
     toast('已发送','验证码已发送到 ' + phone);
     startSmsCountdown();
-  } catch(e) { toast('发送失败', e.message || '请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; }
+  } catch(e) { toast('发送失败', (e && e.message) || '请稍后重试'); btn.disabled = false; btn.textContent = '获取验证码'; }
 }
 
 function startSmsCountdown(){
@@ -479,8 +474,6 @@ function startSmsCountdown(){
   tick();
 }
 
-var phoneSignInData = null;
-
 async function doPhoneLogin(){
   var phone = document.getElementById('phoneNum').value.trim();
   var code = document.getElementById('smsCode').value.trim();
@@ -489,17 +482,15 @@ async function doPhoneLogin(){
   var btn = document.getElementById('phoneLoginBtn');
   btn.disabled = true; btn.textContent = '验证中...';
   try {
-    // 先发送 OTP 获取 signInData（如果之前没发过或过期）
-    if (!phoneSignInData) {
-      var r = await auth.signInWithOtp({ phone: '+86' + phone });
-      if (r.error) { toast('登录失败', r.error.message); btn.disabled = false; btn.textContent = '📱 验证码登录'; return; }
-      phoneSignInData = r.data;
-    }
-    // 验证 OTP
-    var vr = await phoneSignInData.verifyOtp({ token: code });
-    if (vr.error) { toast('验证失败', vr.error.message || '验证码错误'); btn.disabled = false; btn.textContent = '📱 验证码登录'; return; }
-    // 验证成功，清理状态
-    phoneSignInData = null;
+    if (!smsVerificationInfo) { toast('提示','请先获取验证码'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
+    var lr = await auth.signInWithSms({
+      verificationInfo: smsVerificationInfo,
+      verificationCode: code,
+      phoneNum: '+86' + phone
+    });
+    if (lr.error) { toast('验证失败', lr.error.message || '验证码错误或已过期'); btn.disabled = false; btn.textContent = '📱 登录 / 注册'; return; }
+    // 成功
+    smsVerificationInfo = null;
     document.getElementById('phoneNum').value = '';
     document.getElementById('smsCode').value = '';
     resetSmsCountdown();
@@ -507,8 +498,8 @@ async function doPhoneLogin(){
     closeLogin();
     toast('登录成功','欢迎回来！');
     if (pendingCallback) { var cb = pendingCallback; pendingCallback = null; cb(); }
-  } catch(e) { toast('登录失败', e.message || '请检查验证码'); }
-  btn.disabled = false; btn.textContent = '📱 验证码登录';
+  } catch(e) { toast('登录失败', (e && e.message) || '请检查验证码'); }
+  btn.disabled = false; btn.textContent = '📱 登录 / 注册';
 }
 
 async function doLogin(){
@@ -519,40 +510,17 @@ async function doLogin(){
   btn.disabled = true; btn.textContent = '登录中...';
   try {
     var r = await auth.signInWithPassword({ username: u, password: p });
-    if (r.error) { toast('登录失败', r.error.message || '用户名或密码错误'); btn.disabled = false; btn.textContent = '💚 登录'; return; }
+    if (r.error) { toast('登录失败', r.error.message || '用户名或密码错误'); btn.disabled = false; btn.textContent = '🔑 登录'; return; }
     await checkSession();
     closeLogin();
     toast('登录成功','欢迎回来！');
+    toast('登录成功','欢迎回来！');
     if (pendingCallback) { var cb = pendingCallback; pendingCallback = null; cb(); }
   } catch(e) { toast('登录失败', e.message || '请检查用户名和密码'); }
-  btn.disabled = false; btn.textContent = '💚 登录';
+  btn.disabled = false; btn.textContent = '🔑 登录';
 }
 
 var pendingCallback = null;
-
-async function doRegister(){
-  var u = document.getElementById('regUser').value.trim();
-  var p = document.getElementById('regPass').value;
-  var n = document.getElementById('regName').value.trim();
-  if (!u || u.length < 3) { toast('提示','用户名至少3位'); return; }
-  if (!p || p.length < 6) { toast('提示','密码至少6位'); return; }
-  if (!n || n.length < 2) { toast('提示','请输入昵称'); return; }
-  var btn = document.getElementById('regBtn');
-  btn.disabled = true; btn.textContent = '注册中...';
-  try {
-    // 尝试用 email 方式注册（CloudBase SDK signUp 兼容性最佳路径）
-    var r = await auth.signUp({ email: u + '@chashankaoyu.local', password: p, options: { data: { nickname: n, username: u } } });
-    if (r.error) { toast('注册失败', r.error.message || '请重试'); btn.disabled = false; btn.textContent = '💚 一键注册登录'; return; }
-    // 注册成功后自动登录
-    var lr = await auth.signInWithPassword({ email: u + '@chashankaoyu.local', password: p });
-    if (lr.error) { toast('自动登录失败','请手动登录'); closeLogin(); switchLoginTab('login'); btn.disabled = false; btn.textContent = '💚 一键注册登录'; return; }
-    await checkSession();
-    closeLogin();
-    toast('注册成功','欢迎你，'+n+'！');
-    if (pendingCallback) { var cb = pendingCallback; pendingCallback = null; cb(); }
-  } catch(e) { toast('注册失败', e.message || '请重试'); }
-  btn.disabled = false; btn.textContent = '💚 一键注册登录';
-}
 
 async function doLogout(){
   await auth.signOut();
