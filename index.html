@@ -537,6 +537,17 @@ function showQuoteEditor() {
   document.getElementById('quoteInput').focus();
 }
 
+// 预设今日话语
+(function() {
+  const today = getToday();
+  if (today === '2026-08-04') {
+    const saved = JSON.parse(localStorage.getItem('dq') || '{}');
+    if (!saved[today]) {
+      saved[today] = '欢迎周五茶山吃烤鱼';
+      localStorage.setItem('dq', JSON.stringify(saved));
+    }
+  }
+})();
 // 初始化话语
 renderQuoteView();
 // 阻止话语区域点击冒泡到封面
