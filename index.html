@@ -947,9 +947,12 @@ function requireLogin(cb){
 var _dailyQuote = ''; // 由 loadSiteData 预加载
 async function loadDailyQuote(){
   var dt = document.getElementById('dailyQuote');
-  // 优先：云函数
+  // 优先：云函数（带 3 秒超时，防止长期无响应）
   try {
-    var r = await fetch(CLOUD_FN + '/get-quote?date=' + todayStr());
+    var controller = new AbortController();
+    var timeout = setTimeout(function(){ controller.abort(); }, 3000);
+    var r = await fetch(CLOUD_FN + '/get-quote?date=' + todayStr(), {signal: controller.signal});
+    clearTimeout(timeout);
     var d = await r.json();
     if (d.success && d.quote) {
       dt.innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+eHtml(d.quote.text)+'</div><div class="quote-date">'+todayStr()+'</div>';
@@ -975,10 +978,12 @@ var newsSections = [];
 
 // ==================== 全局数据加载 ====================
 function loadSiteData(){
+  // 按天缓存击穿：确保浏览器每天拉取最新 JSON，不被旧缓存拖累
+  var cacheBuster = '?v=' + todayStr().replace(/-/g,'');
   return Promise.all([
-    fetch('data/news.json').then(function(r){return r.json()}),
-    fetch('data/articles.json').then(function(r){return r.json()}),
-    fetch('data/quote.json').then(function(r){return r.json()}).catch(function(){return {text:''}})
+    fetch('data/news.json' + cacheBuster).then(function(r){return r.json()}).catch(function(e){console.error('[茶山烤鱼] news.json 加载失败:', e.message || e); return {items:{}, sections:[]};}),
+    fetch('data/articles.json' + cacheBuster).then(function(r){return r.json()}).catch(function(e){console.error('[茶山烤鱼] articles.json 加载失败:', e.message || e); return {articles:[]};}),
+    fetch('data/quote.json' + cacheBuster).then(function(r){return r.json()}).catch(function(){return {text:''}})
   ]).then(function(results){
     var newsJson = results[0];
     var articlesJson = results[1];
