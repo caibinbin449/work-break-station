@@ -997,8 +997,8 @@ var archiveCache = {}; // 缓存已加载的归档数据
 
 // ==================== 全局数据加载 ====================
 function loadSiteData(){
-  // 按天缓存击穿：确保浏览器每天拉取最新 JSON，不被旧缓存拖累
-  var cacheBuster = '?v=' + todayStr().replace(/-/g,'');
+  // 按时间戳缓存击穿：确保每次访问拉取最新 JSON，不被CDN或浏览器旧缓存拖累
+  var cacheBuster = '?v=' + Date.now();
   return Promise.all([
     fetch('data/news.json' + cacheBuster).then(function(r){return r.json()}).catch(function(e){console.error('[茶山烤鱼] news.json 加载失败:', e.message || e); return {items:{}, sections:[]};}),
     fetch('data/articles.json' + cacheBuster).then(function(r){return r.json()}).catch(function(e){console.error('[茶山烤鱼] articles.json 加载失败:', e.message || e); return {articles:[]};}),
@@ -1028,7 +1028,7 @@ function loadArchiveNews(dateStr, callback){
     if (callback) callback(true);
     return;
   }
-  var cacheBuster = '?v=' + dateStr.replace(/-/g,'');
+  var cacheBuster = '?v=' + Date.now();
   fetch('data/archive/news-'+dateStr+'.json' + cacheBuster).then(function(r){
     if (!r.ok) throw new Error('Archive not found');
     return r.json();
