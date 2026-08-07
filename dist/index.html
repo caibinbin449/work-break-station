@@ -137,6 +137,17 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 .news-section .news-row .nr-tag.world{background:#16a085}
 .news-section .news-row .nr-title{font-size:14px;font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 .news-section .news-row .nr-date{font-size:11px;color:#999;flex-shrink:0}
+/* 日期导航 */
+.date-nav{display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0;margin-bottom:4px}
+.date-nav-btn{width:34px;height:34px;border-radius:50%;border:1px solid #ddd;background:#fff;color:#666;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1}
+.date-nav-btn:hover{background:#8b4513;color:#fff;border-color:#8b4513}
+.date-nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.date-nav-label{font-size:15px;font-weight:600;color:#8b4513;min-width:120px;text-align:center;cursor:pointer}
+.date-nav-label:hover{color:#e67e22}
+.date-nav-today{font-size:12px;color:#999;cursor:pointer;text-decoration:underline}
+.date-nav-today:hover{color:#e67e22}
+.news-empty{padding:40px 0;text-align:center;color:#999;font-size:14px}
+.news-loading{padding:40px 0;text-align:center;color:#999;font-size:14px}
 
 .detail-content{background:#fff;border-radius:12px;padding:30px 30px 40px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:10px}
 .detail-content .detail-tag{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:#e67e22;padding:3px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:1px}
@@ -344,6 +355,8 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
 
 /* 新闻：紧凑标题列表 */
 .dash-news .dash-news-cat{font-size:12px;font-weight:700;color:#8b4513;margin:0 0 4px;padding-left:8px;border-left:3px solid #e67e22}
+.dash-cat-more{font-size:11px;color:#999;cursor:pointer;text-decoration:none;padding:2px 0 6px;display:inline-block;transition:color .2s}
+.dash-cat-more:hover{color:#e67e22}
 .dash-news .dash-news-list{display:flex;flex-direction:column;margin-bottom:8px}
 .dash-news .dash-news-list:last-child{margin-bottom:0}
 .dash-news .dash-news-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;cursor:pointer;transition:all .12s;border-bottom:1px solid #f0ebe0}
@@ -573,6 +586,12 @@ body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;b
   <div class="page-header">
     <div class="brand"><div class="mini-fish"><img src="images/grilled-fish.png" alt="茶山烤鱼"></div><h1>茶山烤鱼 · 新闻信息</h1></div>
     <div class="date">📅 <span id="newsToday"></span> · 每日新闻速览</div>
+  </div>
+  <div class="date-nav">
+    <button class="date-nav-btn" id="dateNavPrev" onclick="changeNewsDate(-1)" title="前一天">◀</button>
+    <span class="date-nav-label" id="dateNavLabel" onclick="goToTodayNews()"></span>
+    <button class="date-nav-btn" id="dateNavNext" onclick="changeNewsDate(1)" title="后一天">▶</button>
+    <span class="date-nav-today" onclick="goToTodayNews()" style="display:none" id="dateNavTodayLink">回到今天</span>
   </div>
   <div class="page-content" id="newsPageContent"></div>
 </div>
@@ -942,45 +961,154 @@ function requireLogin(cb){
 }
 
 // ==================== 每日话语 ====================
+var _dailyQuote = ''; // 由 loadSiteData 预加载
 async function loadDailyQuote(){
   var dt = document.getElementById('dailyQuote');
+  // 优先：云函数（带 3 秒超时，防止长期无响应）
   try {
-    var r = await fetch(CLOUD_FN + '/get-quote?date=' + todayStr());
+    var controller = new AbortController();
+    var timeout = setTimeout(function(){ controller.abort(); }, 3000);
+    var r = await fetch(CLOUD_FN + '/get-quote?date=' + todayStr(), {signal: controller.signal});
+    clearTimeout(timeout);
     var d = await r.json();
     if (d.success && d.quote) {
       dt.innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+eHtml(d.quote.text)+'</div><div class="quote-date">'+todayStr()+'</div>';
       return;
     }
   } catch(e) {}
-  // 降级：使用本地默认话语
+  // 其次：本地 quote.json（由每日自动化更新）
+  if (_dailyQuote) {
+    dt.innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+eHtml(_dailyQuote)+'</div><div class="quote-date">'+todayStr()+'</div>';
+    return;
+  }
+  // 降级：本地默认话语库
   var autoQuotes = ['每一天都是崭新的开始，用热爱奔赴山海，用坚持书写答案。','你只管努力，剩下的交给时间。星光不负赶路人。','人生没有白走的路，每一步都算数。今天也要加油。','与其仰望别人的光芒，不如点亮自己的灯火。','山有顶峰，湖有彼岸，在人生漫漫长途中，万物皆有回转。'];
-  var d = new Date(); var start = new Date(d.getFullYear(),0,0);
-  var dayOfYear = Math.floor((d-start)/(1000*60*60*24));
+  var d2 = new Date(); var start = new Date(d2.getFullYear(),0,0);
+  var dayOfYear = Math.floor((d2-start)/(1000*60*60*24));
   var text = autoQuotes[dayOfYear % autoQuotes.length];
   dt.innerHTML = '<div class="quote-label">✦ 今日话语 ✦</div><div class="quote-text">'+eHtml(text)+'</div><div class="quote-date">'+todayStr()+'</div>';
 }
 
-// ==================== 新闻数据 ====================
-var newsData = {
-  1:{tag:'政策',tagClass:'',title:'新型电力系统建设"十五五"规划发布',date:'2026年8月4日',source:'国家能源局',body:'<p>国家发改委、国家能源局联合印发《新型电力系统建设"十五五"规划》，明确到2030年初步建成新型电力系统。这是我国实现"双碳"目标的关键举措之一，标志着能源绿色低碳转型进入加速期。</p><p>规划提出六大重点任务：一是加快新能源大规模开发，重点推进"沙戈荒"大型风电光伏基地建设；二是推动电网全面升级，建设适应新能源占比逐渐提高的智能电网；三是新能源汽车充电基础设施全面升级，实现"县县有站、乡乡有桩"；四是储能规模化发展，新型储能装机规模达到4000万千瓦以上；五是电力市场化改革深化，完善现货市场和辅助服务市场；六是数字化智能化转型，推动虚拟电厂、智能微电网等新模式规模化应用。</p><p>规划特别强调了安全底线，要求增强电力系统韧性，建立健全极端天气和突发事件下的电力应急保障体系。到2030年，非化石能源消费比重将提高到25%左右，风电、太阳能发电总装机容量达到12亿千瓦以上。业内专家认为，该规划的发布将为相关产业链带来超过万亿级的投资机遇。</p>'},
-  2:{tag:'经济',tagClass:'economy',title:'上半年海洋生产总值5.5万亿元，同比增长5.1%',date:'2026年8月4日',source:'新华社',body:'<p>自然资源部最新数据显示，2026年上半年我国海洋生产总值达到5.5万亿元，同比增长5.1%，占国内生产总值的比重稳步提升。海洋经济已成为国民经济的重要增长极，增速高于同期GDP增速约0.3个百分点。</p><p>在海洋能源领域，太平岭核电2号机组正式投产，新增核电装机容量120万千瓦，年发电量可达100亿度。海上风电装机突破5000万千瓦，稳居全球第一。海洋油气产量保持稳定增长，渤海、南海东部等重点海域勘探开发取得新进展。海洋渔业转型升级成效显著，深远海养殖产量同比增长15%，智慧渔业平台建设加快推进。</p><p>不过数据也显示，海洋经济发展仍面临一些挑战，包括近海生态环境压力增大、海洋高端装备自主化率有待提升、海洋灾害风险防控能力需进一步加强等。相关部门表示，下半年将重点推动海洋生物医药、海水淡化、海洋信息等战略性新兴产业的发展。</p>'},
-  3:{tag:'法规',tagClass:'',title:'《集成电路布图设计保护条例》20多年来首次修订',date:'2026年8月4日',source:'国务院',body:'<p>国务院正式公布修订后的《集成电路布图设计保护条例》，这是该条例自2001年颁布实施以来的首次重大修订，将于2026年10月15日起正式施行。此次修订旨在适应集成电路产业快速发展的新形势，加强对芯片设计原创成果的知识产权保护。</p><p>修订的主要亮点包括：一是扩展保护范围，明确将三维集成、先进封装等新型布图设计纳入保护范围，适应Chiplet（芯粒）等新技术发展趋势；二是大幅简化申请程序，将审查周期从原来的6个月缩短至2个月，并引入电子申请和快速审查通道；三是引入惩罚性赔偿制度，对故意侵权行为可判处最高5倍的惩罚性赔偿；四是法定赔偿上限从100万元大幅提高至500万元，显著增强了侵权威慑力度。</p><p>业内律师和半导体企业普遍认为，此次修订回应了集成电路行业长期以来的诉求，特别是在中美科技竞争加剧的背景下，加强知识产权保护将为国内芯片设计企业提供更好的创新环境和法律保障。中国半导体行业协会表示将配合做好新条例的宣传和培训工作。</p>'},
-  4:{tag:'治理',tagClass:'',title:'中央网信办处置违规网络团播账号1840余个',date:'2026年8月4日',source:'中央网信办',body:'<p>中央网信办持续深入推进"清朗·网络娱乐团播乱象整治"专项行动，最新通报显示，自专项行动开展以来，各级网信部门累计处置违规网络团播账号1840余个，关闭问题直播间320余间，约谈平台负责人60余人次，有力净化了网络直播环境。</p><p>本次整治聚焦三大突出问题：一是部分团播账号通过低俗表演、虚假互动等方式诱导观众打赏消费；二是一些直播间存在刷量控评、数据造假等不正当竞争行为；三是部分平台对入驻主播审核不严，为违规内容传播提供了渠道。网信办要求各直播平台切实履行主体责任，完善内容审核机制，建立健全主播信用评价体系。</p><p>多家头部直播平台已表态积极响应，承诺将加强自查自纠，对违规内容"零容忍"。业内人士认为，随着监管规则日益明确，网络直播行业正在从野蛮生长向规范发展转型，合规经营将成为平台长期竞争力的核心要素。</p>'},
-  5:{tag:'科技',tagClass:'tech',title:'我国牵头的区块链国际标准在ISO立项',date:'2026年8月4日',source:'工信部',body:'<p>由我国牵头的"区块链和分布式记账技术 参考架构"国际标准近日在ISO（国际标准化组织）正式立项，这是我国在区块链国际标准化领域取得的又一重要突破，标志着中国在区块链底层技术标准方面的话语权进一步增强。</p><p>该标准将定义区块链系统的参考架构、功能组件和互操作性要求，为全球区块链技术的研发和应用提供统一的技术框架。标准由中国电子技术标准化研究院牵头，联合国内多家科研机构和企业共同提出，得到了来自美国、英国、德国、日本等20多个国家的支持。与此同时，工信部等三部门联合启动了碳效领跑者企业遴选工作，将利用区块链技术实现碳排放数据的可信采集和追溯。</p><p>分析人士指出，掌握国际标准制定权意味着在全球区块链产业竞争中占据了有利位置。我国区块链专利申请量已连续多年位居全球第一，但在国际标准层面的话语权仍然需要加强。此次ISO标准的成功立项，将有助于推动中国区块链企业的国际化发展，促进国产区块链技术和产品的全球应用。</p>'},
-  6:{tag:'金融',tagClass:'economy',title:'人民币国债期货在港交所挂牌上市',date:'2026年8月4日',source:'中国证监会',body:'<p>8月4日，人民币国债期货在香港交易所正式挂牌交易，首批上市合约包括2年期、5年期和10年期三个品种。这是香港资本市场发展的又一里程碑事件，也是人民币国际化进程中的重要一步。</p><p>港交所行政总裁在上市仪式上表示，人民币国债期货的推出将为境外投资者提供重要的利率风险管理工具，有助于进一步提升人民币资产的吸引力。首批参与交易的做市商包括中银国际、工银国际、汇丰银行、渣打银行等16家中外资金融机构。上市首日，三个品种合计成交约2300手，市场反应平稳积极。</p><p>市场分析人士认为，人民币国债期货的推出具有多重意义：一是有助于完善离岸人民币利率曲线，为人民币债券定价提供更准确的参考；二是丰富了离岸人民币投资和风险管理工具，有利于吸引更多国际资本参与中国债券市场；三是进一步巩固了香港作为全球离岸人民币业务枢纽的地位。配合债券通"南向通"的扩容，未来将有更多国际投资者进入中国利率衍生品市场。</p>'},
-  7:{tag:'数据',tagClass:'economy',title:'保险行业上半年接报案53.3万件，已赔付55.3亿元',date:'2026年8月4日',source:'中国保险行业协会',body:'<p>中国保险行业协会发布2026年上半年自然灾害理赔数据。数据显示，上半年保险行业针对暴雨洪涝、台风、地震等自然灾害累计接报案53.3万件，已赔付55.3亿元，整体估损金额约110.5亿元，赔付进度已超过估损金额的50%。</p><p>从灾害类型来看，暴雨洪涝相关报案占比最大，约占总报案数的62%，主要集中在我国长江中下游地区和华南地区。6月份南方持续的强降雨共造成湖南、江西、广西等8个省份大面积受灾，保险理赔已超30亿元。台风灾害报案约占总数的18%，地震和其他灾害占比约20%。从险种分布来看，车险报案最多，占比约45%；农业保险和企业财产保险次之，各占比约20%。</p><p>协会相关负责人表示，各保险公司已开通绿色理赔通道，简化理赔流程，部分地区实现了"快赔先付"，确保受灾群众和企业及时获得经济补偿。同时，协会呼吁社会公众和企业增强风险防范意识，合理配置保险保障，特别是在汛期和台风季节要提前做好防灾减损准备。</p>'},
-  8:{tag:'民生',tagClass:'',title:'上海集中处罚12家网约车平台，总额超2500万元',date:'2026年8月4日',source:'上海市交通委',body:'<p>上海市交通委员会联合市场监管、公安等多部门，对全市网约车平台开展集中执法检查，共对12家平台企业作出行政处罚，罚款总额超过2500万元。这是今年以来上海对网约车行业开出的最大规模"罚单"，彰显了监管部门规范网约车市场的坚定决心。</p><p>检查发现的主要问题集中在三个方面：一是大量向无资质的车辆和驾驶员派单，严重违反"双证齐全"的运营要求，部分平台无证派单比例高达40%以上；二是未按规定向监管平台实时上传运营数据，存在数据缺失、延迟甚至人为篡改的情况；三是对乘客投诉处理不及时、不到位，部分平台投诉解决率不足70%。</p><p>上海市交通委明确表示，下一步将继续加大执法力度，对屡罚不改的平台将依法从重处罚，直至吊销经营许可。同时，将推动建立网约车行业信用评价体系，将平台合规情况与企业信用挂钩。受此消息影响，多家网约车平台表示将立即整改，全面清退不合规车辆和驾驶员，并加强数据对接和乘客权益保障机制建设。</p>'},
-  9:{tag:'中东',tagClass:'world',title:'美伊谈判动态：特朗普称谈判已重启，伊朗否认',date:'2026年8月4日',source:'Reuters',body:'<p>围绕美伊核谈判的最新动态出现矛盾信号。美国总统特朗普8月4日在社交媒体上发文称，与伊朗的谈判"已经重启"，并表示"正在取得良好进展"。然而，伊朗外交部发言人随即作出回应，明确否认重启谈判的说法。</p><p>伊朗外交部发言人在每周例行记者会上表示："目前没有任何关于核谈判的正式或非正式接触。"他强调，除非美国首先解除对伊朗的非法单边制裁，否则伊朗不认为与华盛顿的对话具有任何实质性意义。分析人士指出，双方在谈判前提条件上的根本分歧是导致谈判停滞不前的核心原因。</p><p>与此同时，霍尔木兹海峡的紧张局势持续升级。据海运监测数据显示，霍尔木兹海峡的日均船舶通行量已降至单日仅9艘，远低于正常水平的25-30艘。国际油价受此影响持续走高，布伦特原油期货价格已突破每桶92美元。能源分析机构警告称，如果霍尔木兹海峡通航受阻持续，全球石油供应可能面临每日约1700万桶的缺口风险。</p>'},
-  10:{tag:'贸易',tagClass:'world',title:'美国25州联合起诉特朗普政府301关税政策',date:'2026年8月4日',source:'CNN',body:'<p>据CNN报道，美国25个州的总检察长于8月4日联合提起诉讼，指控特朗普政府依据301条款加征的关税政策违宪，认为总统在未经国会充分授权的情况下滥用关税权力。这是美国国内反对301关税政策的法律行动中规模最大的一次。</p><p>诉讼书指出，美国宪法赋予国会而非总统制定关税和监管对外贸易的权力。特朗普政府利用《贸易法》301条款和《国际紧急经济权力法》单方面加征全面关税的行为，已经超出了法律授权的范围，构成行政权力的严重越权。参与诉讼的包括加利福尼亚州、纽约州、伊利诺伊州等主要经济大州，这些州的进出口贸易因关税政策受到了显著冲击。</p><p>据彼得森国际经济研究所估算，301关税政策已导致美国普通家庭年均支出增加约1300美元，总计给美国消费者和企业带来了超过1500亿美元的额外成本。多个行业协会对此次诉讼表示支持，认为高关税损害了美国制造业的竞争力。白宫方面则回应称，关税政策是保护美国工人和国家安全的必要手段，将坚决捍卫总统依法享有的贸易权力。</p>'},
-  11:{tag:'国际',tagClass:'world',title:'俄乌冲突：俄击落1158架无人机创单日新高',date:'2026年8月4日',source:'俄罗斯国防部',body:'<p>俄罗斯国防部8月4日通报称，俄防空部队在过去24小时内击落乌克兰无人机共计1158架，创下冲突爆发以来单日击落无人机数量的最高纪录。其中，在罗斯托夫州和别尔哥罗德州方向拦截数量最多，分别超过300架。</p><p>乌方此次大规模无人机袭击主要针对俄南部军民用基础设施，包括多个军用机场、油料库和电力设施。俄方表示，袭击造成部分设施受损，但没有人员伤亡报告。军事分析人士指出，无人机已成为现代战场上的核心作战手段，双方都在通过大量使用低成本无人机来消耗对方昂贵的防空导弹资源，这种"不对称作战"正在改变传统战争的面貌。</p><p>与此同时，加沙地带局势仍在持续恶化。以军8月4日对加沙中部的军事行动已造成至少18人死亡、50多人受伤，其中包括多名儿童。联合国秘书长发言人表示，对加沙平民伤亡人数的持续上升深感担忧，再次呼吁各方立即停火并恢复人道主义援助通道。</p>'},
-  12:{tag:'天气',tagClass:'',title:'台风"白海豚"周四起影响我国，18条河流维持超警',date:'2026年8月4日',source:'中央气象台',body:'<p>中央气象台8月4日发布台风蓝色预警：今年第13号台风"白海豚"（强台风级）正以每小时约15公里的速度向西北方向移动，预计将于8月6日至7日移入东海海域，之后可能在我国华东沿海登陆，中心附近最大风力14级（42米/秒）。</p><p>受"白海豚"外围环流影响，8月5日起浙江、福建、上海、江苏等沿海地区将陆续出现强降雨和大风天气，部分地区过程降雨量可达200-300毫米，沿海最大阵风可达12-14级。国家防总已启动防汛防台风四级应急响应，要求相关省份做好船只回港避风、人员转移安置等防御工作。</p><p>此外，受前期持续强降雨影响，全国目前仍有18条河流维持超警戒水位，主要分布在我国长江流域和松花江流域。应急管理部已紧急调拨6.5万件救灾物资支援湖南、江西等重灾区，包括帐篷、折叠床、应急照明设备等。气象部门提醒，在台风来临前的窗口期内，各地应抓紧做好灾后恢复和隐患排查工作，防止台风与前期洪涝叠加造成更大灾害。</p>'},
-  13:{tag:'娱乐',tagClass:'',title:'暑期档电影总票房突破75亿元',date:'2026年8月4日',source:'央视新闻',body:'<p>根据国家电影局和猫眼专业版数据，截至8月4日，2026年暑期档电影总票房（含预售）已突破75亿元，观影人次超过1.8亿，较去年同期增长约12%，创下暑期档同期票房历史新高。暑期档还有近一个月时间，全年票房有望冲击新纪录。</p><p>国产影片表现尤为亮眼，票房占比超过85%。其中科幻片《星辰纪元》、动画电影《山海神话》和现实主义题材的《亲爱的城市》三部国产片票房均突破10亿元，形成明显的"第一梯队"。《星辰纪元》凭借精良的视觉特效和扎实的剧本口碑发酵，上映三周累计票房已达到28亿元，成为年度票房冠军的有力竞争者。</p><p>业内分析认为，今年暑期档的成功得益于多重因素：一是国产电影工业化水平持续提升，特效和叙事质量显著进步；二是影院基础设施不断完善，IMAX、CINITY等高端放映厅覆盖率提升；三是票价趋于合理，平均票价维持在42元左右，观影门槛降低。暑期档国产影片占比超85%的成绩，也充分证明了中国电影市场的本土化竞争力和文化自信。</p>'},
-  14:{tag:'正能量',tagClass:'',title:'00后军人顶着巨浪三次入海救起三人',date:'2026年8月4日',source:'新华社',body:'<p>近日，一段"00后军人巨浪中三次入海救人"的视频在网络上广泛传播，感动了无数网友。事情发生在海南陵水黎族自治县英州镇附近海域。8月3日下午，三名外地游客在未开发海域游泳时遭遇离岸流，被卷入深水区，情况十分危急。</p><p>正在附近休假的海南某部队战士陈海龙（22岁）听到呼救声后，毫不犹豫地冲向海中。当时海面风力达到6级，浪高接近3米，救援条件极为恶劣。他先后三次冲入巨浪，凭借在部队练就的过硬体能和海上救援技能，将三名落水游客逐一营救上岸，整个过程持续约40分钟。三名获救游客中有一名12岁的少年，因溺水时间较长情况最为危险，陈海龙对其进行了心肺复苏，直到120急救人员赶到。</p><p>事后陈海龙因体力严重透支和手臂多处擦伤被送医治疗，目前已恢复健康出院。被救游客家属为他送去了锦旗，当地政府也对其见义勇为的行为予以表彰。面对赞誉，陈海龙表示"作为一名军人，守护人民安全是我的天职。当时心里只想着赶紧把人救上来，其他的没想那么多。"网友们纷纷点赞："这才是00后该有的样子""向中国军人致敬"。</p>'}
-};
+// ==================== 新闻数据（从 data/news.json 动态加载） ====================
+var newsData = {};
+var newsSections = [];
+var currentNewsDate = ''; // 当前查看的新闻日期，空表示今天
+var archiveCache = {}; // 缓存已加载的归档数据
+
+// ==================== 全局数据加载 ====================
+function loadSiteData(){
+  // 按时间戳缓存击穿：确保每次访问拉取最新 JSON，不被CDN或浏览器旧缓存拖累
+  var cacheBuster = '?v=' + Date.now();
+  return Promise.all([
+    fetch('data/news.json' + cacheBuster).then(function(r){return r.json()}).catch(function(e){console.error('[茶山烤鱼] news.json 加载失败:', e.message || e); return {items:{}, sections:[]};}),
+    fetch('data/articles.json' + cacheBuster).then(function(r){return r.json()}).catch(function(e){console.error('[茶山烤鱼] articles.json 加载失败:', e.message || e); return {articles:[]};}),
+    fetch('data/quote.json' + cacheBuster).then(function(r){return r.json()}).catch(function(){return {text:''}})
+  ]).then(function(results){
+    var newsJson = results[0];
+    var articlesJson = results[1];
+    var quoteJson = results[2];
+    newsData = newsJson.items || {};
+    newsSections = newsJson.sections || [];
+    authorArticles = articlesJson.articles || [];
+    _dailyQuote = (quoteJson && quoteJson.text) || '';
+    console.log('Data loaded: '+Object.keys(newsData).length+' news, '+authorArticles.length+' articles');
+  });
+}
+
+// ==================== 历史新闻存档加载 ====================
+function formatDateStr(y,m,d){ return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0') }
+function parseDateStr(s){ var p=s.split('-'); return {y:parseInt(p[0]),m:parseInt(p[1]),d:parseInt(p[2])} }
+
+function loadArchiveNews(dateStr, callback){
+  // 检查缓存
+  if (archiveCache[dateStr]) {
+    var d = archiveCache[dateStr];
+    newsData = d.items || {};
+    newsSections = d.sections || [];
+    if (callback) callback(true);
+    return;
+  }
+  var cacheBuster = '?v=' + Date.now();
+  fetch('data/archive/news-'+dateStr+'.json' + cacheBuster).then(function(r){
+    if (!r.ok) throw new Error('Archive not found');
+    return r.json();
+  }).then(function(json){
+    archiveCache[dateStr] = json;
+    newsData = json.items || {};
+    newsSections = json.sections || [];
+    if (callback) callback(true);
+  }).catch(function(e){
+    console.error('[茶山烤鱼] 归档 '+dateStr+' 加载失败:', e.message || e);
+    if (callback) callback(false);
+  });
+}
+
+function changeNewsDate(delta){
+  // 从当前日期算偏移
+  if (!currentNewsDate) currentNewsDate = todayStr();
+  var p = parseDateStr(currentNewsDate);
+  var d = new Date(p.y, p.m-1, p.d);
+  d.setDate(d.getDate() + delta);
+  var newDate = formatDateStr(d.getFullYear(), d.getMonth()+1, d.getDate());
+  var today = todayStr();
+  // 不能超过今天
+  if (newDate > today) { toast('提示','已经是今天了'); return; }
+  showNewsWithDate(newDate);
+}
+
+function goToTodayNews(){
+  currentNewsDate = '';
+  loadSiteData().then(function(){
+    renderNewsPage();
+  });
+}
+
+function showNewsWithDate(dateStr){
+  currentNewsDate = dateStr;
+  var ts = todayStr();
+  if (dateStr === ts) {
+    // 回到今天，用主数据
+    loadSiteData().then(function(){ renderNewsPage() });
+    return;
+  }
+  // 显示加载中
+  document.getElementById('newsPageContent').innerHTML = '<div class="news-loading">⏳ 加载中...</div>';
+  document.getElementById('dateNavLabel').textContent = dateStr;
+  document.getElementById('dateNavTodayLink').style.display = 'inline';
+  document.getElementById('dateNavNext').disabled = true;
+  document.getElementById('dateNavPrev').disabled = true;
+  loadArchiveNews(dateStr, function(success){
+    if (success) {
+      renderNewsPage();
+    } else {
+      document.getElementById('newsPageContent').innerHTML = '<div class="news-empty">📭 该日期暂无新闻存档<br><small style="color:#bbb">'+dateStr+'</small></div>';
+    }
+    updateDateNavUI(dateStr);
+  });
+}
+
+function updateDateNavUI(dateStr){
+  var ts = todayStr();
+  var label = document.getElementById('dateNavLabel');
+  var todayLink = document.getElementById('dateNavTodayLink');
+  var prevBtn = document.getElementById('dateNavPrev');
+  var nextBtn = document.getElementById('dateNavNext');
+  if (!label) return;
+  if (dateStr === ts) {
+    label.textContent = '今日 ('+dateStr+')';
+    todayLink.style.display = 'none';
+    nextBtn.disabled = true;
+  } else {
+    label.textContent = dateStr;
+    todayLink.style.display = 'inline';
+    nextBtn.disabled = (dateStr >= ts);
+  }
+  prevBtn.disabled = false;
+}
 
 function renderNewsPage(){
   var h='';
-  var sections = [
+  var sections = newsSections.length > 0 ? newsSections : [
     {title:'🔥 国内要闻',ids:[1,2,3,4,5]},
     {title:'💰 财经速递',ids:[6,7,8]},
     {title:'🌍 国际观察',ids:[9,10,11]},
@@ -1008,7 +1136,8 @@ function renderNewsPage(){
       navigateTo('detail',id);
     });
   });
-  document.getElementById('newsToday').textContent = todayCN();
+  document.getElementById('newsToday').textContent = currentNewsDate || todayCN();
+  updateDateNavUI(currentNewsDate || todayStr());
 }
 
 // ==================== 信息分享 ====================
@@ -1021,36 +1150,9 @@ function switchShareTab(tab){
   renderSharePage();
 }
 
-var authorArticles = [
-  {
-    id:'a1',tag:'原创',tagClass:'original',
-    title:'从茶山到餐桌：一条烤鱼的互联网创业之路',
-    excerpt:'在数字化浪潮席卷各行各业的今天，传统餐饮如何借助互联网实现转型升级？本文以茶山烤鱼为例，深入探讨小而美品牌的生存与发展之道...',
-    author:'茶山老蔡',date:'2026-08-01',reads:1256,
-    body:'<p>十年前，我还在深圳一家互联网公司做程序员，每天对着屏幕敲代码。那时的生活很规律，朝九晚九，唯一的慰藉就是周末约上三五好友，去街边小摊吃烤鱼。</p><p>重庆烤鱼，万州风味，炭火慢烤，麻辣鲜香。每次吃到满头大汗的时候，我都会想：如果能把这个味道带出那条小巷，带到更多人面前，该多好。</p><h2>从程序员的工位到烤鱼的灶台</h2><p>2018年春天，我递交了辞职信。同事们觉得我疯了——放着月薪两万的工作不做，要去开烤鱼店？但我心里清楚，互联网行业虽然光鲜，却不是我想要的生活方式。</p><p>最初的三个月最难熬。找店面、办营业执照、学配方、招厨师，每一件事都比写代码复杂十倍。有段时间我甚至怀疑自己的选择，但每当炉火升起，当第一条鱼在炭火上滋滋作响时，那种满足感告诉我：这条路值得走。</p><h2>为什么叫"茶山烤鱼"</h2><p>店址选在深圳南山区的茶光村附近，背靠茶山。每天清晨，山上的雾气还没散，我就在店里准备食材了。这个名字就是这样来的：茶山，是我创业的地方，也是我重新认识自己的地方。</p><p>我们的鱼全部选用新鲜活鱼，现杀现烤。配方是我花了三个月，跑了八趟重庆，拜访了七位老师傅之后反复调试出来的。不追求刺激的重麻重辣，而是讲究麻、辣、鲜、香、嫩五味的平衡。</p><blockquote>"做餐饮和写代码其实很像——好的产品，都是在无数次debug中打磨出来的。"</blockquote><h2>互联网思维做传统餐饮</h2><p>虽然离开了互联网行业，但思维方式没有离开。我们用数据管理库存、用线上平台引流、用会员系统沉淀客户。更重要的是，我们坚持了互联网最核心的理念：用户至上。</p><p>每一条评价我都会认真看，每一个建议我都会考虑。有人说太辣了我们就调整辣度，有人说配菜太少我们就增加份量。这种快速迭代的思维，恰恰是互联网给我的最大财富。</p><h2>展望未来</h2><p>现在茶山烤鱼已经从一家小店发展到深圳有三家分店，每天服务超过五百位食客。但我们没有停止探索：标准化流程、中央厨房、线上商城、品牌输出……每一个环节都在不断完善。</p><p>我想说的是：无论你在什么行业，无论你做什么工作，保持热爱、持续学习、不断创新，就一定能把一件事情做好。就像烤鱼一样，火候到了，味道自然就出来了。</p><p>感谢每一位支持茶山烤鱼的朋友，我们继续努力，让你每一口都吃到幸福。</p>'
-  },
-  {
-    id:'a2',tag:'原创',tagClass:'original',
-    title:'2026年中国餐饮行业数字化趋势报告',
-    excerpt:'餐饮行业正经历前所未有的变革：AI点餐、无人配送、智能厨房...本文将全面分析2026年餐饮数字化的五大趋势及其对中小餐饮企业的影响...',
-    author:'茶山老蔡',date:'2026-07-28',reads:2389,
-    body:'<h2>引言</h2><p>2026年，中国餐饮市场规模预计突破6万亿元人民币。与此同时，数字化渗透率从2020年的15%增长到了目前的38%。对于中小餐饮企业而言，数字化转型已经从"选择题"变成了"必答题"。</p><h2>趋势一：AI驱动的智能点餐系统</h2><p>传统的扫码点餐正在被AI语义点餐取代。顾客只需要说出"我今天想吃辣的，预算80块左右"，AI系统就能自动推荐最匹配的菜品组合。这种体验的提升，让中小餐厅也能提供五星级的服务。</p><h2>趋势二：全渠道会员运营</h2><p>单一平台的会员体系已经成为过去。2026年，成功的餐饮品牌都在构建自己的私域流量池——微信社群、小程序、抖音、小红书，全渠道触达客户，用数据指导营销决策。</p><h2>趋势三：智能厨房管理系统</h2><p>IoT设备在厨房中的普及率大幅提升。智能温控、自动排烟、食材库存预警……这些技术在降低人力成本的同时，也显著提升了出品的稳定性。</p><h2>趋势四：即时零售与外卖3.0</h2><p>外卖不再只是配送现做餐食。预制菜、半成品食材包、品牌周边产品通过即时零售渠道触达消费者，拓展了餐饮的消费场景。</p><h2>趋势五：ESG与绿色餐饮</h2><p>消费者越来越关注食品的来源和环保性。数字化溯源系统让每一条鱼、每一棵菜都能追溯到产地。绿色餐饮不仅是社会责任，更是品牌溢价的重要来源。</p><h2>给中小餐饮企业的建议</h2><p>数字化不是大品牌的专利。从最简单的微信小程序点餐开始，逐步延伸到会员管理、数据分析和供应链优化。关键不是一步到位，而是迈出第一步并持续迭代。</p>'
-  },
-  {
-    id:'a3',tag:'热点',tagClass:'hot',
-    title:'劳动合同法修订解读：2026年中小企业用工新规',
-    excerpt:'2026年7月，人社部发布劳动合同法修订草案征求意见稿。本文对新规变化进行逐一解读，帮助企业HR和法务快速掌握要点...',
-    author:'法务小张',date:'2026-07-25',reads:4210,
-    body:'<h2>修订背景</h2><p>2026年7月15日，人力资源和社会保障部发布《劳动合同法（修订草案征求意见稿）》，这是自2008年劳动合同法实施以来最大规模的一次修订。此次修订聚焦新就业形态劳动者权益保障、灵活用工规范、竞业限制范围调整等社会关注热点。</p><h2>一、竞业限制范围收窄</h2><p>修订草案第24条明确：竞业限制仅适用于高级管理人员、高级技术人员和其他负有保密义务的人员。普通岗位员工不得设置竞业限制条款。这意味着大量此前被"泛竞业"困扰的普通员工将获得更大的职业自由。</p><h2>二、试用期工资标准上调</h2><p>试用期工资不得低于本单位相同岗位最低档工资的80%，且不低于用人单位所在地的最低工资标准的120%。这一调整对于一线城市的新入职员工尤为有利。</p><h2>三、灵活用工入法</h2><p>新规首次将平台用工、共享用工等新型用工形式纳入调整范围。平台企业需要为符合条件的灵活就业人员缴纳工伤保险，这是对零工经济从业者权益的重大保障。</p><h2>四、加班费计算基数明确</h2><p>加班费计算基数以劳动者本人正常工作时间的工资为准，包括基本工资、岗位工资、绩效工资等固定收入。奖金、津贴等浮动收入是否纳入由双方约定。</p><h2>五、经济补偿金上限调整</h2><p>经济补偿金的计算基数上限由原来的"本地区上年度职工月平均工资三倍"调整为"五倍"，显著提高了高薪员工被裁时的补偿标准。</p><blockquote>建议所有企业HR和法务部门尽快组织学习新规草案，提前做好合规准备。正式实施日期预计为2027年1月1日。</blockquote>'
-  },
-  {
-    id:'a4',tag:'原创',tagClass:'original',
-    title:'开一家烤鱼店的完整指南：从选址到盈利',
-    excerpt:'从0到1开一家烤鱼店需要做什么？选址秘诀、装修预算、设备清单、人员配置、营销方案...这份万字指南帮你全面避坑...',
-    author:'茶山老蔡',date:'2026-07-20',reads:5873,
-    body:'<h2>写在前面</h2><p>经常有朋友问我："蔡哥，我也想开一家烤鱼店，你觉得能做吗？"我的回答永远是：能做，但不是人人都适合。餐饮行业看似门槛低，实际上水很深。这份指南是我花了八年时间、踩了无数坑之后总结的经验，希望对你有帮助。</p><h2>第一步：自我评估</h2><p>开烤鱼店需要三个基本条件：一是至少30万的启动资金（以二线城市、100平米店面为例）；二是每天至少12小时的工作时间；三是有一定的烹饪基础或能管好厨师。三个条件缺任何一个，都建议慎重考虑。</p><h2>第二步：选址</h2><p>烤鱼店的选址有几个硬指标：<br>1）人流量：日均人流量不低于5000人次的临街商铺<br>2）竞争密度：半径一公里内同品类不超过3家<br>3）交通便利：有停车位或靠近地铁站<br>4）面积要求：80-150平米，需要有排烟条件</p><h2>第三步：装修与设备</h2><p>烤鱼店的装修投入建议控制在总预算的25%以内。核心设备包括：烤鱼炉（炭火/电烤）、排烟系统、冷藏冰柜、制冰机、厨房操作台。设备总投入约5-8万元。</p><h2>第四步：人员配置</h2><p>标准配置：主厨1名（月薪8000-12000）、帮厨1名（月薪5000-7000）、服务员2名（月薪4000-5000）、收银员1名（月薪4500-5500）。前三个月建议多配1名机动人员。</p><h2>第五步：盈利模型</h2><p>以二线城市100平米烤鱼店为例：月租金12000元、人工35000元、食材成本占营收35%、水电气5000元、其他3000元。客单价80元、日接待80桌左右即可实现月净利润3-5万元。</p><h2>最重要的忠告</h2><p>味道是根本，服务是关键，成本控制是生命线。这三条做到了，你的烤鱼店就有了活下去的基础。剩下的，就是坚持和运气了。</p>'
-  }
-];
+// ==================== 文章和法律数据 ====================
+var authorArticles = [];
+var dashShareTab = 'articles';
 
 var lawDocuments = [
   {id:'d1',icon:'📕',title:'中华人民共和国民法典',desc:'2021年1月1日起施行，共7编1260条',tag:'民事基本法',size:'10.2万字'},
@@ -1479,17 +1581,21 @@ function renderDashboard(){
   var h = '<div class="dash-grid">';
 
   // ===== 1. 新闻信息 =====
-  h += '<div class="dash-section"><div class="dash-section-header"><span class="dash-icon">📰</span><h2>新闻信息</h2><span class="dash-badge orange">14条</span><a class="dash-more" href="javascript:void(0)" onclick="event.stopPropagation();navigateTo(\'news\');history.pushState({view:\'news\'},\'\',\'#news\')">更多新闻 ></a></div><div class="dash-section-body dash-news">';
-  var newsSections = [
+  var totalNews = Object.keys(newsData).length;
+  h += '<div class="dash-section"><div class="dash-section-header"><span class="dash-icon">📰</span><h2>新闻信息</h2><span class="dash-badge orange">'+totalNews+'条</span><a class="dash-more" href="javascript:void(0)" onclick="event.stopPropagation();navigateTo(\'news\');history.pushState({view:\'news\'},\'\',\'#news\')">更多新闻 ></a></div><div class="dash-section-body dash-news">';
+  var sections = newsSections.length > 0 ? newsSections : [
     {title:'🔥 国内要闻',ids:[1,2,3,4,5]},
     {title:'💰 财经速递',ids:[6,7,8]},
     {title:'🌍 国际观察',ids:[9,10,11]},
     {title:'📋 社会民生',ids:[12,13,14]}
   ];
-  newsSections.forEach(function(s){
+  sections.forEach(function(s){
     h += '<div class="dash-news-cat">'+s.title+'</div><div class="dash-news-list">';
-    s.ids.forEach(function(id){
+    var maxShow = 5;
+    var showIds = s.ids.slice(0, maxShow);
+    showIds.forEach(function(id){
       var n = newsData[id];
+      if (!n) return;
       var brief = n.body.replace(/<[^>]*>/g,'').substring(0,45)+'...';
       h += '<div class="dash-news-row" onclick="event.stopPropagation();history.pushState({view:\'detail\',id:'+id+'},\'\',\'#detail-'+id+'\');navigateTo(\'detail\','+id+')">';
       h += '<span class="ncr-tag '+n.tagClass+'">'+n.tag+'</span>';
@@ -1497,6 +1603,9 @@ function renderDashboard(){
       h += '<span class="ncr-brief">'+brief+'</span>';
       h += '</div>';
     });
+    if (s.ids.length > maxShow) {
+      h += '<a class="dash-cat-more" href="javascript:void(0)" onclick="event.stopPropagation();navigateTo(\'news\');history.pushState({view:\'news\'},\'\',\'#news\')">更多 '+s.title+' ></a>';
+    }
     h += '</div>';
   });
   h += '</div></div>';
@@ -1548,19 +1657,29 @@ function renderDashShare(){
   var h = '';
   if (dashShareTab === 'articles') {
     h += '<div class="dash-article-list">';
-    authorArticles.forEach(function(a){
+    var maxShow = 5;
+    var showArticles = authorArticles.slice(0, maxShow);
+    showArticles.forEach(function(a){
       h += '<div class="dash-article-card" onclick="openArticle(\''+a.id+'\')">';
       h += '<span class="ac-tag '+a.tagClass+'">'+a.tag+'</span>';
       h += '<span class="ac-title">'+a.title+'</span>';
       h += '<span class="ac-date">'+a.date+'</span>';
       h += '</div>';
     });
+    if (authorArticles.length > maxShow) {
+      h += '<a class="dash-cat-more" href="javascript:void(0)" onclick="navigateTo(\'share\');history.pushState({view:\'share\'},\'\',\'#share\')">更多作者分享 ></a>';
+    }
     h += '</div>';
   } else {
     h += '<div class="dash-dl-list">';
-    lawDocuments.forEach(function(d){
+    var maxShow = 5;
+    var showDocs = lawDocuments.slice(0, maxShow);
+    showDocs.forEach(function(d){
       h += '<div class="dash-dl-item"><span class="dl-icon">'+d.icon+'</span><span class="dl-title">'+d.title+'</span><span class="dl-tag">'+d.tag+'</span><span class="dl-size">'+d.size+'</span><div class="dl-actions"><button class="dl-btn read" onclick="event.stopPropagation();viewLawDocument(\''+d.id+'\')">📖 阅读</button><button class="dl-btn share" onclick="event.stopPropagation();shareLawDocument(\''+d.id+'\')">📤 分享</button></div></div>';
     });
+    if (lawDocuments.length > maxShow) {
+      h += '<a class="dash-cat-more" href="javascript:void(0)" onclick="switchDashShareTab(\'downloads\');navigateTo(\'share\');history.pushState({view:\'share\'},\'\',\'#share\')">更多资料下载 ></a>';
+    }
     h += '</div>';
   }
   c.innerHTML = h;
@@ -1658,7 +1777,7 @@ function navigateTo(view, data){
   switch(view){
     case 'landing': var l = document.getElementById('landing'); l.style.display='flex'; l.classList.remove('hidden'); break;
     case 'dash': document.getElementById('dashPage').style.display='block'; updateUserUI(); document.getElementById('todayDate').textContent = todayCN(); renderDashboard(); break;
-    case 'news': document.getElementById('newsPage').style.display='block'; renderNewsPage(); break;
+    case 'news': document.getElementById('newsPage').style.display='block'; currentNewsDate=''; renderNewsPage(); break;
     case 'detail':
       var n = newsData[data]; if(!n) return;
       document.getElementById('detailContent').innerHTML = '<span class="detail-tag '+n.tagClass+'">'+n.tag+'</span><h1>'+n.title+'</h1><div class="detail-meta"><span>📅 '+n.date+'</span><span>📰 '+n.source+'</span></div><div class="detail-body">'+n.body+'</div><div class="detail-source">来源：'+n.source+'</div>';
@@ -1699,6 +1818,7 @@ window.addEventListener('popstate',function(event){
 
 // 初始化
 (async function init(){
+  await loadSiteData();
   loadDailyQuote();
   await checkSession();
   var hash = window.location.hash;
